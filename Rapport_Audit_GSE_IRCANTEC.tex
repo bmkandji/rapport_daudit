@@ -54,7 +54,6 @@
 
 % --------- PACKAGES FONCTIONNELS --------------------------------------------
 \usepackage{amsmath,amssymb}
-\usepackage{bm}
 \usepackage{graphicx}
 \usepackage{eurosym}
 \usepackage{textcomp}
@@ -97,7 +96,8 @@
 % \sffamily force Montserrat. Hiérarchie portée par la taille (pas de filet).
 \titleformat{\section}{\sffamily\Large\bfseries\color{nxnavy}}{\thesection.}{0.5em}{}
 \titleformat{\subsection}{\sffamily\large\bfseries\color{nxnavy}}{}{0em}{\thesubsection.~}
-\titleformat{\subsubsection}{\sffamily\normalsize\bfseries\color{nxnavy}}{}{0em}{\thesubsubsection.~}
+\titleformat{\subsubsection}
+{\sffamily\normalsize\bfseries\color{nxred}}{}{0em}{}
 
 % --------- TABLE DES MATIÈRES via etoc (charte v2) --------------------------
 % H1 rouge Nexialog, H2/H3 bleu navy, le tout en Montserrat, liens cliquables.
@@ -175,7 +175,7 @@
   enhanced, breakable,
   colback=nxoffwhite, frame hidden, boxrule=0pt, arc=3pt,
   fonttitle=\sffamily\bfseries\color{nxred},
-  title={Recommendation - Point d'attention},
+  title={Recommandation - Point d'attention},
   detach title, before upper={\tcbtitle\par\nobreak\medskip\nobreak},
   before skip=4mm, after skip=3mm,
   left=4mm, right=4mm, top=3mm, bottom=3mm
@@ -202,7 +202,6 @@
 
 % --------- COMMANDES & STYLES DE TABLEAUX (du document, restylés v2) --------
 \newcolumntype{P}[1]{>{\RaggedRight\arraybackslash}p{#1}}
-\newcolumntype{R}{>{\raggedright\arraybackslash}X}   % colonne X ragged (tableaux de paramètres)
 % Charte v2 : règles booktabs par défaut (noires), interligne de tableau 1.4
 % (cf. rapport_Audit_GSE_CDC_Phase1, skill nexialog-note-technique-latex).
 \renewcommand{\arraystretch}{1.4}
@@ -316,7 +315,7 @@ Valentin Erades - Consultant\par
 
 Ce rapport a été préparé par Nexialog Consulting pour l'usage exclusif de l'IRCANTEC et de la Caisse des Dépôts, dans les conditions définies par la lettre de mission référencée \ph{Affaire n° 20265040}. Il est confidentiel ; toute distribution à un tiers requiert l'accord écrit préalable de Nexialog Consulting.
 
-Nos travaux ont été conduits conformément aux pratiques actuarielles et quantitatives communément admises, sur la base des données, codes et documentations transmis par l'Ircantec et la Caisse des Dépôts, sans contrôle exhaustif de leur exactitude. La modification de certaines hypothèses ou données pourrait conduire à des résultats significativement différents de ceux présentés. Tout processus de calibrage embarque une erreur d'estimation traduisant l'incertitude sur les valeurs estimées des paramètres. Le choix final des paramètres retenus pour la sélection de l'allocation stratégique demeure de la responsabilité de l'Ircantec.
+\noindent Nos travaux ont été conduits conformément aux pratiques actuarielles et quantitatives communément admises, sur la base des données, codes et documentations transmis par l'Ircantec et la Caisse des Dépôts, sans contrôle exhaustif de leur exactitude. La modification de certaines hypothèses ou données pourrait conduire à des résultats significativement différents de ceux présentés. Tout processus de calibrage embarque une erreur d'estimation traduisant l'incertitude sur les valeurs estimées des paramètres. Le choix final des paramètres retenus pour la sélection de l'allocation stratégique demeure de la responsabilité de l'Ircantec.
 
 \clearpage
 % --------- TABLE DES MATIÈRES (charte v2) -----------------------------------
@@ -335,13 +334,13 @@ Nos travaux ont été conduits conformément aux pratiques actuarielles et quant
 
 \subsection{Contexte de la mission}
 
-L'IRCANTEC (Institution de Retraite Complémentaire des Agents Non Titulaires de l'État et des Collectivités publiques) est l'un des principaux régimes de retraite complémentaire par répartition provisionnée, géré par la Caisse des Dépôts (CDC). La sélection de l'allocation stratégique des réserves repose, depuis 2009, sur un modèle d'allocation d'actifs adossé à un Générateur de Scénarios Économiques (GSE) en univers monde réel, simulant par Monte-Carlo l'ensemble des facteurs de risque sur un horizon ALM long. À la suite des revues Mercer (2016) et Milliman (2022), le Pôle ALM \& Risques Financiers a engagé une refonte du modèle pour l'exercice d'allocation 2026 : prise en compte des corrélations taux réels et inflation dans le pricing des zéro-coupons nominaux, la migration du schéma de simulation du CIR de crédit, l'introduction d'un modèle log-Vasicek (Black-Karasinski) pour la dette privée, ajout des classes actions émergentes et infrastructure, et mise à jour complète des calibrages et de la matrice de corrélation.
+L'IRCANTEC (Institution de Retraite Complémentaire des Agents Non Titulaires de l'État et des Collectivités publiques) est l'un des principaux régimes de retraite complémentaire par répartition provisionnée, géré par la Caisse des Dépôts (CDC). La sélection de l'allocation stratégique des réserves repose, depuis 2009, sur un modèle d'allocation d'actifs adossé à un Générateur de Scénarios Économiques (GSE) en univers monde réel, simulant par Monte-Carlo l'ensemble des facteurs de risque sur un horizon ALM long. À la suite des revues Mercer (2016) et Milliman (2022), le Pôle ALM \& Risques Financiers a engagé une refonte du modèle pour l'exercice d'allocation 2026 : prise en compte des corrélations entre les taux réels et l'inflation dans le pricing des zéro-coupons nominaux, la migration du schéma de simulation du CIR de crédit, l'introduction d'un modèle log-Vasicek (Black-Karasinski) pour la dette privée, l'ajout des classes actions émergentes et infrastructure, et la mise à jour complète des calibrages et de la matrice de corrélation.
 
-L'Ircantec souhaite disposer d'un avis indépendant sur la pertinence des modèles, la qualité des calibrages et la robustesse du dispositif, ainsi que de propositions de remédiation le cas échéant.
+\noindent L'Ircantec souhaite disposer d'un avis indépendant sur la pertinence des modèles, la qualité des calibrages et la robustesse du dispositif, ainsi que de propositions de remédiation le cas échéant.
 
 \subsection{Architecture de l'audit en trois phases}
 
-Pour chaque section ou facteur de risque audité, la méthodologie s'articulera systématiquement autour des trois phases suivantes :
+Notre revue se concentre autour des trois phases suivantes :
 
 \begin{itemize}
     \item \textbf{Phase 1 : Revue exhaustive des évolutions depuis la dernière revue (2022).}
@@ -351,21 +350,24 @@ Pour chaque section ou facteur de risque audité, la méthodologie s'articulera 
     Analyse de l'adéquation entre la profondeur d'estimation des paramètres du générateur de scénarios économiques (qui est liée à la duration du passif) et l'horizon de projection des engagements de l'Ircantec.
 
     \item \textbf{Phase 3 : Audit du modèle et validation de la nouvelle calibration historique.}
-    Cette phase vient consolider les axes d'analyse technique suivants :
+    Cette phase se décline à travers les axes d'analyse technique suivants :
 
     \begin{enumerate}[label=\textbf{\color{nexred}Axe \arabic*.},leftmargin=2.6em]
-        \item \textbf{Vérification des Paramètres et de l’implémentation :} Rappel du modèle retenu par facteur de risque, des techniques de calibrage et de simulation, des données et de la fenêtre de calibrage (cf. \S\ref{sec:fenetre}). Cela consiste à : (i) vérifier l'\emph{exactitude analytique} des équations dérivées des modèles (calibrage, simulation, courbe des taux, corrélations) ; (ii) confirmer la \emph{conformité de l'implémentation} au regard de la technique documentée ; (iii) s'assurer que les \emph{paramètres obtenus par un run indépendant} sont identiques à ceux en production dans le modèle ALM.
+        \item \textbf{Vérification des Paramètres et de l’implémentation :} Rappel du modèle retenu par facteur de risque, des données, des techniques de calibrage et de simulation. Cela consiste à : (i) vérifier l'\emph{exactitude analytique} des équations dérivées des modèles (calibrage, simulation, courbe des taux, corrélations) ; (ii) confirmer la \emph{conformité de l'implémentation} au regard de la technique documentée ; (iii) s'assurer que les \emph{paramètres obtenus par un run indépendant} sont identiques à ceux en production dans le modèle ALM.
 
-        \item \textbf{Validation des modèles et des données.} Valider la nouvelle calibration historique des paramètres réalisée au sein de la DPS, de manière à ce que les trajectoires simulées reflètent au mieux le contexte de marché actuel en termes de rentabilité et de risque au regard d'un contexte de marchés financiers qui a évolué depuis 2022. Cet Axe inclut l'évaluation de la robustesse des modèles de diffusion, l'analyse de l'adéquation des indices proxy retenus pour le calibrage aux expositions réelles, ainsi que l'analyse des résidus pour vérifier les hypothèses de modélisation : normalité, indépendance et autocorrélation.
+        \item \textbf{Validation des modèles et des données.} Valider la nouvelle calibration historique des paramètres réalisée au sein de la DPS, pour garantir que les trajectoires simulées reflètent au mieux le contexte de marché actuel en termes de rentabilité et de risque au regard d'un contexte de marchés financiers qui a évolué depuis 2022. Cet axe inclut l'évaluation de la robustesse des modèles de diffusion, l'analyse de l'adéquation des indices proxy retenus pour le calibrage aux expositions réelles, ainsi que l'analyse des résidus pour vérifier les hypothèses de modélisation : normalité, indépendance et autocorrélation.
 
         \item \textbf{Points d'attention et alternatives.} Identification des limites et proposition de modèles et d'approches (calibrage, simulation) alternatifs, plus pertinents sur le plan économique et mathématique. Cette sous-partie permet de formuler des recommandations d'évolution au regard des travaux menés.
     \end{enumerate}
+    \item \textbf{Phase 4 : Validation du processus de sélection des allocations optimales.}
+    Évaluation du processus de sélection des allocations optimales et de la pertinence des critères retenus au regard des contraintes réglementaires de l’IRCANTEC.
+    
 \end{itemize}
 
 \subsection{Cartographie du GSE à date}
 \label{sec:carto}
 
-Le tableau ~\ref{tab:carto} presente l'inventaire des composantes du GSE, les modèle de diffusion, la technique de calibrage, le schéma / moteur de simulation et l'outil d'implémentation par facteur de risque. Il constitue le référentiel de la revue.
+Le tableau ~\ref{tab:carto} présente l'inventaire des composantes du GSE, les modèle de diffusion, la technique de calibrage, le schéma / moteur de simulation et l'outil d'implémentation par facteur de risque. Il constitue le référentiel de la revue.
 
 \begingroup\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.2}
 \begin{longtable}{>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{2.8cm}>{\raggedright\arraybackslash}p{2.7cm}>{\raggedright\arraybackslash}p{2.8cm}>{\raggedright\arraybackslash}p{2.1cm}}
@@ -379,17 +381,17 @@ Le tableau ~\ref{tab:carto} presente l'inventaire des composantes du GSE, les mo
 \endhead
 \bottomrule
 \endfoot
-\rowcolor{nxlightblue} Inflation (CT~/~LT) & Vasicek 2 facteurs & MCO + Cibles distributionnelles & Schéma exact V2F & R~/~MATLAB \\
+\rowcolor{nxlightblue} Inflation (CT~/~LT) & Vasicek 2 facteurs & cible COR + Cibles distributionnelles & Schéma exact V2F & R~/~MATLAB \\
 Taux réels (CT~/~LT) & Vasicek 2 facteurs & MCO + Cibles distributionnelles & Schéma exact V2F & R~/~MATLAB \\
-\rowcolor{nxlightblue} Courbe nominale (ZC) & Fisher + corrections de covariance & Hérité ; primes de risque & Formules fermées V2F & MATLAB \\
-Crédit (spread IG) & CIR & Régression ou max.\ vraisemblance & Schéma d'Euler, Alfonsi ou Diop, pas mensuel & MATLAB \\
-\rowcolor{nxlightblue} Dette privée (spread) & Black-Karasinski & Régression (log-spreads) & Schéma exact log-OU & Excel~/~MATLAB \\
-Prime de liquidité & Écart CDS~/~obligataire ; ajust.\ de $\theta$ & Calcul + dire d'expert & --- & Excel \\
+\rowcolor{nxlightblue} Courbe nominale (ZC) & Fisher + corrections de covariance & Param. hérités taux-inflation + primes de risque & Formules fermées V2F & MATLAB \\
+Crédit (spread IG) & CIR & {\small Schéma d'Euler puis Initialisation par OLS puis max.\ de vraisemblance ($\chi^2$ décentré)}. & Schéma d'Euler, Alfonsi ou Diop selon pas, pas mensuel (Alfonsi) & MATLAB \\
+\rowcolor{nxlightblue} Dette privée (spread) & Black-Karasinski & Régression (log-spreads) & Schéma exact log-OU & MATLAB \\
+Prime de liquidité & Écart CDS~/~obligataire ; ajust.\ de $\theta$ & Dire d'expert + Solveur d'implicitaion & --- & Excel~/~MATLAB \\
 \rowcolor{nxlightblue} Actions (Euro~/~Monde~/~Émergent) & Hardy RSLN-2 (2 régimes) & Maximum de vraisemblance & BS par régime, pas mensuel & R~/~MATLAB \\
-Action non cotée (PE) & BS (après \emph{unsmoothing}) & \emph{Unsmoothing} AR(1) + régression & BS, pas mensuel & Excel~/~MATLAB \\
-\rowcolor{nxlightblue} Immobilier & BS (après \emph{unsmoothing}) & \emph{Unsmoothing} AR(1) + régression & BS, pas mensuel & Excel~/~MATLAB \\
-Infrastructure & BS (après \emph{unsmoothing}) & \emph{Unsmoothing} AR(1) + régression & BS, pas mensuel & Excel~/~MATLAB \\
-\rowcolor{nxlightblue} Corrélations & Copule gaussienne ; passage cibles $\to$ browniens & Pearson + formules de passage & Cholesky & Python~/~MATLAB \\
+Action non cotée (PE) & BS (après \emph{unsmoothing}) & \emph{Unsmoothing} AR(1) + formule fermée & Loi normal iid & Excel~/~MATLAB \\
+\rowcolor{nxlightblue} Immobilier & BS (après \emph{unsmoothing}) & \emph{Unsmoothing} AR(1) + formule fermée & Loi normal iid & Excel~/~MATLAB \\
+Infrastructure & BS & Formule fermée & Loi normal iid & Excel~/~MATLAB \\
+\rowcolor{nxlightblue} Corrélations & Gaussienne ; passage cibles $\to$ browniens & Pearson + formules de passage & Cholesky & Python \\
 Moteur de simulation & Monte-Carlo (5\,000 traj., $dt=1/12$) & --- & Diffusion jointe corrélée & MATLAB \\
 \caption{Cartographie des composantes du GSE.}
 \label{tab:carto}
@@ -397,42 +399,36 @@ Moteur de simulation & Monte-Carlo (5\,000 traj., $dt=1/12$) & --- & Diffusion j
 \endgroup
 
 \clearpage
-\section{Phase 1 - Revue des évolutions du GSE depuis la revue Milliman (2022)}
+\section{Revue des évolutions du GSE}
 \label{sec:evolutions}
 
-La refonte du modèle d'allocation engagée pour l'exercice 2026 fait évoluer le GSE sur quatre dimensions : la \textbf{modélisation} de certains facteurs de risque, la \textbf{méthodologie} de calibrage et de simulation, la \textbf{structure de corrélation} et le \textbf{périmètre des classes d'actifs}. Cette section synthétise ces évolutions par rapport au dispositif documenté lors de la dernière revue Milliman (2022), en rappelle la formulation (formules comprises) et en apprécie la validité et la cohérence. Le détail facteur par facteur est repris en Phase~3 ; les renvois sont indiqués.
+La refonte du GSE engagée pour l'exercice 2026 depuis le derniere excercice d'allocation en 2022,  fait évoluer le GSE sur quatre dimensions : sur le changement de \textbf{modélisation} de certains facteurs de risque, de la \textbf{méthodologie} de calibrage et de simulation, la \textbf{structure de corrélation} et l'evolution du \textbf{périmètre des classes d'actifs}. Cette section synthétise ces évolutions par rapport au dispositif documenté lors de la dernière revue Milliman (2022), en rappelle la formulation (formules comprises) et en apprécie la validité et la cohérence. Le détail facteur par facteur est repris en Phase~3.
 
 \subsection{Synthèse des évolutions}
 
 \begingroup\small
-\begin{longtable}{P{3.0cm}P{4.3cm}P{4.7cm}P{2.0cm}}
+\begin{longtable}{P{3.0cm}P{4.0cm}P{5.5cm}P{1.75cm}}
 \toprule
-\tablehead{Composante} & \tablehead{Avant - revue Milliman (2022)} & \tablehead{Après - refonte 2026} & \tablehead{Nature} \\
+\tablehead{Composante} & \tablehead{Exercice (2022)} & \tablehead{Refonte 2026} & \tablehead{Nature} \\
 \midrule\endfirsthead
 \toprule
-\tablehead{Composante} & \tablehead{Avant - revue Milliman (2022)} & \tablehead{Après - refonte 2026} & \tablehead{Nature} \\
+\tablehead{Composante} & \tablehead{Exercice (2022)} & \tablehead{Refonte 2026} & \tablehead{Nature} \\
 \midrule\endhead
 \bottomrule\endfoot
 \multicolumn{4}{l}{\cellcolor{nxslate}\textcolor{white}{\sffamily\bfseries\small Modélisation des facteurs de risque}} \\
-{\small ZC nominaux - taux réel $\times$ inflation} & {\small Fisher avec hypothèse d'indépendance : $P^{nom}=P^{r\acute{e}el}P^{inf}$} & {\small Ajout d'un terme de covariance $\rho_{r,i}$ taux réel $\times$ inflation} & {\small Enrichis-sement} \\
-\rowcolor{nxlightblue}
-{\small ZC nominaux - taux court $\times$ long} & {\small Corrélation court / long supposée nulle} & {\small Nouveau facteur de covariance $\rho_{r,l}$ dans $\operatorname{Var}[\int r]$} & {\small Nouveau} \\
-{\small Dette privée (spread)} & {\small Diffusion par CIR ($\sqrt{s_t}$)} & {\small Black-Karasinski / log-Vasicek (positivité, vol.\ élevée)} & {\small Changement de modèle} \\
+{\small ZC nominaux - taux réel $\times$ inflation} & {\small Fisher avec hypothèse d'indépendance : $P^{nom}=P^{r\acute{e}el}P^{inf}$} & {\small Correction de correlation $\rho_{r,i}\,\sqrt{\operatorname{Var}\!\big[e^{-R_r(t,T)}\big]\operatorname{Var}\!\big[e^{-R_i(t,T)}\big]}$ taux réel $\times$ inflation} & {\small Enrichis-sement} \\
+{\small Dette privée (spread)} & {\small Diffusion par CIR ($\sqrt{s_t}$)} & {\small Black-Karasinski / log-Vasicek (cible de + vol.\ élevée)} & {\small Changement de modèle} \\
 \multicolumn{4}{l}{\cellcolor{nxslate}\textcolor{white}{\sffamily\bfseries\small Méthodologie - calibrage et simulation}} \\
 \rowcolor{nxlightblue}
-{\small Crédit IG - schéma CIR} & {\small Euler-Deelstra/Deelbaen (non positif)} & {\small Schéma positif : Euler-DIOP (réfléchi) / Alfonsi $E(0)$} & {\small Changement de schéma} \\
-{\small Crédit IG - calibrage} & {\small Régression d'Euler} & {\small Initialisation par régression puis max.\ de vraisemblance ($\chi^2$ décentré)} & {\small Renforce-ment} \\
-\rowcolor{nxlightblue}
-{\small Fenêtre \& données} & {\small Calibrage 2022 (fenêtre 20 ans)} & {\small Recalibrage complet au 31/12/2025 ; fenêtres 15 / 20 ans testées, 20 ans retenue} & {\small Mise à jour} \\
+{\small Crédit IG - schéma CIR (simulation)} & {\small Euler-Deelstra/Deelbaen (non ncessairement positif)} & {\small Schéma positif : Euler-DIOP ou Alfonsi} & {\small Changement de schéma} \\
 \multicolumn{4}{l}{\cellcolor{nxslate}\textcolor{white}{\sffamily\bfseries\small Structure de corrélation}} \\
-{\small Matrice de corrélation} & {\small Périmètre 2022 (hors dette privée et infrastructure)} & {\small Intégration dette privée et infrastructure ; matrice étendue (13 facteurs)} & {\small Extension} \\
 \rowcolor{nxlightblue}
 {\small Passage corrél.\ $\to$ browniens} & {\small Formules V2F, BS, CIR} & {\small Dérivation du couple BK (V2F$\times$BK, BS$\times$BK, CIR$\times$BK)} & {\small Nouveau} \\
 \multicolumn{4}{l}{\cellcolor{nxslate}\textcolor{white}{\sffamily\bfseries\small Nouvelles classes d'actifs}} \\
 {\small Actions émergentes} & {\small Absente} & {\small Hardy RSLN-2 (2 régimes)} & {\small Nouvelle classe} \\
 \rowcolor{nxlightblue}
-{\small Infrastructure} & {\small Absente} & {\small Black-Scholes après \emph{unsmoothing} AR(1)} & {\small Nouvelle classe} \\
-{\small Dette privée (classe)} & {\small Modélisée via le module crédit} & {\small Classe dédiée diffusée par Black-Karasinski} & {\small Nouvelle classe} \\
+{\small Infrastructure} & {\small Absente} & {\small Black-Scholes} & {\small Nouvelle classe} \\
+{\small Dette privée} & {\small Modélisée via le module composite crédit} & {\small Classe dédiée diffusée par Black-Karasinski} & {\small Nouvelle classe} \\
 \caption{Synthèse, ligne par ligne, des évolutions du GSE depuis la revue Milliman (2022).}
 \label{tab:evolutions}
 \end{longtable}
@@ -500,7 +496,7 @@ Les évolutions introduites depuis la revue Milliman (2022) sont \textbf{bien fo
 \end{insightbox}
 
 \clearpage
-\section{Phase 2 - Fenêtre de calibrage et profondeur d'estimation}
+\section{Fenêtre de calibrage et profondeur d'estimation}
 \label{sec:fenetre}
 
 Le GSE alimente des projections ALM dont l'horizon est de l'ordre de 30 ans. Deux profondeurs d'historique ont été testées (15 et 20 ans). Pour déterminé la profondeur d’historique nécessaire au calibrage des paramètres, on s’appuie sur la représentativité de l'historique considéré ainsi que sur l’horizon du passif.
@@ -542,7 +538,7 @@ Les produits financiers sont obtenus en appliquant le taux de rendement aux rés
 \right).
 \]
 
-Sous l'hypothèse d'un taux de rendement centrale de \(1{,}75\,\%\), l'écoulement économique des réserves est aujourd'hui estimé à environ 15 ans (voir Table \ref{tab:scenarios}). Pour rappel, les travaux d’allocation d’actifs réalisés en 2022 faisaient ressortir un horizon d’investissement estimé à 17 ans, avec l’apparition d’un déficit technique en 2039, soit 18 ans après la date de projection. Dans ce contexte, il n’était pas nécessaire de revoir l’horizon de calibrage des paramètres du modèle, alors fixé à 20 ans.
+\noindent Sous l'hypothèse d'un taux de rendement centrale de \(1{,}75\,\%\), l'écoulement économique des réserves est aujourd'hui estimé à environ 15 ans (voir Table \ref{tab:scenarios}). Pour rappel, les travaux d’allocation d’actifs réalisés en 2022 faisaient ressortir un horizon d’investissement estimé à 17 ans, avec l’apparition d’un déficit technique en 2039, soit 18 ans après la date de projection. Dans ce contexte, il n’était pas nécessaire de revoir l’horizon de calibrage des paramètres du modèle, alors fixé à 20 ans.
 \begin{table}[h!]
 
 \centering
@@ -618,32 +614,30 @@ Non &
 \label{tab:scenarios}
 \end{table}
 
-Néanmoins sous l'hypothèse d'un taux de rendement central de \(2{,}75\,\%\), l'horizon d'écoulement des réserves est de \(16{,}29\) années.
+\noindent Néanmoins sous l'hypothèse d'un taux de rendement central de \(2{,}75\,\%\), l'horizon d'écoulement des réserves est de \(16{,}29\) années.
 
-Le critère de l'horizon plébiscite donc toujours un choix d'horizon de calibrage de 20 ans, l'horizon étant de \(16{,}29\) ans dans le scénario médian du COR (rendement nominal de \(2{,}75\,\%\)).
+\noindent Le critère de l'horizon plébiscite donc toujours un choix d'horizon de calibrage de 20 ans, l'horizon étant de \(16{,}29\) ans dans le scénario médian du COR (rendement nominal de \(2{,}75\,\%\)).
 
-Le choix d’un horizon de calibration ne dépend toutefois pas uniquement de l’horizon économique du passif, mais également de la robustesse statistique des paramètres estimés ainsi que de l'environnement économique de la période de calibrage.
+\noindent Le choix d’un horizon de calibration ne dépend toutefois pas uniquement de l’horizon économique du passif, mais également de la robustesse statistique des paramètres estimés ainsi que de l'environnement économique de la période de calibrage.
 
 \subsubsection*{Environnement économique et fenêtre}
 
-La littérature actuarielle montre que la longueur des séries utilisées pour le calibrage est un élément structurant. Dans Stochastic Investment Models, A. D. Wilkie utilise des données couvrant la période 1919 à 1982, soit 63 ans de données annuelles. L’auteur souligne également qu’un calibrage réalisé sur une période de forte inflation conduit à projeter des dynamiques futures biaisées par ce régime inflationniste, et inversement, il en va de même pour d’autres variables économiques tel que les rendements des actions.
+\noindent La littérature actuarielle montre que la longueur des séries utilisées pour le calibrage est un élément structurant. Dans Stochastic Investment Models, A. D. Wilkie utilise des données couvrant la période 1919 à 1982, soit 63 ans de données annuelles. L’auteur souligne également qu’un calibrage réalisé sur une période de forte inflation conduit à projeter des dynamiques futures biaisées par ce régime inflationniste, et inversement, il en va de même pour d’autres variables économiques tel que les rendements des actions.
 
-Dans Modeling Financial Scenarios: A Framework for the Actuarial Profession, Kevin C. Ahlgrim s’appuie sur des données allant de 1913 à 2003, soit environ 90 observations annuelles. Cette approche vise à capter différents régimes économiques afin d’assurer une meilleure robustesse des paramètres estimés.
+\noindent Dans Modeling Financial Scenarios: A Framework for the Actuarial Profession, Kevin C. Ahlgrim s’appuie sur des données allant de 1913 à 2003, soit environ 90 observations annuelles. Cette approche vise à capter différents régimes économiques afin d’assurer une meilleure robustesse des paramètres estimés.
 
-La période 2005-2025 intègre des régimes de marché contrastés et plusieurs épisodes de stress (crise financière 2008-2009, crise des dettes souveraines 2011-2012, choc Covid 2020, remontée de l'inflation et des taux 2022-2023 cf Figure \ref{fig:cycle_eco_spread}), essentiels pour calibrer les volatilités, les régimes stressés des modèles actions et les corrélations en conditions de tension.
+\noindent La période 2005-2025 intègre des régimes de marché contrastés et plusieurs épisodes de stress (crise financière 2008-2009, crise des dettes souveraines 2011-2012, choc Covid 2020, remontée de l'inflation et des taux 2022-2023 cf Figure \ref{fig:cycle_eco_spread}), essentiels pour calibrer les volatilités, les régimes stressés des modèles actions et les corrélations en conditions de tension.
 
 \begin{figure}[h!]
     \centering
     \includegraphics[
-        width=\textwidth,
-        trim=1cm 12.5cm 0.1cm 1cm,
-        clip
-    ]{Graphique/PARTIE 1/Cycle ECO spread.pdf}
+        width=\textwidth
+    ]{Graphique/PARTIE 1/cycle eco.pdf}
     \caption{Cycle économique et principaux régimes de taux.}
     \label{fig:cycle_eco_spread}
 \end{figure}
 
-Une fenêtre de 20 ans englobe au moins deux cycles d'affaires complets (cycle de Juglar, d'une durée de 8 à 11 ans, lié à la dynamique de l'investissement).
+\noindent Une fenêtre de 20 ans englobe au moins deux cycles d'affaires complets (cycle de Juglar, d'une durée de 8 à 11 ans, lié à la dynamique de l'investissement).
 
 %ainsi qu'un \textbf{cycle financier moyen} (8 à 25 ans selon les indicateurs de cycle financier, p.~ex. ceux de la DG Trésor) ;
   %\item elle offre un nombre de points mensuels ($\sim$240) compatible avec le nombre de paramètres à estimer, là où une fenêtre de 15 ans réduit l'échantillon et peut exclure la crise de 2008-2009 pour les séries démarrant plus tard.
@@ -1130,7 +1124,7 @@ Les fragilités identifiées portent sur l'\emph{estimation} et le \emph{couplag
 
 \subsection{Seuil de tolérance}
 
-Dans le cadre de la réforme du régime de 2008, deux contraintes de solvabilité sont imposées lors de l'optimisation de l'allocation stratégique des actifs. Ces contraintes visent à garantir la robustesse financière du régime à moyen et long terme, avec un niveau de confiance de 95\,\%, voir \href{https://www.cor-retraites.fr/sites/default/files/2019-06/doc-2104.pdf}{\textcolor{nexnavy}{Les réserves en répartition et leur allocation stratégique : le cas de l’Ircantec (2013)}}.
+Dans le cadre de la réforme du régime de 2008, deux contraintes de solvabilité sont imposées lors de l'optimisation de l'allocation stratégique des actifs. Ces contraintes visent à garantir la robustesse financière du régime à moyen et long terme, avec un niveau de confiance de 95\,\%, voir \href{https://www.cor-retraites.fr/sites/default/files/2019-06/doc-2104.pdf}{\textcolor{nexnavy}{les réserves en répartition et leur allocation stratégique : le cas de l’Ircantec (2013)}}.
 
 \paragraph{Critère de solvabilité à 20 ans}
 
@@ -1182,9 +1176,14 @@ où :
 
 \subsection{Critère de Liquidité}
 
-Pour le critère de liquidité, il est proposé de s'appuyer sur le critère de pérennité, dont l'objectif est de garantir, à l'horizon de 20 ans, un niveau de réserves suffisant pour couvrir les prestations projetées sur 1,5 an.
+Le processus d’allocation stratégique de l’IRCANTEC ne prend pas explicitement en compte l’illiquidité des classes d’actifs dans les critères d’optimisation. Les contraintes d’illiquidité sont actuellement traitées au moyen de bornes d’allocation, qui définissent des limites minimales et maximales d’exposition aux actifs illiquides, tels que le non-coté et l’immobilier (cf. section~\ref{subsec:bornes_allocation}).
 
-L'approche consiste à définir une matrice de liquidité par classe d'actifs : 
+
+\subsubsection*{Proposition d'adaption du critère de précaution}
+
+\noindent Pour le critère de liquidité, il est proposé de s'appuyer sur le critère de pérennité, dont l'objectif est de garantir, à l'horizon de 20 ans, un niveau de réserves suffisant pour couvrir les prestations projetées sur 1,5 an.
+
+\noindent L'approche consiste à définir une matrice de liquidité par classe d'actifs : 
 
 \begin{table}[h!]
 \centering
@@ -1236,7 +1235,7 @@ La contrainte de liquidité s'écrit alors :
 \]
 
 \subsection{Bornes d'allocation}
-
+\label{subsec:bornes_allocation}
 À ce stade de l'étude, les bornes d'allocation retenues sont les suivantes :
 
 \begin{table}[H]
@@ -1257,7 +1256,7 @@ Supérieure & 24 & 18 & 10 & 6 & 24 & 22 & 14 & 4 \\
 \label{tab:bornes_allocation}
 \end{table}
 
-Les justifications de l'IRCANTEC quant à ces bornes sont les suivantes :
+\noindent Les justifications de l'IRCANTEC quant à ces bornes sont les suivantes :
 
 \begin{itemize}
     \renewcommand{\labelitemi}{\textbullet}
@@ -1267,9 +1266,35 @@ Les justifications de l'IRCANTEC quant à ces bornes sont les suivantes :
     \item Maximum 16\,\% d'actifs non liquides afin de limiter le risque de liquidité.
 \end{itemize}
 
-Au total, cela représente une exposition aux taux d'au moins 44\,\%, sans compter l'exposition aux actifs privés au sein de la poche non cotée.
+\noindent Au total, cela représente une exposition aux taux d'au moins 44\,\%, sans compter l'exposition à la dettes privés au sein de la poche non cotée.
 
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1\linewidth]{Graphique/PARTIE 1/allocation_reserves_ircantec_2025.pdf}
+    \label{fig:alloc strat}
+\end{figure}
 
+\begin{table}[H]
+\centering
+\caption{Évolution de l’allocation effective de l'IRCANTEC par classe d’actifs (2018–2025).}
+
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Classe d'actifs} & \textbf{2018} & \textbf{2021} & \textbf{2022} & \textbf{2023} & \textbf{2024} & \textbf{2025} \\
+\midrule
+Actions & 34,24\% & 42,71\% & 41,41\% & 40,76\% & 39,28\% & 45,77\% \\
+Obligations d'entreprises (crédit) & 19,98\% & 24,39\% & 21,89\% & 23,19\% & 23,51\% & 18,40\% \\
+Obligations souveraines nominales & 21,56\% & 6,78\% & 10,67\% & 11,15\% & 11,64\% & 9,74\% \\
+Obligations souveraines indexées (inflation) & 16,25\% & 18,61\% & 16,57\% & 16,49\% & 17,66\% & 18,49\% \\
+Immobilier (OPCI/OPPCI) & 6,33\% & 5,09\% & 6,26\% & 5,67\% & 5,34\% & 5,18\% \\
+Investissements d'impacts/Non côtés & 1,63\% & 2,43\% & 3,20\% & 2,74\% & 2,57\% & 2,43\% \\
+\midrule
+\textbf{Total (M€)} & \textbf{11 016,30} & \textbf{14 816,33} & \textbf{13 334,66} & \textbf{15 471,31} & \textbf{17 185,00} & \textbf{18 571,73} \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
 
 \subsection{Processus de sélection de l'allocation optimale revu}
 
@@ -1299,6 +1324,106 @@ Le processus de sélection des allocations optimales nous a été présenté. Ce
 
     \item Les réserves associées aux allocations restantes après application des filtres précédents sont classées par ordre croissant et les 15 meilleures allocations sont retenues.
 \end{enumerate}
+
+\section{Chocs de marché et tests de résilience}
+
+Le dispositif de stress du régime repose aujourd'hui sur des chocs de marché appliqués individuellement par classe d'actifs. Cette section examine deux axes d'amélioration : d'une part la sécurisation et l'évaluation d'un choc combiné agrégeant simultanément ces effets, d'autre part la déclinaison de ces chocs sur plusieurs exercices.
+
+\subsection{Choc combiné : sécurisation et évaluation}
+
+Le dispositif actuel calibre des chocs unitaires (choc action, choc de taux, choc de spread) appliqués séparément. Un choc combiné consiste à appliquer ces effets de façon simultanée, sur le modèle des paramètres retenus en 2022 : un choc actions de $-20\,\%$, une hausse des taux de $1\,\%$ appliquée aux obligations nominales via une sensibilité de $10$ et aux obligations indexées via une sensibilité de $8$, et un écartement du spread de crédit de $1\,\%$ via une sensibilité de $5$.
+
+\begin{definitionbox}
+La perte associée à chaque poche se déduit de l'exposition et de l'ampleur du choc. Pour les composantes de taux et de crédit, la perte relative s'écrit
+\[
+\Delta V \;=\; -\,S \times \Delta y,
+\]
+où $S$ désigne la sensibilité (duration modifiée) de la poche et $\Delta y$ la variation de taux ou de spread. Une hausse de $1\,\%$ avec une sensibilité de $10$ se traduit ainsi par une perte de $10\,\%$ sur la poche nominale.
+\end{definitionbox}
+
+\paragraph{Pourquoi le choc combiné est plus conservateur.} Appliqués simultanément, les chocs se cumulent sur des poches dont la diversification se réduit en période de tension, les corrélations tendant vers l'unité dans les épisodes de stress. Le choc combiné capture donc une perte supérieure à celle du pire choc unitaire pris isolément, ce qui en fait le scénario adverse de référence pertinent pour apprécier la solvabilité du régime.
+
+\paragraph{Traitement de l'immobilier non coté.} En l'absence de prix de marché continu, l'application d'un choc de marché par valorisation à dire de modèle est moins fidèle qu'un stress de liquidité : décote sur la valeur réalisable et délai de cession. Nous recommandons de retenir cette seconde lecture pour les poches non cotées.
+
+\begin{insightbox}[Avis Nexialog]
+Nous recommandons de formaliser le choc combiné comme scénario adverse de référence, avec des paramètres explicites et documentés (hausse de taux de $1\,\%$ déclinée par sensibilité de $10$ et $8$ sur les poches nominale et indexée, écartement de spread de $1\,\%$ via une sensibilité de $5$, choc actions de $-20\,\%$), puis d'en évaluer l'impact sur les ratios de pérennité et de précaution. Les poches non cotées sont traitées par un stress de liquidité plutôt que par un choc de marché.
+\end{insightbox}
+
+\subsection{Déclinaison pluriannuelle des chocs}
+
+Le choc combiné est actuellement instantané et appliqué en première année de projection. Un régime par répartition doté d'un horizon long reste pourtant exposé à un choc différé ou prolongé, dont la date d'occurrence influence l'effet sur la trajectoire de réserves.
+
+\paragraph{Enjeu.} Un choc unique en première année teste la résilience immédiate des réserves, mais non la sensibilité de leur trajectoire au moment du choc. Un choc survenant en année 2, 3 ou 4 frappe une réserve déjà entamée par le déficit démographique et croise différemment les critères de précaution à 20 ans et de pérennité à 30 ans. La trajectoire de réserves n'étant pas monotone, le point d'entrée du choc détermine son ampleur réelle.
+
+\begin{insightbox}[Avis Nexialog]
+Nous recommandons de compléter le choc instantané de première année par des chocs positionnés en années 2, 3 et 4, ainsi que par une variante de stress prolongé sur plusieurs exercices. Cette déclinaison révèle le point d'entrée le plus défavorable et évite de sous-estimer la vulnérabilité du régime en ne considérant qu'un choc immédiat.
+\end{insightbox}
+
+% =====================================================================
+% SECTION 2 : Recommandations et évolutions du dispositif
+% =====================================================================
+\section{Recommandations et évolutions du dispositif}
+
+Au-delà du diagnostic, plusieurs évolutions renforceraient la robustesse et l'auditabilité du dispositif. Cette section rassemble quatre recommandations : la modélisation du risque de change dans le GSE, la qualité et l'industrialisation du code, le backtesting des critères de solvabilité, et le traitement des rendements stressés.
+
+\subsection{Modélisation du risque de change dans le GSE}
+
+Le risque de change n'est pas modélisé dans le GSE actuel, alors que le portefeuille porte une exposition libellée hors euro, notamment sur la poche actions, et qu'une couverture de change partielle est déjà en place.
+
+\paragraph{Analyse.} En l'absence de facteur de change, les rendements projetés des actifs hors euro supposent implicitement un taux de change constant ou diluent le change dans la volatilité propre de l'actif, ce qui biaise la mesure de risque et interdit toute appréciation cohérente de la politique de couverture. Introduire un processus de change, taux de change stochastique corrélé aux facteurs de taux et d'actions déjà présents, ferme la boucle avec l'avis transverse sur la couverture de change : on ne peut se prononcer sur la calibration de la couverture sans que le GSE produise des scénarios de change.
+
+\begin{mabox}[Recommandation : facteur de change]
+Introduire la modélisation du change dans le GSE, au moins pour les principales devises de la poche actions, via un processus stochastique corrélé aux facteurs de taux et d'actions existants. Ce facteur est le préalable à la quantification de la couverture et à l'alimentation de l'avis transverse.
+\end{mabox}
+
+\subsection{Qualité et industrialisation du code}
+
+L'audit du code supportant le GSE fait apparaître trois points d'amélioration : l'absence de documentation, des marges d'optimisation, et surtout une hétérogénéité des outils porteuse de risque opérationnel.
+
+\paragraph{Documentation.} Un code non documenté constitue un risque de dépendance à l'homme clé et un frein à l'auditabilité. Nous recommandons de documenter les hypothèses, les paramètres et la chaîne de calibration, par une note technique versionnée et des commentaires en ligne, afin de garantir la reproductibilité des résultats.
+
+\paragraph{Optimisation.} Nous recommandons de profiler la chaîne de calcul, de vectoriser les boucles de simulation Monte Carlo et de rationaliser la structure du code, afin de réduire les temps d'exécution et de faciliter la multiplication des scénarios qu'appellent les chocs pluriannuels décrits plus haut.
+
+\paragraph{Harmonisation et risque opérationnel.} La chaîne actuelle mobilise plusieurs environnements : R, Matlab et Excel pour le calibrage, et Python pour la corrélation. Cette cohabitation est une source de risque opérationnel : transferts manuels de données entre outils, ruptures de format, absence de chaîne reproductible de bout en bout, et dépendance à des licences propriétaires comme à des compétences hétérogènes. Excel se prête en outre mal à l'audit et au versionnage. Cette dispersion fragilise la reproductibilité des résultats et la traçabilité de la chaîne de calibration.
+
+\begin{insightbox}[Avis Nexialog]
+Nous recommandons de faire converger le calibrage et le calcul des corrélations vers un langage unique (Python ou R), afin de réduire le risque opérationnel d'interface entre outils, de sécuriser une chaîne reproductible de bout en bout, et de faciliter la maintenance comme le transfert de compétence. À défaut d'une convergence complète à court terme, isoler en priorité les traitements Excel, les moins auditables.
+\end{insightbox}
+
+\subsection{Backtesting des critères de solvabilité}
+
+Les critères de solvabilité du régime, pérennité et précaution, sont aujourd'hui évalués de façon prospective, sur la base des projections du modèle.
+
+\paragraph{Analyse.} Une évaluation prospective ne renseigne pas sur le comportement historique du dispositif. Un backtesting mensuel, rejouant les critères sur données réalisées de marché et de démographie, teste la robustesse historique du dispositif et met en évidence les périodes où les critères auraient été franchis, ce qui calibre la confiance accordée au signal prospectif.
+
+\begin{insightbox}[Avis Nexialog]
+Nous recommandons de mettre en place un backtesting mensuel des critères de pérennité et de précaution, rejouant ces critères sur données historiques, en complément des projections prospectives.
+\end{insightbox}
+
+\subsection{Rendements stressés et moyenne géométrique}
+
+Les rendements sont aujourd'hui agrégés par une moyenne arithmétique. Le choix de la moyenne est pourtant structurant pour la projection de l'accumulation des réserves sur l'horizon long du régime.
+
+\paragraph{Le biais de la moyenne arithmétique.} La moyenne arithmétique surestime la croissance effectivement capitalisée sur longue période, en raison du frein de volatilité (volatility drag). C'est la moyenne géométrique qui reflète l'accumulation réelle.
+
+\begin{definitionbox}
+La moyenne géométrique $g$ se relie à la moyenne arithmétique $\mu$ et à la variance $\sigma^2$ des rendements par l'approximation
+\[
+g \;\approx\; \mu - \tfrac{1}{2}\,\sigma^2 .
+\]
+L'écart entre les deux moyennes croît donc avec la volatilité : plus les rendements sont dispersés, plus la moyenne arithmétique s'éloigne de l'accumulation réelle.
+\end{definitionbox}
+
+\begin{exemplebox}[Exemple chiffré : frein de volatilité]
+Deux scénarios de rendement à $+20\,\%$ et $-20\,\%$ donnent une moyenne arithmétique de $0\,\%$, mais une performance composée de $1{,}20 \times 0{,}80 = 0{,}96$, soit une perte de $4\,\%$ sur la période. La moyenne géométrique, négative, rend compte de cette érosion que la moyenne arithmétique masque.
+\end{exemplebox}
+
+\paragraph{Portée.} Ce point prolonge directement l'avis sur le rendement long terme : le rendement actions de l'ordre de $9\,\%$ issu de la calibration historique est en partie un artefact arithmétique, qu'une lecture en moyenne géométrique corrige.
+
+\begin{insightbox}[Avis Nexialog]
+Nous recommandons d'ajouter une dimension de stress sur les rendements et de retenir la moyenne du scénario stressé, puis de privilégier la moyenne géométrique pour la projection de l'accumulation des réserves sur l'horizon du régime.
+\end{insightbox}
+
 \section{Modèle ALM}
 
 \subsection{Scénarios de passif disponibles}
