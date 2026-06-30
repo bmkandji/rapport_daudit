@@ -337,15 +337,28 @@ L'IRCANTEC (Institution de Retraite Complémentaire des Agents Non Titulaires de
 
 L'Ircantec souhaite disposer d'un avis indépendant sur la pertinence des modèles, la qualité des calibrages et la robustesse du dispositif, ainsi que de propositions de remédiation le cas échéant.
 
-\subsection{Architecture de l'audit en trois Axes}
+\subsection{Architecture de l'audit en trois phases}
 
-Pour chaque classe d'actif (\emph{y compris} les facteurs nouvellement introduits, la prime de liquidité, la matrice de corrélation et le moteur de simulation), notre revue se concentre en trois axes d'audit:
+Pour chaque section ou facteur de risque audité, la méthodologie s'articulera systématiquement autour des trois phases suivantes :
 
-\begin{enumerate}[label=\textbf{\color{nexred}Axe \arabic*.},leftmargin=2.6em]
-  \item \textbf{Vérification des Paramètres et de l’implémentation :} Rappel du modèle retenu par facteur de risque, des techniques de calibrage et de simulation, des données et de la fenêtre de calibrage (cf. \S\ref{sec:fenetre}). Le consiste à : (i) vérifier l'\emph{exactitude analytique} des équations dérivées des modèles (calibrage, simulation, courbe des taux, corrélations) ; (ii) confirmer la \emph{conformité de l'implémentation} au regard de la technique documentée ; (iii) s'assurer que les \emph{paramètres obtenus par un run indépendant} sont identiques à ceux en production dans le modèle ALM.
-  \item \textbf{Validation des modèles et des données.} Analyser l'adéquation des indices proxy retenue pour le calibrage aux expositions réelles. Analyse des résidus pour vérifier les hypothèse de modélisation :normalité, indépendance et autocorrection.
-  \item \textbf{Points d'attention et alternatives.} Identification des limites et proposition de modèles et d'approches (calibrage, simulation) alternatifs, plus pertinents sur le plan économique et mathématique.
-\end{enumerate}
+\begin{itemize}
+    \item \textbf{Phase 1 : Revue exhaustive des évolutions depuis la dernière revue (2022).}
+    Audit détaillé des méthodologies d'évolution du modèle ALM réalisées en interne au sein de la Direction des Politiques Sociales (DPS) depuis 2022. Réajustement, si nécessaire, des choix opérés lors de ces récentes évolutions pour garantir leur pertinence.
+
+    \item \textbf{Phase 2 : Évaluation de la cohérence de la profondeur d'estimation.}
+    Analyse de l'adéquation entre la profondeur d'estimation des paramètres du générateur de scénarios économiques (qui est liée à la duration du passif) et l'horizon de projection des engagements de l'Ircantec.
+
+    \item \textbf{Phase 3 : Audit du modèle et validation de la nouvelle calibration historique.}
+    Cette phase vient consolider les axes d'analyse technique suivants :
+
+    \begin{enumerate}[label=\textbf{\color{nexred}Axe \arabic*.},leftmargin=2.6em]
+        \item \textbf{Vérification des Paramètres et de l’implémentation :} Rappel du modèle retenu par facteur de risque, des techniques de calibrage et de simulation, des données et de la fenêtre de calibrage (cf. \S\ref{sec:fenetre}). Cela consiste à : (i) vérifier l'\emph{exactitude analytique} des équations dérivées des modèles (calibrage, simulation, courbe des taux, corrélations) ; (ii) confirmer la \emph{conformité de l'implémentation} au regard de la technique documentée ; (iii) s'assurer que les \emph{paramètres obtenus par un run indépendant} sont identiques à ceux en production dans le modèle ALM.
+
+        \item \textbf{Validation des modèles et des données.} Valider la nouvelle calibration historique des paramètres réalisée au sein de la DPS, de manière à ce que les trajectoires simulées reflètent au mieux le contexte de marché actuel en termes de rentabilité et de risque au regard d'un contexte de marchés financiers qui a évolué depuis 2022. Cet Axe inclut l'évaluation de la robustesse des modèles de diffusion, l'analyse de l'adéquation des indices proxy retenus pour le calibrage aux expositions réelles, ainsi que l'analyse des résidus pour vérifier les hypothèses de modélisation : normalité, indépendance et autocorrélation.
+
+        \item \textbf{Points d'attention et alternatives.} Identification des limites et proposition de modèles et d'approches (calibrage, simulation) alternatifs, plus pertinents sur le plan économique et mathématique. Cette sous-partie permet de formuler des recommandations d'évolution au regard des travaux menés.
+    \end{enumerate}
+\end{itemize}
 
 \subsection{Cartographie du GSE à date}
 \label{sec:carto}
