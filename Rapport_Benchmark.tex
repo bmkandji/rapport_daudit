@@ -1,0 +1,442 @@
+% ============================================================================
+%  RAPPORT DE BENCHMARK DE CALIBRAGE — MISSION D'AUDIT GSE
+%  Genere automatiquement par audit_mission/benchmark/report.py
+%  Compilation : pdflatex (x2) ou latexmk -pdf   (depuis audit_mission/)
+% ============================================================================
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\frenchspacing
+\providecommand{\og}{\guillemotleft~}
+\providecommand{\fg}{~\guillemotright}
+\usepackage[a4paper,margin=2cm,headheight=30pt,headsep=18pt,footskip=28pt]{geometry}
+\usepackage{setspace}\setstretch{1.08}
+\setlength{\parindent}{0pt}\setlength{\parskip}{5pt}
+\usepackage{xcolor,colortbl}
+\definecolor{nexred}{HTML}{C8102E}
+\definecolor{nexnavy}{HTML}{14213D}
+\definecolor{nexgrey}{HTML}{808080}
+\definecolor{nexlight}{HTML}{F2F4F8}
+\definecolor{nexgreen}{HTML}{1E7B4F}
+\definecolor{tabborder}{HTML}{BFC5D2}
+\usepackage{booktabs,tabularx,array,float,graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{caption}
+\usepackage{longtable,multirow}
+\usepackage{ragged2e,enumitem}
+\setlist[itemize]{label=--, leftmargin=1.2em, itemsep=2pt, topsep=3pt}
+\usepackage{fancyhdr,lastpage}
+\usepackage{titlesec}
+\usepackage[most]{tcolorbox}
+\usepackage[hidelinks]{hyperref}
+\titleformat{\section}{\LARGE\bfseries\color{nexnavy}}{\thesection.}{0.6em}{}
+  [{\color{nexred}\titlerule[1.4pt]}]
+\titleformat{\subsection}{\large\bfseries\color{nexnavy}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{nexred}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{18pt}{10pt}
+\titlespacing*{\subsection}{0pt}{14pt}{6pt}
+\fancypagestyle{nexialog}{%
+  \fancyhf{}
+  \fancyhead[L]{\small\textbf{\textcolor{nexred}{NEXIALOG}\,\textcolor{nexnavy}{CONSULTING}}}
+  \fancyhead[R]{\small\textcolor{nexgrey}{Benchmark de calibrage GSE \,|\, Confidentiel}}
+  \fancyfoot[L]{\footnotesize\textcolor{nexgrey}{\copyright~Nexialog Consulting}}
+  \fancyfoot[R]{\footnotesize Page \thepage~/~\pageref{LastPage}}
+  \renewcommand{\headrulewidth}{1.2pt}
+  \renewcommand{\headrule}{\color{nexred}\hrule width\headwidth height\headrulewidth}
+  \renewcommand{\footrulewidth}{0.4pt}}
+\pagestyle{nexialog}
+\newcolumntype{P}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+\arrayrulecolor{tabborder}
+\renewcommand{\arraystretch}{1.35}
+\newcommand{\thead}[1]{\textcolor{white}{\textbf{\small #1}}}
+\newcommand{\tabcaption}[1]{\par\vspace{2pt}{\centering\footnotesize\textcolor{nexgrey}{\itshape #1}\par}\vspace{8pt}}
+\newtcolorbox{findingbox}[1]{breakable, colback=nexlight, colframe=nexred,
+  boxrule=0.8pt, left=8pt, right=8pt, top=6pt, bottom=6pt, arc=2pt,
+  fonttitle=\bfseries\color{white}, coltitle=white, title={#1}}
+\begin{document}
+
+
+\begin{titlepage}
+  \thispagestyle{empty}
+  \vspace*{2.0cm}
+  {\large\bfseries\color{nexred} RAPPORT DE BENCHMARK DE CALIBRAGE\par}
+  \vspace{0.4cm}
+  {\setstretch{1.15}\Huge\bfseries\color{nexnavy}
+   Confrontation ind\'ependante du calibrage du G\'en\'erateur de Sc\'enarios
+   \'Economiques : notre outil vs param\`etres en production\par}
+  \vspace{0.6cm}
+  {\large\color{nexgrey} Mission d'audit GSE --- P\^ole Risques Financiers \& Actuariat\par}
+  \vspace{0.4cm}
+  {\normalsize\color{nexnavy}\itshape Exercice d'allocation 2026 --- param\`etres GSE arr\^et\'es au 31/12/2025\par}
+  \vspace{1.0cm}{\color{nexred}\hrule height 1.6pt}\vspace{0.5cm}
+  Fen\^etre et pas : \textbf{variables selon le facteur} (d\'etaill\'es en t\^ete de chaque section).\par
+  Param\`etres en production confront\'es : millésime 2026 (20 ans).\par
+  \vfill
+\end{titlepage}
+\tableofcontents
+\clearpage
+
+\section{Objet et p\'erim\`etre}
+Ce rapport restitue, facteur de risque par facteur de risque, la confrontation
+entre (i) le calibrage obtenu avec \textbf{notre propre outil}
+(\texttt{gse\_engine.ahlgrim}) sur les donn\'ees de calibrage fournies, et (ii)
+les \textbf{param\`etres d\'ej\`a calibr\'es} transmis par le client (classeur
+\texttt{Parametres\_models.xlsx}, mill\'esime 2026). Pour
+chaque facteur sont pr\'esent\'es : un tableau de comparaison des param\`etres,
+un tableau de comparaison des m\'etriques de validation, et les figures de
+diagnostic (QQ-plot et autocorr\'elogramme des r\'esidus standardis\'es).
+
+\subsection{D\'emarche}
+\begin{itemize}
+  \item \textbf{Calibrage (notre outil)} : chaque mod\`ele du moteur est
+        calibr\'e sur les donn\'ees fournies, sur la fen\^etre et le pas \textbf{propres \`a chaque facteur} (cf. sections).
+        En sortent les param\`etres et les r\'esidus.
+  \item \textbf{Param\`etres en production} : les param\`etres du classeur sont
+        inject\'es dans le m\^eme moteur ; les r\'esidus sont recalcul\'es sur les
+        m\^emes donn\'ees, puis les m\'etriques et figures.
+  \item \textbf{M\'etriques} : $R^2$ et $R^2$ ajust\'e, Shapiro-Wilk et
+        Jarque-Bera (normalit\'e), Ljung-Box et ACF (autocorr\'elation). Les
+        r\'esidus standardis\'es sont $(\varepsilon-\bar\varepsilon)/s_\varepsilon$ ;
+        les tests de normalit\'e et d'autocorr\'elation \'etant invariants
+        d'\'echelle, les conclusions ne d\'ependent pas de l'\'echelle du $\sigma$ (donc
+        de la coquille de facteur 10, constat U-1).
+\end{itemize}
+
+\subsection{Correspondance mod\`eles / donn\'ees}
+\begin{itemize}
+  \item Inflation, taux r\'eels : Vasicek \`a deux facteurs (donn\'ees \og rate \fg, niveaux) ;
+  \item Cr\'edit IG : CIR (\og rate \fg) ; dette priv\'ee : Black-Karasinski / log-OU
+        (s\'erie d\'ej\`a en $100\log$, OU direct) ;
+  \item Actions cot\'ees (Euro, Monde, \'Emergent) : Hardy RSLN-2 (donn\'ees \og brutes \fg, log-rendements) ;
+  \item Actions non cot\'ees, immobilier, infrastructure : Black-Scholes apr\`es
+        \emph{unsmoothing} AR(1) (donn\'ees \og brutes \fg).
+\end{itemize}
+
+\subsection{Constats transverses de calibrage}
+\begin{findingbox}{Constat U-1 --- Coquille de facteur 10 sur les volatilit\'es (identifi\'ee puis corrig\'ee \`a la source)}
+\textbf{Anomalie identifi\'ee, puis corrig\'ee par le client.} Les volatilit\'es
+du classeur pour les mod\`eles sur log-rendements (Hardy, Black-Scholes) et pour
+l'OU sur log-spread (dette priv\'ee) \'etaient initialement \textbf{amput\'ees
+d'un facteur 10} par rapport \`a l'unit\'e du moteur (\'etat $z=100\log$). La
+preuve \'etait exacte sur le Private Equity : notre s\'erie deslissée donne une
+volatilit\'e post-unsmoothing de $29{,}70$ alors que le classeur indiquait
+$2{,}970$. \textbf{La coquille a \'et\'e corrig\'ee directement dans le classeur
+source} (\texttt{Parametres\_models.xlsx}) ; le pr\'esent benchmark utilise le
+classeur corrig\'e et \textbf{le code n'applique aucune correction}
+($\sigma$ pris tel quel). \textbf{V\'erification a posteriori} : apr\`es
+correction, le recalibrage co\"incide avec la production \`a $\sim$1--2\,\%
+pr\`es (ex. actions Euro $\sigma_1$ : $21{,}48$ vs $21{,}76$ ; infrastructure
+$\sigma$ : $13{,}38$ vs $13{,}50$).
+
+\textbf{Périm\`etre.} La coquille ne concernait que les volatilit\'es sur
+log-rendements / log-spread. La volatilit\'e du CIR cr\'edit ($0{,}517$)
+co\"incide d\'ej\`a avec notre recalibrage ($0{,}534$) : exprim\'ee sur
+l'\'echelle de diffusion du spread ($\sigma\sqrt{s}$), elle n'\'etait pas
+concern\'ee (un facteur 10 y donnerait une dispersion aberrante). Les
+volatilit\'es V2F (taux, inflation) rel\`event d'une diff\'erence
+m\'ethodologique distincte (constat M-1).
+\end{findingbox}
+\begin{findingbox}{Constat M-1 --- M\'ethodologie V2F (taux / inflation)}
+Notre outil calibre le V2F par \textbf{maximum de vraisemblance} ; la production
+calibre par \textbf{cibles distributionnelles}. Les vitesses de retour
+($\kappa$) et la moyenne long terme sont proches ; les volatilit\'es
+diff\`erent sensiblement par construction (volatilit\'e d'innovation MV vs
+volatilit\'e stationnaire cible). La comparaison des r\'esidus reste valide
+(la pr\'ediction conditionnelle ne d\'epend que des $\kappa$ et de $\mu_l$).
+\end{findingbox}
+\begin{findingbox}{Constat D-1 --- Dérive immobilier (rendement total vs prix)}
+La d\'erive $\mu$ immobilier en production int\`egre le r\'einvestissement des
+loyers (rendement total), alors que la s\'erie fournie est un indice de prix.
+L'\'ecart de $\mu$ est donc attendu et ne traduit pas une erreur de calibrage.
+\end{findingbox}
+
+\clearpage
+\section{Synth\`ese}
+Le tableau ci-dessous r\'esume, pour chaque facteur, le nombre d'observations,
+le $R^2$ (notre outil / production), la p-value de Shapiro-Wilk et le verdict
+d'ind\'ependance (Ljung-Box, seuil 5\,\%).
+\input{benchmark_output/tables/synthese.tex}
+\tabcaption{Synth\`ese du benchmark de calibrage (notre outil vs production 2026).}
+\clearpage
+
+\section{Inflation (Vasicek 2 facteurs)}
+\subsection{Mod\`ele et donn\'ees}
+\textbf{Mod\`ele :} Vasicek à deux facteurs (V2F).
+\begin{equation*}
+dq^s_t=\kappa_1(q^l_t-q^s_t)\,dt+\sigma_1\,dW^1_t,\qquad dq^l_t=\kappa_2(\mu_l-q^l_t)\,dt+\sigma_2\,dW^2_t
+\end{equation*}
+\textbf{Fen\^etre / pas :} 31/12/2005 -- 31/12/2025 \`a pas mensuel ($\delta=1/12$).
+\textbf{Donn\'ees :} Inflation point mort (BEIR) 2 ans (facteur court) et 10 ans (facteur long latent), à pas mensuel.
+\textbf{Note de calibrage :} Notre outil calibre le V2F par maximum de vraisemblance exact (discrétisation OU bivariée). Le dispositif en production calibre par cibles distributionnelles (volatilité des variations, corrélation inter-maturités, écart-type des taux) : les volatilités diffèrent donc par construction méthodologique. La corrélation $\rho$ des browniens est fixée à 0 en production (remédiation), retenue ici pour le recalcul des résidus.
+\subsection{Comparaison des param\`etres}
+\input{benchmark_output/tables/inflation_params.tex}
+\tabcaption{Param\`etres calibr\'es : notre outil vs production 2026 --- Inflation (Vasicek 2 facteurs).}
+\subsection{M\'etriques de validation}
+\input{benchmark_output/tables/inflation_metrics.tex}
+\tabcaption{M\'etriques de validation des r\'esidus --- Inflation (Vasicek 2 facteurs).}
+\subsection{Figures de diagnostic}
+\begin{figure}[H]\centering
+\includegraphics[width=\linewidth]{benchmark_output/figures/inflation_qq.pdf}
+\caption*{\footnotesize\itshape QQ-plot des r\'esidus standardis\'es vs loi normale --- Inflation (Vasicek 2 facteurs) (gauche : notre outil ; droite : production).}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=\linewidth]{benchmark_output/figures/inflation_acf.pdf}
+\caption*{\footnotesize\itshape Autocorr\'elogramme (ACF) des r\'esidus (retards successifs, bande IC 95\,\%) --- Inflation (Vasicek 2 facteurs).}
+\end{figure}
+\clearpage
+\section{Taux reels (Vasicek 2 facteurs)}
+\subsection{Mod\`ele et donn\'ees}
+\textbf{Mod\`ele :} Vasicek à deux facteurs (V2F).
+\begin{equation*}
+dr_t=\kappa_1(l_t-r_t)\,dt+\sigma_1\,dW^1_t,\qquad dl_t=\kappa_2(\mu-l_t)\,dt+\sigma_2\,dW^2_t
+\end{equation*}
+\textbf{Fen\^etre / pas :} 31/12/2005 -- 31/12/2025 \`a pas mensuel ($\delta=1/12$).
+\textbf{Donn\'ees :} Taux réels 2 ans et 10 ans (reconstruits par Fisher), pas mensuel.
+\textbf{Note de calibrage :} Mêmes remarques méthodologiques que pour l'inflation (MV vs cibles distributionnelles, $\rho=0$).
+\subsection{Comparaison des param\`etres}
+\input{benchmark_output/tables/real_rate_params.tex}
+\tabcaption{Param\`etres calibr\'es : notre outil vs production 2026 --- Taux reels (Vasicek 2 facteurs).}
+\subsection{M\'etriques de validation}
+\input{benchmark_output/tables/real_rate_metrics.tex}
+\tabcaption{M\'etriques de validation des r\'esidus --- Taux reels (Vasicek 2 facteurs).}
+\subsection{Figures de diagnostic}
+\begin{figure}[H]\centering
+\includegraphics[width=\linewidth]{benchmark_output/figures/real_rate_qq.pdf}
+\caption*{\footnotesize\itshape QQ-plot des r\'esidus standardis\'es vs loi normale --- Taux reels (Vasicek 2 facteurs) (gauche : notre outil ; droite : production).}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=\linewidth]{benchmark_output/figures/real_rate_acf.pdf}
+\caption*{\footnotesize\itshape Autocorr\'elogramme (ACF) des r\'esidus (retards successifs, bande IC 95\,\%) --- Taux reels (Vasicek 2 facteurs).}
+\end{figure}
+\clearpage
+\section{Credit - spread IG (CIR)}
+\subsection{Mod\`ele et donn\'ees}
+\textbf{Mod\`ele :} Cox-Ingersoll-Ross (CIR), schéma d'Alfonsi.
+\begin{equation*}
+ds_t=\kappa(\theta-s_t)\,dt+\sigma\sqrt{s_t}\,dW_t
+\end{equation*}
+\textbf{Fen\^etre / pas :} 31/12/2005 -- 31/12/2025 \`a pas mensuel ($\delta=1/12$).
+\textbf{Donn\'ees :} Spread Investment Grade bucket 5--7 ans, pas mensuel.
+\textbf{Note de calibrage :} Calibrage par maximum de vraisemblance sur la pseudo-vraisemblance gaussienne d'Alfonsi. Les résidus sont standardisés par la volatilité conditionnelle $\sigma\sqrt{s_{t-1}\delta}$. La condition de Feller $2\kappa\theta\geq\sigma^2$ est contrôlée.
+\subsection{Comparaison des param\`etres}
+\input{benchmark_output/tables/credit_params.tex}
+\tabcaption{Param\`etres calibr\'es : notre outil vs production 2026 --- Credit - spread IG (CIR).}
+\subsection{M\'etriques de validation}
+\input{benchmark_output/tables/credit_metrics.tex}
+\tabcaption{M\'etriques de validation des r\'esidus --- Credit - spread IG (CIR).}
+\subsection{Figures de diagnostic}
+\begin{figure}[H]\centering
+\includegraphics[width=\linewidth]{benchmark_output/figures/credit_qq.pdf}
+\caption*{\footnotesize\itshape QQ-plot des r\'esidus standardis\'es vs loi normale --- Credit - spread IG (CIR) (gauche : notre outil ; droite : production).}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=\linewidth]{benchmark_output/figures/credit_acf.pdf}
+\caption*{\footnotesize\itshape Autocorr\'elogramme (ACF) des r\'esidus (retards successifs, bande IC 95\,\%) --- Credit - spread IG (CIR).}
+\end{figure}
+\clearpage
+\section{Dette privee (Black-Karasinski / log-OU)}
+\subsection{Mod\`ele et donn\'ees}
+\textbf{Mod\`ele :} Black-Karasinski (log-OU).
+\begin{equation*}
+d\ln s_t=k\,(\theta-\ln s_t)\,dt+\sigma\,dW_t
+\end{equation*}
+\textbf{Fen\^etre / pas :} 31/12/2005 -- 31/12/2025 \`a pas mensuel ($\delta=1/12$).
+\textbf{Donn\'ees :} Spread de dette privée déjà transformé en $100\log(s_t)$ : l'OU est appliqué directement sur la série fournie.
+\textbf{Note de calibrage :} L'initialisation de la vraisemblance OU est guidée par les données (moyenne $\approx-305$) afin d'assurer la convergence. Les volatilités du classeur (corrigé de la coquille de facteur 10, cf. constat U-1) sont en unité moteur.
+\subsection{Comparaison des param\`etres}
+\input{benchmark_output/tables/dette_privee_params.tex}
+\tabcaption{Param\`etres calibr\'es : notre outil vs production 2026 --- Dette privee (Black-Karasinski / log-OU).}
+\subsection{M\'etriques de validation}
+\input{benchmark_output/tables/dette_privee_metrics.tex}
+\tabcaption{M\'etriques de validation des r\'esidus --- Dette privee (Black-Karasinski / log-OU).}
+\subsection{Figures de diagnostic}
+\begin{figure}[H]\centering
+\includegraphics[width=\linewidth]{benchmark_output/figures/dette_privee_qq.pdf}
+\caption*{\footnotesize\itshape QQ-plot des r\'esidus standardis\'es vs loi normale --- Dette privee (Black-Karasinski / log-OU) (gauche : notre outil ; droite : production).}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=\linewidth]{benchmark_output/figures/dette_privee_acf.pdf}
+\caption*{\footnotesize\itshape Autocorr\'elogramme (ACF) des r\'esidus (retards successifs, bande IC 95\,\%) --- Dette privee (Black-Karasinski / log-OU).}
+\end{figure}
+\clearpage
+\section{Action Euro (Hardy RSLN-2)}
+\subsection{Mod\`ele et donn\'ees}
+\textbf{Mod\`ele :} Hardy (RSLN-2, changement de régime).
+\begin{equation*}
+z_t\mid\rho_t=i\ \sim\ \mathcal N(\delta\mu_i,\ \delta\sigma_i^2),\quad i\in\{1,2\}
+\end{equation*}
+\textbf{Fen\^etre / pas :} 31/12/2005 -- 31/12/2025 \`a pas mensuel ($\delta=1/12$).
+\textbf{Donn\'ees :} Indice actions zone euro, log-rendements mensuels.
+\textbf{Note de calibrage :} Calibrage EM (Baum-Welch). Le $R^2$ est structurellement proche de 0 (la moyenne conditionnelle de régime explique peu la variance des rendements) : les tests pertinents sont la normalité conditionnelle (SW/QQ) et l'absence d'autocorrélation. Les volatilités de régime du classeur (corrigé de la coquille de facteur 10, cf. constat U-1) sont en unité moteur.
+\subsection{Comparaison des param\`etres}
+\input{benchmark_output/tables/action_eur_params.tex}
+\tabcaption{Param\`etres calibr\'es : notre outil vs production 2026 --- Action Euro (Hardy RSLN-2).}
+\subsection{M\'etriques de validation}
+\input{benchmark_output/tables/action_eur_metrics.tex}
+\tabcaption{M\'etriques de validation des r\'esidus --- Action Euro (Hardy RSLN-2).}
+\subsection{Figures de diagnostic}
+\begin{figure}[H]\centering
+\includegraphics[width=\linewidth]{benchmark_output/figures/action_eur_qq.pdf}
+\caption*{\footnotesize\itshape QQ-plot des r\'esidus standardis\'es vs loi normale --- Action Euro (Hardy RSLN-2) (gauche : notre outil ; droite : production).}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=\linewidth]{benchmark_output/figures/action_eur_acf.pdf}
+\caption*{\footnotesize\itshape Autocorr\'elogramme (ACF) des r\'esidus (retards successifs, bande IC 95\,\%) --- Action Euro (Hardy RSLN-2).}
+\end{figure}
+\clearpage
+\section{Action Monde ex-Europe (Hardy RSLN-2)}
+\subsection{Mod\`ele et donn\'ees}
+\textbf{Mod\`ele :} Hardy (RSLN-2, changement de régime).
+\begin{equation*}
+z_t\mid\rho_t=i\ \sim\ \mathcal N(\delta\mu_i,\ \delta\sigma_i^2)
+\end{equation*}
+\textbf{Fen\^etre / pas :} 31/12/2005 -- 31/12/2025 \`a pas mensuel ($\delta=1/12$).
+\textbf{Donn\'ees :} Indice actions Monde ex-Europe, log-rendements mensuels.
+\textbf{Note de calibrage :} Mêmes remarques que pour les actions Euro (constat U-1 sur les volatilités de régime).
+\subsection{Comparaison des param\`etres}
+\input{benchmark_output/tables/action_monde_params.tex}
+\tabcaption{Param\`etres calibr\'es : notre outil vs production 2026 --- Action Monde ex-Europe (Hardy RSLN-2).}
+\subsection{M\'etriques de validation}
+\input{benchmark_output/tables/action_monde_metrics.tex}
+\tabcaption{M\'etriques de validation des r\'esidus --- Action Monde ex-Europe (Hardy RSLN-2).}
+\subsection{Figures de diagnostic}
+\begin{figure}[H]\centering
+\includegraphics[width=\linewidth]{benchmark_output/figures/action_monde_qq.pdf}
+\caption*{\footnotesize\itshape QQ-plot des r\'esidus standardis\'es vs loi normale --- Action Monde ex-Europe (Hardy RSLN-2) (gauche : notre outil ; droite : production).}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=\linewidth]{benchmark_output/figures/action_monde_acf.pdf}
+\caption*{\footnotesize\itshape Autocorr\'elogramme (ACF) des r\'esidus (retards successifs, bande IC 95\,\%) --- Action Monde ex-Europe (Hardy RSLN-2).}
+\end{figure}
+\clearpage
+\section{Action Emergent (Hardy RSLN-2)}
+\subsection{Mod\`ele et donn\'ees}
+\textbf{Mod\`ele :} Hardy (RSLN-2, changement de régime).
+\begin{equation*}
+z_t\mid\rho_t=i\ \sim\ \mathcal N(\delta\mu_i,\ \delta\sigma_i^2)
+\end{equation*}
+\textbf{Fen\^etre / pas :} 31/12/2005 -- 31/12/2025 \`a pas mensuel ($\delta=1/12$).
+\textbf{Donn\'ees :} Indice actions Émergents, log-rendements mensuels.
+\textbf{Note de calibrage :} Mêmes remarques que pour les actions Euro (constat U-1).
+\subsection{Comparaison des param\`etres}
+\input{benchmark_output/tables/action_em_params.tex}
+\tabcaption{Param\`etres calibr\'es : notre outil vs production 2026 --- Action Emergent (Hardy RSLN-2).}
+\subsection{M\'etriques de validation}
+\input{benchmark_output/tables/action_em_metrics.tex}
+\tabcaption{M\'etriques de validation des r\'esidus --- Action Emergent (Hardy RSLN-2).}
+\subsection{Figures de diagnostic}
+\begin{figure}[H]\centering
+\includegraphics[width=\linewidth]{benchmark_output/figures/action_em_qq.pdf}
+\caption*{\footnotesize\itshape QQ-plot des r\'esidus standardis\'es vs loi normale --- Action Emergent (Hardy RSLN-2) (gauche : notre outil ; droite : production).}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=\linewidth]{benchmark_output/figures/action_em_acf.pdf}
+\caption*{\footnotesize\itshape Autocorr\'elogramme (ACF) des r\'esidus (retards successifs, bande IC 95\,\%) --- Action Emergent (Hardy RSLN-2).}
+\end{figure}
+\clearpage
+\section{Action non cotee - PE (Black-Scholes apres unsmoothing)}
+\subsection{Mod\`ele et donn\'ees}
+\textbf{Mod\`ele :} Black-Scholes après unsmoothing AR(1).
+\begin{equation*}
+\frac{dV_t}{V_t}=\mu\,dt+\sigma\,dW_t\quad\text{(série deslissée)}
+\end{equation*}
+\textbf{Fen\^etre / pas :} 31/12/2005 -- 31/12/2025 \`a pas mensuel ($\delta=1/12$).
+\textbf{Donn\'ees :} Indice LPX50 (Private Equity coté), log-rendements mensuels deslissés.
+\textbf{Note de calibrage :} Le deslissage AR(1) (régression $r_t=a+b\,r_{t-1}+e_t$, série $r^{uns}=(r_t-b\,r_{t-1})/(1-b)$) reproduit exactement la volatilité production ($29{,}70$), portée au classeur corrigé (cf. constat U-1). L'ACF(1) post-unsmoothing doit être proche de 0.
+\subsection{Comparaison des param\`etres}
+\input{benchmark_output/tables/action_noncotee_params.tex}
+\tabcaption{Param\`etres calibr\'es : notre outil vs production 2026 --- Action non cotee - PE (Black-Scholes apres unsmoothing).}
+\subsection{M\'etriques de validation}
+\input{benchmark_output/tables/action_noncotee_metrics.tex}
+\tabcaption{M\'etriques de validation des r\'esidus --- Action non cotee - PE (Black-Scholes apres unsmoothing).}
+\subsection{Figures de diagnostic}
+\begin{figure}[H]\centering
+\includegraphics[width=\linewidth]{benchmark_output/figures/action_noncotee_qq.pdf}
+\caption*{\footnotesize\itshape QQ-plot des r\'esidus standardis\'es vs loi normale --- Action non cotee - PE (Black-Scholes apres unsmoothing) (gauche : notre outil ; droite : production).}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=\linewidth]{benchmark_output/figures/action_noncotee_acf.pdf}
+\caption*{\footnotesize\itshape Autocorr\'elogramme (ACF) des r\'esidus (retards successifs, bande IC 95\,\%) --- Action non cotee - PE (Black-Scholes apres unsmoothing).}
+\end{figure}
+\clearpage
+\section{Immobilier (Black-Scholes apres unsmoothing)}
+\subsection{Mod\`ele et donn\'ees}
+\textbf{Mod\`ele :} Black-Scholes après unsmoothing AR(1).
+\begin{equation*}
+\frac{dRE_t}{RE_t}=\mu\,dt+\sigma\,dW_t\quad\text{(série deslissée)}
+\end{equation*}
+\textbf{Fen\^etre / pas :} 31/12/2005 -- 31/12/2025 \`a pas annuel ($\delta=1$).
+\textbf{Donn\'ees :} Indice immobilier, log-rendements annuels deslissés.
+\textbf{Note de calibrage :} La dérive $\mu$ production ($\approx5{,}6$) intègre l'hypothèse de réinvestissement des loyers, alors que la série fournie est un indice de prix (rendement en capital seul, dérive $\approx0$). L'écart de $\mu$ est attendu (constat D-1) ; le $R^2$ n'est pas significatif pour un BS.
+\subsection{Comparaison des param\`etres}
+\input{benchmark_output/tables/immobilier_params.tex}
+\tabcaption{Param\`etres calibr\'es : notre outil vs production 2026 --- Immobilier (Black-Scholes apres unsmoothing).}
+\subsection{M\'etriques de validation}
+\input{benchmark_output/tables/immobilier_metrics.tex}
+\tabcaption{M\'etriques de validation des r\'esidus --- Immobilier (Black-Scholes apres unsmoothing).}
+\subsection{Figures de diagnostic}
+\begin{figure}[H]\centering
+\includegraphics[width=\linewidth]{benchmark_output/figures/immobilier_qq.pdf}
+\caption*{\footnotesize\itshape QQ-plot des r\'esidus standardis\'es vs loi normale --- Immobilier (Black-Scholes apres unsmoothing) (gauche : notre outil ; droite : production).}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=\linewidth]{benchmark_output/figures/immobilier_acf.pdf}
+\caption*{\footnotesize\itshape Autocorr\'elogramme (ACF) des r\'esidus (retards successifs, bande IC 95\,\%) --- Immobilier (Black-Scholes apres unsmoothing).}
+\end{figure}
+\clearpage
+\section{Infrastructure (Black-Scholes apres unsmoothing)}
+\subsection{Mod\`ele et donn\'ees}
+\textbf{Mod\`ele :} Black-Scholes après unsmoothing AR(1).
+\begin{equation*}
+\frac{dI_t}{I_t}=\mu\,dt+\sigma\,dW_t\quad\text{(série deslissée)}
+\end{equation*}
+\textbf{Fen\^etre / pas :} 31/12/2005 -- 31/12/2025 \`a pas mensuel ($\delta=1/12$).
+\textbf{Donn\'ees :} Indice infrastructure, log-rendements mensuels deslissés.
+\textbf{Note de calibrage :} Coefficient d'unsmoothing faible ($b\approx0$) : l'effet du deslissage est marginal. Volatilité du classeur (corrigé de la coquille de facteur 10) en unité moteur (cf. constat U-1).
+\subsection{Comparaison des param\`etres}
+\input{benchmark_output/tables/infra_params.tex}
+\tabcaption{Param\`etres calibr\'es : notre outil vs production 2026 --- Infrastructure (Black-Scholes apres unsmoothing).}
+\subsection{M\'etriques de validation}
+\input{benchmark_output/tables/infra_metrics.tex}
+\tabcaption{M\'etriques de validation des r\'esidus --- Infrastructure (Black-Scholes apres unsmoothing).}
+\subsection{Figures de diagnostic}
+\begin{figure}[H]\centering
+\includegraphics[width=\linewidth]{benchmark_output/figures/infra_qq.pdf}
+\caption*{\footnotesize\itshape QQ-plot des r\'esidus standardis\'es vs loi normale --- Infrastructure (Black-Scholes apres unsmoothing) (gauche : notre outil ; droite : production).}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=\linewidth]{benchmark_output/figures/infra_acf.pdf}
+\caption*{\footnotesize\itshape Autocorr\'elogramme (ACF) des r\'esidus (retards successifs, bande IC 95\,\%) --- Infrastructure (Black-Scholes apres unsmoothing).}
+\end{figure}
+\clearpage
+
+\section{Conclusion}
+La confrontation montre une \textbf{forte coh\'erence} entre notre recalibrage
+et les param\`etres en production sur les facteurs \`a retour \`a la moyenne
+mod\'elis\'es par maximum de vraisemblance (cr\'edit, dette priv\'ee) : $R^2$
+\'elev\'es ($\approx0{,}92$) et param\`etres proches. Les facteurs Vasicek \`a
+deux facteurs (inflation, taux r\'eels) pr\'esentent des vitesses de retour et
+moyennes long terme coh\'erentes, mais des volatilit\'es diff\'erentes,
+imputables \`a la m\'ethodologie de calibrage (cibles distributionnelles en
+production vs maximum de vraisemblance), cf.\ constat M-1.
+
+Pour les actions (Hardy) et les actifs r\'eels (Black-Scholes apr\`es
+unsmoothing), les moyennes de r\'egime, les matrices de transition \emph{et les
+volatilit\'es} se r\'epliquent fid\`element ($\sim$1--2\,\% d'\'ecart) une fois
+prise en compte la coquille de facteur 10 (constat U-1), \textbf{depuis
+corrig\'ee dans le classeur source}. Le deslissage AR(1) reproduit exactement
+la volatilit\'e post-unsmoothing du Private Equity, validant l'impl\'ementation.
+L'autocorr\'elation r\'esiduelle d'ordre 1 est, comme attendu, ramen\'ee \`a
+z\'ero apr\`es unsmoothing.
+
+Les tests de normalit\'e (Shapiro-Wilk, Jarque-Bera) sont fr\'equemment
+rejet\'es, refl\'etant les queues \'epaisses des s\'eries financi\`eres
+(\'episodes 2008, 2020, 2022) ; ce constat, commun aux deux jeux de
+param\`etres, rel\`eve du choix de mod\`ele (diffusions gaussiennes) et non du
+calibrage. Les analyses d\'etaill\'ees et les valeurs num\'eriques figurent
+dans les tableaux et figures ci-dessus, reproductibles via le module
+\texttt{audit\_mission/benchmark}.
+
+\end{document}
