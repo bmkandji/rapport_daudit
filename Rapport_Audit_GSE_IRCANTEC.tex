@@ -54,6 +54,7 @@
 
 % --------- PACKAGES FONCTIONNELS --------------------------------------------
 \usepackage{amsmath,amssymb}
+\usepackage{bm}
 \usepackage{graphicx}
 \usepackage{eurosym}
 \usepackage{textcomp}
@@ -201,6 +202,7 @@
 
 % --------- COMMANDES & STYLES DE TABLEAUX (du document, restylés v2) --------
 \newcolumntype{P}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+\newcolumntype{R}{>{\raggedright\arraybackslash}X}   % colonne X ragged (tableaux de paramètres)
 % Charte v2 : règles booktabs par défaut (noires), interligne de tableau 1.4
 % (cf. rapport_Audit_GSE_CDC_Phase1, skill nexialog-note-technique-latex).
 \renewcommand{\arraystretch}{1.4}
@@ -654,176 +656,437 @@ Nous recommendons une fenêtre de calibrage de 20 ans plutôt que 15 ans, justif
 \section{Phase 3 - Audit du modèle et validation de la nouvelle calibration historique}
 \label{sec:phase3}
 
-La phase~3 consolide l'audit technique du dispositif et la validation de la nouvelle calibration historique (données arrêtées au 31/12/2025). Elle s'organise selon les trois axes annoncés : (i) la \textbf{vérification} des paramètres et de l'implémentation ; (ii) la \textbf{validation} des modèles et des données, conduite par un \emph{recalibrage indépendant} confronté aux paramètres en production ; (iii) les \textbf{points d'attention} et les approches alternatives, plus pertinentes sur le plan statistique.
+La phase~3 conduit l'audit technique \emph{facteur par facteur} et la validation de la nouvelle calibration historique (données arrêtées au 31/12/2025). Pour chaque composante, on précise : le \textbf{dispositif et sa vérification} (Axe~1) - modèle, calibrage, simulation et paramètres en production, re-dérivés et répliqués indépendamment ; la \textbf{validation} (Axe~2) - confrontation de notre recalibrage indépendant (moteur \texttt{gse\_engine.ahlgrim}) aux paramètres en production et analyse des résidus. Les \textbf{points d'attention et le cadre alternatif} (Axe~3), transverses par nature, sont regroupés en fin de phase.
 
-\subsection{Axe 1 - Vérification des paramètres et de l'implémentation}
+\begin{insightbox}[Constats transverses du benchmark de recalibrage]
+\textbf{U-1 - Coquille de facteur 10 (identifiée puis corrigée à la source).} Les volatilités du classeur pour les modèles sur log-rendements (Hardy, Black-Scholes) et l'OU sur log-spread (dette privée) étaient initialement amputées d'un facteur~10 (preuve exacte sur le \emph{private equity} : $\sigma$ post-\emph{unsmoothing} de $29{,}70$ contre $2{,}970$ au classeur). \textbf{Corrigée directement dans le classeur source} ; après correction, le recalibrage coïncide avec la production à $\sim$1--2\,\% près.
 
-Cet axe rappelle le dispositif audité (modèles, techniques de calibrage et de simulation, implémentation) et atteste de la réplication indépendante des paramètres en production. Le référentiel détaillé des composantes figure dans la cartographie du GSE (Table~\ref{tab:carto}).
+\textbf{M-1 - Méthodologie V2F.} Notre outil calibre les V2F (inflation, taux réels) par maximum de vraisemblance ; la production par cibles distributionnelles : $\kappa$ et $\mu_l$ proches, mais volatilités différentes par construction.
 
-\subsubsection{Dispositif audité et réplication indépendante}
-
-La diffusion repose sur cinq familles de modèles : Vasicek à deux facteurs (V2F) pour l'inflation et les taux réels (schéma exact) ; Cox-Ingersoll-Ross (CIR) pour le spread crédit \emph{investment grade} (schéma d'Alfonsi $E(0)$, positif) ; Black-Karasinski / log-Vasicek pour la dette privée (schéma exact log-OU) ; Hardy RSLN-2 à deux régimes pour les actions cotées (Euro, Monde, Émergent) ; Black-Scholes après \emph{unsmoothing} AR(1) pour les actifs à valorisation espacée (private equity, immobilier, infrastructure). La courbe nominale est reconstruite par la relation de Fisher avec corrections de covariance (\S\ref{sec:zc-corr}) ; la dépendance est une copule gaussienne sur les browniens du GSE.
-
-La vérification consiste à : (i) re-dériver l'\emph{exactitude analytique} des équations (densités de transition, schémas de simulation, formules de pricing et de passage des corrélations) ; (ii) confirmer la \emph{conformité de l'implémentation} aux techniques documentées ; (iii) répliquer les paramètres en production par un \emph{run indépendant}. Nous avons recalibré l'ensemble des facteurs au moyen de notre propre moteur (\texttt{gse\_engine.ahlgrim}), sur les données de calibrage fournies : les paramètres obtenus reproduisent ceux du classeur en production (\texttt{Parametres\_models.xlsx}, millésime~2026). Le détail quantitatif facteur par facteur est restitué à l'Axe~2.
-
-\subsubsection{Paramètres du moteur de simulation en production}
-
-Le moteur Monte-Carlo (MATLAB) est paramétré comme suit pour l'exercice 2026 \ph{[valeurs extraites du classeur, à confirmer]} :
-
-\begin{longtable}{P{4.8cm}P{3.0cm}P{4.8cm}P{3.0cm}}
-\toprule
-\tablehead{Paramètre} & \tablehead{Valeur} & \tablehead{Paramètre} & \tablehead{Valeur} \\
-\midrule\endfirsthead
-\toprule
-\tablehead{Paramètre} & \tablehead{Valeur} & \tablehead{Paramètre} & \tablehead{Valeur} \\
-\midrule\endhead
-\bottomrule\endfoot
-{\small Nombre de simulations} & {\small 5\,000} & {\small Pas de temps $dt$} & {\small $1/12$ (mensuel)} \\
-\rowcolor{nxlightblue}
-{\small Horizon de projection} & {\small 35 ans \ph{[ALM $\sim$30 ans]}} & {\small Fenêtre de calibrage} & {\small 20 ans} \\
-{\small Schéma CIR (crédit)} & {\small Alfonsi} & {\small Réserve initiale} & {\small $\approx$ 18,63 Md\euro{}} \\
-\rowcolor{nxlightblue}
-{\small Corrélation taux court / taux long} & {\small $-22,65\,\%$} & {\small Nb. de classes corrélées} & {\small 15} \\
-\end{longtable}
-\vspace{-10pt}
-\tabcaption{Paramètres du moteur de simulation (onglet \texttt{Paramètre GSE20}).}
-
-\subsubsection{Corrections de covariance de la courbe nominale et hypothèses de corrélation}
-\label{sec:zc-corr}
-
-Le pricing du ZC nominal lève l'hypothèse d'indépendance par deux termes de covariance (cf.\ Phase~1) : (1) entre taux réel et inflation dans la relation de Fisher ; (2) entre taux réel court et taux réel long dans $\operatorname{Var}[\int_t^T r_u\,du]$. La re-dérivation indépendante (intégrales de Wiener, Fubini) confirme leur exactitude ; l'effet cumulé est de $\approx$+17~bp sur le rendement du ZC à 10~ans, à volatilité quasi inchangée.
-
-La matrice de corrélation des browniens repose sur des hypothèses structurelles qui méritent d'être tracées : (i) \emph{décorrélation interne} de chaque V2F (facteur court $\times$ long fixé à $0$), convention de modélisation non justifiée empiriquement ; (ii) \emph{adossement} du facteur court au facteur long (le court hérite des corrélations du long avec les autres classes) ; (iii) \emph{décorrélation croisée} inter-V2F (seul le couple long/long porte la dépendance inflation / taux réel, $-22{,}65\,\%$) ; (iv) corrélation \emph{identique aux deux facteurs} d'un V2F dans les formules de passage ; (v) corrélation Action Monde $\times$ Action Monde stressée à $0\,\%$, à confirmer. Ces hypothèses déterminent à la fois le pricing des ZC et la structure de dépendance simulée : leur levée éventuelle doit être quantifiée (impact sur le pricing et sur l'allocation).
-
-\subsection{Axe 2 - Validation des modèles et des données (benchmark de recalibrage)}
-
-Cet axe restitue la validation, conduite en confrontant, \emph{facteur par facteur}, notre recalibrage indépendant (moteur \texttt{gse\_engine.ahlgrim}) aux paramètres en production, sur les mêmes données et selon la fenêtre et le pas propres à chaque facteur. L'objectif est de s'assurer que les trajectoires simulées reflètent le contexte de marché actuel (rentabilité et risque) dans un environnement financier qui a évolué depuis 2022.
-
-\subsubsection{Démarche et batterie de tests}
-
-\begin{itemize}
-  \item \textbf{Calibrage (notre outil)} : chaque modèle du moteur est recalibré sur les données fournies ; en sortent les paramètres et les résidus.
-  \item \textbf{Paramètres en production} : les paramètres du classeur sont injectés dans le même moteur ; les résidus sont recalculés sur les mêmes données, puis les métriques et figures de diagnostic.
-  \item \textbf{Métriques} : $R^2$ et $R^2$ ajusté ; Shapiro-Wilk et Jarque-Bera (normalité) ; Ljung-Box et ACF (autocorrélation). Les résidus standardisés sont $(\varepsilon-\bar\varepsilon)/s_\varepsilon$ ; les tests de normalité et d'indépendance étant invariants d'échelle, les conclusions ne dépendent pas de l'échelle de $\sigma$.
-\end{itemize}
-
-\begin{longtable}{P{3.4cm}P{5.2cm}P{4.0cm}P{2.2cm}}
-\toprule
-\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Application} & \tablehead{Seuil indicatif} \\
-\midrule\endfirsthead
-\toprule
-\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Application} & \tablehead{Seuil indicatif} \\
-\midrule\endhead
-\bottomrule\endfoot
-{\small Shapiro-Wilk / Jarque-Bera} & {\small Normalité des résidus ou des log-rendements conditionnels} & {\small Toutes classes} & {\small p-value $>$ 5\,\%} \\
-\rowcolor{nxlightblue}
-{\small QQ-plot} & {\small Adéquation distributionnelle (queues)} & {\small Toutes classes} & {\small Alignement sur la bissectrice} \\
-{\small Ljung-Box / ACF (1--12)} & {\small Autocorrélation résiduelle ; contrôle post-unsmoothing} & {\small Toutes classes ; immobilier, non coté, infra} & {\small p-value $>$ 5\,\% ; ACF(1) $\approx$ 0} \\
-\rowcolor{nxlightblue}
-{\small $R^2$ / $R^2$ ajusté} & {\small Qualité d'ajustement conditionnel} & {\small Facteurs à retour à la moyenne} & {\small Documenté} \\
-{\small Réplication des paramètres} & {\small Écart paramètres recalculés vs production} & {\small Toutes composantes} & {\small Écart $<$ [tolérance]} \\
-\end{longtable}
-\vspace{-10pt}
-\tabcaption{Batterie de tests et indicateurs de validation.}
-
-\subsubsection{Constats transverses de calibrage}
-
-\begin{insightbox}[Constats transverses du benchmark]
-\textbf{U-1 - Coquille de facteur 10 (identifiée puis corrigée à la source).} Les volatilités du classeur pour les modèles sur log-rendements (Hardy, Black-Scholes) et pour l'OU sur log-spread (dette privée) étaient initialement amputées d'un facteur~10 par rapport à l'unité du moteur (état $z=100\log$) ; preuve exacte sur le private equity ($\sigma$ post-\emph{unsmoothing} de $29{,}70$ contre $2{,}970$ au classeur). \textbf{La coquille a été corrigée directement dans le classeur source} ; après correction, le recalibrage coïncide avec la production à $\sim$1--2\,\% près (actions Euro $\sigma_1$ : $21{,}48$ vs $21{,}76$ ; infrastructure $\sigma$ : $13{,}38$ vs $13{,}50$). La volatilité du CIR crédit, exprimée sur l'échelle de diffusion $\sigma\sqrt{s}$, n'était pas concernée.
-
-\textbf{M-1 - Méthodologie V2F (taux / inflation).} Notre outil calibre le V2F par maximum de vraisemblance ; la production par cibles distributionnelles. Les vitesses de retour ($\kappa$) et les moyennes long terme sont proches ; les volatilités diffèrent par construction (volatilité d'innovation MV vs volatilité stationnaire cible). La comparaison des résidus reste valide (la prédiction conditionnelle ne dépend que des $\kappa$ et de $\mu_l$).
-
-\textbf{D-1 - Dérive immobilier (rendement total vs prix).} La dérive $\mu$ en production intègre le réinvestissement des loyers (rendement total), alors que la série fournie est un indice de prix : l'écart de $\mu$ est attendu et ne traduit pas une erreur de calibrage.
+\textbf{D-1 - Dérive immobilier.} La dérive $\mu$ en production intègre le réinvestissement des loyers (rendement total), alors que la série fournie est un indice de prix : l'écart de $\mu$ est attendu.
 \end{insightbox}
 
-\subsubsection{Synthèse de la validation par facteur}
+\subsection{Inflation (Vasicek 2 facteurs)}
 
-\begin{longtable}{P{3.6cm}P{3.2cm}P{4.0cm}P{3.6cm}}
+\textbf{Dispositif et vérification (Axe 1).} L'inflation est diffusée par un Vasicek à deux facteurs (V2F) calibré par cibles distributionnelles et simulé par discrétisation exacte. Un facteur court $q_t^{s}$ revient vers un facteur long stochastique $q_t^{l}$, lui-même en retour à la moyenne vers la cible COR $\mu_l=1{,}75\,\%$ :
+\begin{definitionbox}
+\[
+dq_t^{s}=\kappa_1(q_t^{l}-q_t^{s})\,dt+\sigma_1\,dW_t^1,\qquad
+dq_t^{l}=\kappa_2(\mu_l-q_t^{l})\,dt+\sigma_2\,dW_t^2 .
+\]
+\end{definitionbox}
+
+Le \textbf{calibrage} estime $\bm{\Theta}_d=\{\kappa_1,\kappa_2,\sigma_1,\sigma_2\}$ pour répliquer trois cibles aux maturités $\tau_1=2$ et $\tau_2=10$~ans (volatilité des variations, corrélation inter-maturités, écart-type des taux). Le taux est affine, de matrice de chargement $B_{ik}=B_k(\tau_i)/\tau_i$ avec $B_1(\tau)=\tfrac{1-e^{-\kappa_1\tau}}{\kappa_1}$ et $B_2(\tau)=\tfrac{\kappa_1}{\kappa_1-\kappa_2}\big(\tfrac{1-e^{-\kappa_2\tau}}{\kappa_2}-\tfrac{1-e^{-\kappa_1\tau}}{\kappa_1}\big)$.
+\label{sec:cibles}
+\begin{definitionbox}
+En notant $\bm{Y}_t=(R(t,t+\tau_i))_i$ et les variance-covariances stationnaires $\bm{\Sigma}^{\bullet}_\infty=\bm{B}\,\bm{\Sigma}^{X}_\infty\,\bm{B}^\top$, les paramètres résolvent
+\[
+\bm{\Theta}_d^{\star}=\operatorname*{arg\,min}_{\bm{\Theta}_d\in\mathbb{R}_+^4}
+\frac{\lambda_{\mathrm{v}}}{m}\sum_{i}\!\Big(\tfrac{\sigma^{\mathrm{mod}}_{\Delta Y}(\tau_i)}{\sigma^{\mathrm{hist}}_{\Delta Y}(\tau_i)}-1\Big)^2
++\frac{2\lambda_{\mathrm{c}}}{m(m-1)}\sum_{i<j}\!\big(\rho^{\mathrm{mod}}_{\Delta Y}-\rho^{\mathrm{hist}}_{\Delta Y}\big)^2
++\frac{\lambda_{\mathrm{s}}}{m}\sum_{i}\!\Big(\tfrac{\sigma^{\mathrm{mod}}_{Y}(\tau_i)}{\sigma^{\mathrm{hist}}_{Y}(\tau_i)}-1\Big)^2 .
+\]
+\end{definitionbox}
+
+La \textbf{simulation} est exacte : la loi conditionnelle jointe de $(q^{s}_{t+\Delta},q^{l}_{t+\Delta})$ est gaussienne bivariée, sans biais quel que soit le pas.
+\label{sec:exactv2f}
+\begin{definitionbox}
+\[
+\begin{aligned}
+q^{l}_{t+\Delta}&=q^{l}_t e^{-\kappa_2\Delta}+\mu_l(1-e^{-\kappa_2\Delta})+\sqrt{\mathbb V_m}\;\varepsilon^{1}_t,\\
+q^{s}_{t+\Delta}&=q^{s}_t e^{-\kappa_1\Delta}+\mu_l(1-e^{-\kappa_1\Delta})+\tfrac{\kappa_1}{\kappa_1-\kappa_2}(q^{l}_t-\mu_l)\big(e^{-\kappa_2\Delta}-e^{-\kappa_1\Delta}\big)+\sqrt{\mathbb V_r}\,\big(\rho_c\,\varepsilon^{1}_t+\sqrt{1-\rho_c^2}\,\varepsilon^{2}_t\big),
+\end{aligned}
+\]
+avec $\varepsilon^{1}_t,\varepsilon^{2}_t\sim\mathcal N(0,1)$ i.i.d.\ et $\mathbb V_m,\mathbb V_r,\mathbb C_{mr}$ les moments conditionnels du V2F.
+\end{definitionbox}
+
+\begin{table}[H]
+\centering\small
+\renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
+\begin{tabularx}{\linewidth}{R c c >{\raggedright\arraybackslash}p{3.4cm}}
 \toprule
-\tablehead{Facteur} & \tablehead{Modèle} & \tablehead{Recalibrage vs production} & \tablehead{Résidus} \\
-\midrule\endfirsthead
+\tablehead{Paramètre} & \tablehead{2026 (20~ans)} & \tablehead{2022} & \tablehead{Commentaire} \\
+\midrule
+\rowcolor{nxlightblue} $\kappa_2$ (retour LT) & $26{,}18\,\%$ & $35{,}8\,\%$ & Facteur long \\
+$\sigma_2$ (vol.\ LT) & $1{,}06\,\%$ & $1{,}3\,\%$ & \\
+\rowcolor{nxlightblue} $\mu_l$ (moyenne LT) & $1{,}75\,\%$ & $1{,}75\,\%$ & Cible COR \\
+$\kappa_1$ (retour CT) & $78{,}01\,\%$ & $73{,}9\,\%$ & Facteur court \\
+\rowcolor{nxlightblue} $\sigma_1$ (vol.\ CT) & $1{,}567\,\%$ & $1{,}4\,\%$ & \\
+Valeurs initiales (CT~/~LT) & $1{,}167\,\%$ / $1{,}806\,\%$ & --- & \\
+\bottomrule
+\end{tabularx}
+\caption{Paramètres retenus - inflation.}
+\end{table}
+
+\textbf{Validation (Axe 2).} Notre recalibrage par maximum de vraisemblance restitue des vitesses de retour ($\kappa_1\approx78\,\%$, $\kappa_2\approx26\,\%$) et une moyenne long terme cohérentes avec la production ; les volatilités diffèrent par construction méthodologique (constat M-1). La corrélation des browniens est fixée à $0$ en production (remédiation). Les résidus standardisés présentent une autocorrélation non significative (Ljung-Box), mais une normalité fréquemment rejetée (Shapiro-Wilk, Jarque-Bera) du fait des queues épaisses - relevant du choix de modèle, non du calibrage.
+
+\subsection{Taux réels (Vasicek 2 facteurs)}
+
+\textbf{Dispositif et vérification (Axe 1).} Les taux réels reprennent le V2F, le calibrage par cibles (\S\ref{sec:cibles}) et le schéma exact (\S\ref{sec:exactv2f}) de l'inflation ; seule la construction des observables diffère, et la moyenne $\mu$ est préalablement estimée par régression. Le facteur court $r_t$ revient vers le facteur long $l_t$ ; les taux réels sont reconstruits des taux nominaux et de l'inflation BEIR par Fisher (en remplacement de l'« effet miroir ») :
+\begin{definitionbox}
+\[
+dr_t=\kappa_1(l_t-r_t)\,dt+\sigma_1\,dW_t^1,\qquad dl_t=\kappa_2(\mu-l_t)\,dt+\sigma_2\,dW_t^2,\qquad
+R^{r}(0,m)=\frac{1+R^{n}(0,m)}{1+i(m)}-1 .
+\]
+\end{definitionbox}
+
+\begin{table}[H]
+\centering\small
+\renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
+\begin{tabularx}{\linewidth}{R c c >{\raggedright\arraybackslash}p{3.6cm}}
 \toprule
-\tablehead{Facteur} & \tablehead{Modèle} & \tablehead{Recalibrage vs production} & \tablehead{Résidus} \\
-\midrule\endhead
-\bottomrule\endfoot
-{\small Inflation, taux réels} & {\small V2F} & {\small $\kappa$, $\mu_l$ cohérents ; $\sigma$ différents (MV vs cibles, M-1)} & {\small Normalité souvent rejetée ; indép.\ OK} \\
-\rowcolor{nxlightblue}
-{\small Crédit IG} & {\small CIR (Alfonsi)} & {\small Réplication fidèle ; $R^2\approx0{,}92$} & {\small Indép.\ OK ; queues épaisses} \\
-{\small Dette privée} & {\small Black-Karasinski} & {\small Réplication fidèle ; $R^2\approx0{,}92$} & {\small Indép.\ OK ; queues épaisses} \\
-\rowcolor{nxlightblue}
-{\small Actions (Euro, Monde, Émergent)} & {\small Hardy RSLN-2} & {\small Moyennes/vol.\ de régime et transitions répliquées ($\sim$1--2\,\%, post U-1)} & {\small $R^2\approx0$ par construction ; SW/QQ pertinents} \\
-{\small PE, immobilier, infra} & {\small BS + \emph{unsmoothing}} & {\small $\sigma$ post-\emph{unsmoothing} reproduite à l'identique (PE : $29{,}70$)} & {\small ACF(1) ramenée à $\approx 0$} \\
-\end{longtable}
-\vspace{-10pt}
-\tabcaption{Synthèse du benchmark de calibrage (notre outil vs production 2026). Détails numériques et figures de diagnostic (QQ-plot, ACF) reproductibles via le module \texttt{audit\_mission/benchmark}.}
+\tablehead{Paramètre} & \tablehead{2026 (20~ans)} & \tablehead{2022} & \tablehead{Commentaire} \\
+\midrule
+\rowcolor{nxlightblue} $\kappa_2$ (retour LT) & $11{,}89\,\%$ & $10{,}8\,\%$ & Facteur long \\
+$\sigma_2$ (vol.\ LT) & $1{,}086\,\%$ & $0{,}9\,\%$ & \\
+\rowcolor{nxlightblue} $\mu$ (moyenne LT) & $0{,}41\,\%$ & $-0{,}2\,\%$ & Repasse positif \\
+$\kappa_1$ (retour CT) & $61{,}75\,\%$ & $60{,}0\,\%$ & Facteur court \\
+\rowcolor{nxlightblue} $\sigma_1$ (vol.\ CT) & $1{,}545\,\%$ & $1{,}3\,\%$ & \\
+Valeurs initiales (CT~/~LT) & $1{,}146\,\%$ / $1{,}82\,\%$ & --- & Forte révision \\
+\bottomrule
+\end{tabularx}
+\caption{Paramètres retenus - taux réels.}
+\end{table}
 
-\subsubsection{Conclusion de la validation}
+\textbf{Validation (Axe 2).} Mêmes conclusions que pour l'inflation (constat M-1). La moyenne long terme repasse en territoire positif ($0{,}41\,\%$ vs $-0{,}2\,\%$ en 2022), cohérente avec la remontée des taux réels sur la fenêtre 2005--2025. Le facteur long présente une demi-vie longue ($\kappa_2\approx12\,\%$) : sa dispersion de niveau est l'estimateur le plus sensible à la fenêtre (cf.\ Axe~3).
 
-La confrontation montre une \textbf{forte cohérence} entre notre recalibrage et les paramètres en production. Les facteurs à retour à la moyenne calibrés par maximum de vraisemblance (crédit, dette privée) présentent des $R^2$ élevés ($\approx0{,}92$) et des paramètres proches. Les V2F (inflation, taux réels) ont des vitesses de retour et moyennes long terme cohérentes, mais des volatilités différentes imputables à la méthodologie de calibrage (constat M-1). Pour les actions (Hardy) et les actifs réels (Black-Scholes après \emph{unsmoothing}), moyennes de régime, matrices de transition \emph{et} volatilités se répliquent à $\sim$1--2\,\% une fois prise en compte la coquille de facteur~10 (constat U-1, depuis corrigée), et le \emph{unsmoothing} AR(1) ramène l'autocorrélation d'ordre~1 à zéro. Les tests de normalité (Shapiro-Wilk, Jarque-Bera) sont fréquemment rejetés, reflétant les queues épaisses des séries financières (2008, 2020, 2022) : ce constat, commun aux deux jeux de paramètres, relève du \emph{choix de modèle} (diffusions gaussiennes) et non du calibrage.
+\subsection{Courbe des taux nominaux et pricing des zéro-coupons}
+\label{sec:zc-corr}
 
-\subsection{Axe 3 - Points d'attention et approches alternatives}
+\textbf{Dispositif et vérification (Axe 1).} Les zéro-coupons (ZC) nominaux sont reconstruits par Fisher à partir des ZC réels et d'inflation, dont le prix admet une forme fermée affine $P(0,T)=\exp(A(T)-B_1(T)r_0-B_2(T)m_0)$ ; la refonte 2026 lève l'hypothèse d'indépendance par deux corrections de covariance.
+\begin{definitionbox}
+Le taux réel $R_r(t,T)$ est gaussien de variance $s_r^2=\tfrac{1}{(T-t)^2}\big(B_1^2 V_r+B_2^2 V_m+2 B_1 B_2\,C_{mr}\big)$ ; le prix ZC réel étant log-normal, $\operatorname{Var}[e^{-R_r}]=(e^{s_r^2}-1)e^{-2\bar R_r+s_r^2}$, et le prix nominal corrigé s'écrit
+\[
+P^{\mathrm{nom}}(t,T)=P^{\mathrm{r\acute eel}}(t,T)\,P^{\mathrm{inf}}(t,T)+\rho_{r,i}\,\sqrt{\operatorname{Var}\!\big[e^{-R_r}\big]\,\operatorname{Var}\!\big[e^{-R_i}\big]}.
+\]
+\end{definitionbox}
+La re-dérivation indépendante (intégrales de Wiener, Fubini) confirme l'exactitude des deux termes ; l'effet cumulé est de $\approx$+17~bp sur le rendement du ZC à 10~ans, à volatilité quasi inchangée. La courbe ne fait l'objet d'aucun calibrage propre : elle hérite des paramètres taux réels~/~inflation et des corrélations du module dédié (\S\ref{sec:correl}). Les hypothèses structurelles de corrélation sont récapitulées ci-dessous.
 
-Le GSE repose sur des choix de \emph{modélisation} solides : schémas de discrétisation exacts là où ils existent, corrections de covariance sur la courbe nominale, régularisation semi-définie positive (SDP) des corrélations. Les points d'attention ne portent pas sur les EDS retenues mais sur la \emph{méthode d'estimation} et le \emph{couplage} des facteurs, deux dimensions qui conditionnent la stabilité des sorties ALM d'un exercice à l'autre et la fidélité de la dépendance de queue.
+\begin{table}[H]
+\centering\small
+\renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{5pt}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{3.2cm} R >{\raggedright\arraybackslash}p{1.9cm}}
+\toprule
+\tablehead{Hypothèse} & \tablehead{Couples concernés} & \tablehead{Valeur} \\
+\midrule
+\rowcolor{nxlightblue} Décorrélation interne d'un V2F & Infl.\,CT~$\times$~Infl.\,LT ; Taux réel CT~$\times$~LT & $0\,\%$ \\
+Adossement court~$\to$~long & Corrél.\ du facteur court avec les autres & $=$~long \\
+\rowcolor{nxlightblue} Décorrélation croisée inter-V2F & Infl.\,LT~$\times$~Taux réel CT ; Infl.\,CT~$\times$~Taux réel LT & $0\,\%$ \\
+Corrél.\ identique aux 2 facteurs & Formules de passage V2F~$\times$~autre & $\rho_{\varepsilon^1}=\rho_{\varepsilon^2}$ \\
+\rowcolor{nxlightblue} Taux court~/~taux long (pricing) & $\rho_{r,l}$ dans $s_r^2$ & $-22{,}65\,\%$ \\
+\bottomrule
+\end{tabularx}
+\caption{Hypothèses structurelles sur les corrélations.}
+\end{table}
+
+\textbf{Validation (Axe 2).} Les corrections relèvent le rendement du ZC sans altérer la volatilité ; le rendement reste sensible aux corrélations ($\rho_{r,i}=-70\,\%$ et $\rho_{r,l}=+70\,\%\Rightarrow\approx$+23~bp), ce qui justifie de calibrer et documenter $\rho_{r,i}$ et $\rho_{r,l}$ plutôt que de les fixer à dire d'expert. Les hypothèses de décorrélation interne et d'adossement court/long ne sont pas justifiées empiriquement ; le couple Action Monde $\times$ Action Monde stressée à $0\,\%$ reste à confirmer.
+
+\subsection{Crédit - spreads obligataires Investment Grade}
+
+\textbf{Dispositif et vérification (Axe 1).} Le spread \emph{Investment Grade} (IG, \emph{bucket} 5--7~ans) est diffusé par un CIR, calibré en deux étapes et simulé par un schéma garantissant la positivité.
+\begin{definitionbox}
+\textbf{Modèle :} $ds_t=\kappa(\theta-s_t)\,dt+\sigma\sqrt{s_t}\,dW_t$. \textbf{Calibrage :} initialisation par régression d'Euler ($\tfrac{s_{t+\Delta}-s_t}{\sqrt{|s_t|}}\sim c_1\tfrac{1}{\sqrt{|s_t|}}+c_2\tfrac{s_t}{\sqrt{|s_t|}}+\epsilon_t$), puis maximum de vraisemblance exact (loi $\chi^2$ décentrée). \textbf{Simulation :} schéma d'Alfonsi $E(0)$, positif (valide sous $\sigma^2\le4\kappa\theta$) :
+\[
+\bar s_{t+\Delta}=\Big((1-\tfrac{\kappa}{2}\Delta)\sqrt{\bar s_t}+\tfrac{\sigma\,\Delta W_t}{2(1-\tfrac{\kappa}{2}\Delta)}\Big)^{\!2}+\Big(\kappa\theta-\tfrac{\sigma^2}{4}\Big)\Delta .
+\]
+\end{definitionbox}
+
+\begin{table}[H]
+\centering\small
+\renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
+\begin{tabularx}{\linewidth}{R c c >{\raggedright\arraybackslash}p{3.4cm}}
+\toprule
+\tablehead{Paramètre} & \tablehead{2026 (20~ans)} & \tablehead{2022} & \tablehead{Commentaire} \\
+\midrule
+\rowcolor{nxlightblue} $\kappa$ (retour moyenne) & $52{,}59\,\%$ & $38{,}0\,\%$ & \\
+$\sigma$ (volatilité) & $5{,}167\,\%$ & $4{,}8\,\%$ & \\
+\rowcolor{nxlightblue} $\theta$ (moyenne LT) & $1{,}42\,\%$ & $1{,}3\,\%$ & \\
+Valeur initiale & $0{,}786\,\%$ & $0{,}926\,\%$ & Niveau de spread \\
+\rowcolor{nxlightblue} Défaut / recouvrement & $0{,}224\,\%$ / $50\,\%$ & $0{,}2\,\%$ / $50\,\%$ & Dire d'expert (hors périmètre) \\
+\bottomrule
+\end{tabularx}
+\caption{Paramètres retenus - crédit IG.}
+\end{table}
+
+\textbf{Validation (Axe 2).} Le recalibrage par maximum de vraisemblance (pseudo-vraisemblance gaussienne d'Alfonsi) coïncide étroitement avec la production : $R^2\approx0{,}92$ et paramètres proches ($\sigma$ : $0{,}517$ vs $0{,}534$). La condition de Feller $2\kappa\theta\ge\sigma^2$ est contrôlée et l'autocorrélation résiduelle est non significative. La forte révision de $\kappa$ ($52{,}6\,\%$ vs $38{,}0\,\%$) traduit la sensibilité du retour à la moyenne à la fenêtre.
+
+\subsection{Dette privée (Black-Karasinski)}
+
+\textbf{Dispositif et vérification (Axe 1).} La dette privée (\emph{leveraged loans}) est diffusée par un log-Vasicek (Black-Karasinski), garantissant la positivité du spread, avec une moyenne ajustée pour intégrer la prime de liquidité (\S\ref{sec:liqui}). Le log-spread suit un Ornstein-Uhlenbeck de discrétisation exacte :
+\begin{definitionbox}
+\[
+d\ln s_t=k(\theta-\ln s_t)\,dt+\sigma\,dW_t,\qquad
+\mathbb E[s_\infty]=\exp\!\Big(\theta+\tfrac{\sigma^2}{4k}\Big),\qquad
+\theta=m-\frac{\sigma^2}{4k},\quad m=\ln S^\star .
+\]
+$(k,\sigma)$ sont estimés par régression sur les log-spreads ; $\theta$ est ajusté pour que l'espérance long terme atteigne le spread-cible $S^\star$ (base + prime de liquidité).
+\end{definitionbox}
+
+\begin{table}[H]
+\centering\small
+\renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
+\begin{tabularx}{\linewidth}{R c c >{\raggedright\arraybackslash}p{3.2cm}}
+\toprule
+\tablehead{Paramètre} & \tablehead{2026 (20~ans)} & \tablehead{2022} & \tablehead{Commentaire} \\
+\midrule
+\rowcolor{nxlightblue} $k$ (retour moyenne) & $43{,}64\,\%$ & $34{,}7\,\%$ & Sur log-spread \\
+$\sigma$ (vol.\ log-spread) & $49{,}67\,\%$ & $24{,}1\,\%$ & Forte hausse \\
+\rowcolor{nxlightblue} $\theta$ (moyenne log) & $-3{,}109$ & $-3{,}072$ & \\
+Valeur initiale & $2{,}814\,\%$ & $2{,}91\,\%$ & Niveau de spread \\
+\rowcolor{nxlightblue} Prime de liquidité (surplus) & $4{,}64\,\%$ & --- & Via ajustement de $\theta$ \\
+\bottomrule
+\end{tabularx}
+\caption{Paramètres retenus - dette privée.}
+\end{table}
+
+\textbf{Validation (Axe 2).} Le passage du CIR au log-Vasicek garantit la stricte positivité et capte des volatilités élevées ($\sigma$ du log-spread $\approx49{,}7\,\%$ vs $24{,}1\,\%$ en 2022), cohérentes avec le caractère explosif des spreads. Le recalibrage est fidèle ($R^2$ élevé, paramètres proches une fois la coquille U-1 corrigée). La forte hausse de $\sigma$ appelle un suivi de la dispersion long terme.
+
+\subsection{Prime de liquidité}
+\label{sec:liqui}
+
+\textbf{Dispositif et vérification (Axe 1).} La prime de liquidité isole, au sein du spread, la part qui ne rémunère pas le risque de contrepartie : pour le crédit, c'est le différentiel des moyennes long terme entre spread obligataire et CDS ; pour la dette privée, elle est fixée à dire d'expert ($1{,}0\,\%$) puis intégrée à $\theta$.
+\begin{definitionbox}
+Les spreads CDS et obligataire étant log-Vasicek d'espérance $\mathbb E[s_\infty]=\exp(\theta+\tfrac{\sigma^2}{4k})$, la prime de liquidité est
+\[
+\pi_{\mathrm{liq}}=\mathbb E\big[s^{\mathrm{oblig}}_\infty\big]-\mathbb E\big[s^{\mathrm{CDS}}_\infty\big]
+=\exp\!\Big(\theta_{\mathrm{ob}}+\tfrac{\sigma_{\mathrm{ob}}^2}{4k_{\mathrm{ob}}}\Big)-\exp\!\Big(\theta_{\mathrm{cds}}+\tfrac{\sigma_{\mathrm{cds}}^2}{4k_{\mathrm{cds}}}\Big).
+\]
+\end{definitionbox}
+
+\begin{table}[H]
+\centering\small
+\renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
+\begin{tabularx}{\linewidth}{R c c}
+\toprule
+\tablehead{Grandeur} & \tablehead{CDS} & \tablehead{Spread 20~ans} \\
+\midrule
+\rowcolor{nxlightblue} $k$ (sur log-spread) & $1{,}234$ & $0{,}436$ \\
+$\sigma$ & $65{,}97\,\%$ & $49{,}67\,\%$ \\
+\rowcolor{nxlightblue} $\theta$ (log) & $-3{,}461$ & $-3{,}156$ \\
+Moyenne LT du spread & $2{,}875\,\%$ & $3{,}699\,\%$ \\
+\rowcolor{nxlightblue} Prime de liquidité (HY ; dette privée) & --- & $0{,}824\,\%$ ; $1{,}0\,\%$ \\
+\bottomrule
+\end{tabularx}
+\caption{Paramètres retenus - prime de liquidité.}
+\end{table}
+
+\textbf{Validation (Axe 2).} La prime \emph{High Yield} obtenue ($0{,}824\,\%=3{,}699\,\%-2{,}875\,\%$) est cohérente avec l'écart obligataire/CDS ; la prime de dette privée ($1{,}0\,\%$) relève du dire d'expert (hors périmètre quantitatif). L'intégration par inversion de $\theta$ est exacte.
+
+\subsection{Actions cotées - Euro, Monde ex-Europe, Émergent (Hardy RSLN-2)}
+
+\textbf{Dispositif et vérification (Axe 1).} Les actions sont diffusées par le modèle de Hardy à changement de régime (RSLN-2), calibré par maximum de vraisemblance (filtre de Hamilton) et simulé exactement conditionnellement au régime.
+\begin{definitionbox}
+Conditionnellement au régime $\rho_t\in\{1,2\}$ (chaîne de Markov $(p_{ij})$), les log-rendements suivent un Black-Scholes $\tfrac{dS_t}{S_t}=\mu_{\rho_t}\,dt+\sigma_{\rho_t}\,dW_t$ ; la vraisemblance se calcule par la récursion de filtrage
+\[
+\xi_t(y)=\sum_{y'}\frac{f_{t-1}(y')\xi_{t-1}(y')}{\sum_{y''}f_{t-1}(y'')\xi_{t-1}(y'')}\,P(y',y),\qquad
+\ell_\theta=\sum_t\log\Big(\sum_y f_t(y)\xi_t(y)\Big).
+\]
+\end{definitionbox}
+
+\begin{table}[H]
+\centering\small
+\renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{5.6cm} c c c}
+\toprule
+\tablehead{Paramètre (20~ans)} & \tablehead{Euro} & \tablehead{Monde} & \tablehead{Émerg.} \\
+\midrule
+\rowcolor{nxlightblue} $p_{1\to2}$ (sortie régime 1) & $14{,}83\,\%$ & $14{,}73\,\%$ & $15{,}31\,\%$ \\
+$p_{2\to1}$ (sortie régime 2) & $5{,}27\,\%$ & $5{,}64\,\%$ & $4{,}80\,\%$ \\
+\rowcolor{nxlightblue} Moyenne / vol.\ régime 1 (stressé) & $-13{,}2$ / $21{,}8$ & $-12{,}2$ / $19{,}8$ & $-13{,}6$ / $27{,}1$ \\
+Moyenne / vol.\ régime 2 (normal) & $13{,}6$ / $9{,}5$ & $18{,}0$ / $9{,}1$ & $13{,}1$ / $11{,}1$ \\
+\rowcolor{nxlightblue} Proba.\ stationnaire de stress & $26{,}24\,\%$ & $27{,}68\,\%$ & $23{,}85\,\%$ \\
+\bottomrule
+\end{tabularx}
+\caption{Paramètres retenus - actions cotées (moyennes / volatilités en \%).}
+\end{table}
+
+\textbf{Validation (Axe 2).} Le recalibrage EM (Baum-Welch) réplique fidèlement moyennes de régime, volatilités et matrices de transition à $\sim$1--2\,\% près une fois la coquille U-1 corrigée (Euro $\sigma_1$ : $21{,}48$ vs $21{,}76$). Le $R^2$ est structurellement proche de $0$ (la moyenne conditionnelle de régime explique peu la variance des rendements) : les tests pertinents sont la normalité conditionnelle (Shapiro-Wilk, QQ-plot) et l'absence d'autocorrélation, vérifiées. Les actions émergentes présentent la volatilité de régime la plus élevée, comme attendu.
+
+\subsection{Actions non cotées (Private Equity, composite)}
+
+\textbf{Dispositif et vérification (Axe 1).} Les actifs valorisés à pas espacé sont diffusés par un Black-Scholes appliqué à une série préalablement déslissée, l'autocorrélation de valorisation biaisant à la baisse la volatilité.
+\begin{definitionbox}
+À partir des log-rendements $(r_t)$ de coefficient AR(1) $b$ ($r_t=a+b\,r_{t-1}+\epsilon_t$), la série déslissée est
+\[
+r_t^\ast=\frac{1}{1-b}\,r_t-\frac{b}{1-b}\,r_{t-1},\qquad
+\operatorname{Var}(r_t^\ast)=\frac{1-b^2}{(1-b)^2}\,\operatorname{Var}(r_t)\;>\;\operatorname{Var}(r_t),
+\]
+de sorte que $\mathrm{Cov}(r_t^\ast,r_{t-1}^\ast)=0$ ; $(\mu,\sigma)$ du Black-Scholes sont estimés sur la série déslissée, simulée exactement.
+\end{definitionbox}
+
+\begin{table}[H]
+\centering\small
+\renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
+\begin{tabularx}{\linewidth}{R c >{\raggedright\arraybackslash}p{4.0cm}}
+\toprule
+\tablehead{Paramètre} & \tablehead{2026 (20~ans)} & \tablehead{Commentaire} \\
+\midrule
+\rowcolor{nxlightblue} $\mu$ (rendement, PE) & $7{,}18\,\%$ & Régime faible vol.~: $5{,}97\,\%$ \\
+$\sigma$ (post-\emph{unsmoothing}) & $29{,}70\,\%$ & Régime faible vol.~: $15{,}0\,\%$ \\
+\rowcolor{nxlightblue} «~Ncote composite~» (rdt / vol.) & $6{,}71\,\%$ / $15{,}89\,\%$ & PE + dette privée \\
+\bottomrule
+\end{tabularx}
+\caption{Paramètres retenus - actions non cotées.}
+\end{table}
+
+\textbf{Validation (Axe 2).} Le déslissage AR(1) reproduit \emph{exactement} la volatilité de production post-\emph{unsmoothing} ($29{,}70$), ce qui a permis d'établir la preuve de la coquille de facteur~10 (constat U-1, le classeur indiquant initialement $2{,}970$). L'autocorrélation d'ordre~1 résiduelle est ramenée à $\approx0$, validant l'implémentation.
+
+\subsection{Immobilier}
+
+\textbf{Dispositif et vérification (Axe 1).} L'immobilier reprend le dispositif \emph{unsmoothing} + Black-Scholes, sous hypothèse de réinvestissement des loyers ; calibrage et simulation identiques au \emph{private equity}. Indice immobilier d'entreprise France (EDHEC IEIF), série démarrant en 2008, pas annuel.
+
+\begin{table}[H]
+\centering\small
+\renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
+\begin{tabularx}{\linewidth}{R c c}
+\toprule
+\tablehead{Paramètre} & \tablehead{2026 (20~ans)} & \tablehead{2022} \\
+\midrule
+\rowcolor{nxlightblue} $\mu$ (rendement) & $5{,}633\,\%$ & $6{,}288\,\%$ \\
+$\sigma$ (post-\emph{unsmoothing}) & $6{,}128\,\%$ & $7{,}9\,\%$ \\
+\bottomrule
+\end{tabularx}
+\caption{Paramètres retenus - immobilier.}
+\end{table}
+
+\textbf{Validation (Axe 2).} La dérive $\mu$ de production ($\approx5{,}6\,\%$) intègre le réinvestissement des loyers (rendement total), alors que la série fournie est un indice de prix (dérive en capital $\approx0$) : l'écart est attendu (constat D-1) et ne traduit pas une erreur de calibrage ; le $R^2$ n'est pas significatif pour un Black-Scholes. L'autocorrélation post-\emph{unsmoothing} est ramenée à $\approx0$.
+
+\subsection{Infrastructure}
+
+\textbf{Dispositif et vérification (Axe 1).} L'infrastructure (indice coté) reprend également le dispositif \emph{unsmoothing} + Black-Scholes ; calibrage et simulation identiques au \emph{private equity}.
+
+\begin{table}[H]
+\centering\small
+\renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
+\begin{tabularx}{\linewidth}{R c c}
+\toprule
+\tablehead{Paramètre} & \tablehead{2026 (20~ans)} & \tablehead{2022} \\
+\midrule
+\rowcolor{nxlightblue} $\mu$ (rendement) & $6{,}516\,\%$ & $7{,}626\,\%$ \\
+$\sigma$ (post-\emph{unsmoothing}) & $13{,}498\,\%$ & $18{,}459\,\%$ \\
+\bottomrule
+\end{tabularx}
+\caption{Paramètres retenus - infrastructure.}
+\end{table}
+
+\textbf{Validation (Axe 2).} Le coefficient de déslissage est faible ($b\approx0$) : l'effet de l'\emph{unsmoothing} est marginal. La volatilité recalibrée ($13{,}38$) coïncide avec la production ($13{,}50$) une fois la coquille U-1 corrigée. L'infrastructure est plus volatile que l'immobilier, pour un rendement moyen supérieur, comme attendu.
+
+\subsection{Structure de dépendance - corrélations}
+\label{sec:correl}
+
+\textbf{Dispositif et vérification (Axe 1).} La dépendance est modélisée par une copule gaussienne sur les browniens du GSE, obtenue par estimation de Pearson, conversion analytique en corrélations de browniens, puis régularisation de semi-définie positivité (Higham).
+\begin{definitionbox}
+\[
+\rho^{\mathrm{hist}}\ \xrightarrow{\ \text{Pearson}\ }\ \rho^{\mathrm{target}}
+\ \xrightarrow{\ F^{-1}_{\mathcal P_1,\mathcal P_2}\ }\ \rho^{\mathrm{GSE}}
+\ \xrightarrow{\ \text{Higham}\ }\ \rho^{\mathrm{SDP}} .
+\]
+Chaque observable s'écrit $G_t\approx\text{cste}+\bm Z\cdot\bm\varepsilon_t$ ; la corrélation modèle et le passage inverse donnent $\rho^{\mathrm{GSE}}_{1,2}=\tfrac{\lVert\bm Z^1\rVert\,\lVert\bm Z^2\rVert}{\langle\bm Z^1,\bm Z^2\rangle}\,\rho^{\mathrm{target}}_{1,2}$, qui se spécialise par couple de modèles (V2F$\times$V2F, V2F$\times$BS/CIR, BS$\times$BS). Pour le crédit, l'approximation de \emph{freezing} ($s_t\approx s_0$) ramène le calcul au cas Black-Scholes.
+\end{definitionbox}
+La refonte 2026 dérive le couple Black-Karasinski et intègre la dette privée et l'infrastructure, portant la matrice à 13 facteurs (15 avec régimes stressés).
+
+\begin{table}[H]
+\centering\small
+\renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
+\begin{tabularx}{\linewidth}{R c}
+\toprule
+\tablehead{Couple de facteurs} & \tablehead{Corrél.\ browniens 2026} \\
+\midrule
+\rowcolor{nxlightblue} Action Euro $\times$ Action Monde & $82{,}85\,\%$ \\
+Action Euro $\times$ Spread crédit & $-71{,}47\,\%$ \\
+\rowcolor{nxlightblue} Spread crédit $\times$ Dette privée & $90{,}83\,\%$ \\
+Inflation LT $\times$ Taux réel LT & $-22{,}65\,\%$ \\
+\rowcolor{nxlightblue} Private Equity $\times$ Infrastructure & $72{,}66\,\%$ \\
+\bottomrule
+\end{tabularx}
+\caption{Corrélations de browniens retenues (extrait).}
+\end{table}
+
+\textbf{Validation (Axe 2).} Les corrélations obtenues sont économiquement plausibles (forte corrélation actions ; corrélation négative actions/spread ; quasi-colinéarité spread/dette privée à $90{,}8\,\%$). La matrice simulée restitue en sortie les niveaux imposés. Points d'attention : les corrélations de \emph{niveau} sont exposées à la co-tendance (régression fallacieuse) que la projection de Higham régularise sans corriger (cf.\ Axe~3).
+
+\subsection{Moteur de simulation Monte-Carlo}
+
+\textbf{Dispositif et vérification (Axe 1).} Le moteur assemble l'ensemble des facteurs en une diffusion jointe corrélée, par tirages gaussiens corrélés injectés dans les schémas de chaque classe (exact V2F, Alfonsi pour le CIR, exact log-OU, Black-Scholes).
+\begin{definitionbox}
+Les chocs corrélés sont obtenus par décomposition de Cholesky $\bm\varepsilon_t=\bm L\,\bm z_t$, $\bm z_t\sim\mathcal N(\bm 0,\bm I)$, $\bm L\,\bm L^\top=\rho^{\mathrm{SDP}}$ ; l'erreur Monte-Carlo d'une sortie décroît en $1/\sqrt{N}$ (demi-intervalle 95\,\% : $1{,}96\,\sigma_f/\sqrt{N}$).
+\end{definitionbox}
+
+\begin{table}[H]
+\centering\small
+\renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
+\begin{tabularx}{\linewidth}{R c R c}
+\toprule
+\tablehead{Paramètre} & \tablehead{Valeur} & \tablehead{Paramètre} & \tablehead{Valeur} \\
+\midrule
+\rowcolor{nxlightblue} Nombre de simulations & 5\,000 & Pas de temps $dt$ & $1/12$ \\
+Horizon de projection & $\sim$30~ans & Fenêtre de calibrage & 20~ans \\
+\rowcolor{nxlightblue} Schéma CIR & Alfonsi $E(0)$ & Réserve initiale & $\approx 18{,}63$~Md\texteuro \\
+\bottomrule
+\end{tabularx}
+\caption{Paramètres du moteur de simulation.}
+\end{table}
+
+\textbf{Validation (Axe 2).} Le nombre de trajectoires (5\,000) assure une erreur Monte-Carlo en $1/\sqrt{N}$ acceptable sur les indicateurs d'allocation. L'horizon de simulation ($\sim$30--35~ans) est à aligner explicitement sur l'horizon ALM. La diffusion jointe respecte la matrice de corrélation en entrée (contrôle SDP / Cholesky).
+
+\subsection{Points d'attention transverses et cadre alternatif (Axe 3)}
+
+Le GSE repose sur des choix de \emph{modélisation} solides : schémas de discrétisation exacts là où ils existent, corrections de covariance sur la courbe nominale, régularisation SDP des corrélations. Les points d'attention transverses portent non sur les EDS retenues mais sur la \emph{méthode d'estimation} et le \emph{couplage} des facteurs, deux dimensions qui conditionnent la stabilité des sorties ALM et la fidélité de la dépendance de queue.
 
 \begin{insightbox}[Les trois points d'attention]
-\textbf{(1) Calibrage par cibles distributionnelles.} L'appariement d'un petit nombre de moments \emph{stationnaires} est un estimateur de minimum de distance, à forte variance et sensible à la fenêtre ; surtout, ces cibles ($t\to\infty$) sont appariées à une trajectoire \emph{transitoire} courte partant de conditions initiales figées hors régime stationnaire : l'estimateur est biaisé.
+\textbf{(1) Calibrage par cibles distributionnelles.} L'appariement d'un petit nombre de moments \emph{stationnaires} est sensible à la fenêtre ; ces cibles ($t\to\infty$) sont appariées à une trajectoire \emph{transitoire} courte partant de conditions initiales figées hors régime stationnaire : l'estimateur est biaisé.
 
 \textbf{(2) Hardy estimé séparément et corrélations par état.} La maximisation directe de vraisemblance est non robuste ; les corrélations stressées calculées sur l'\emph{intersection} des fenêtres de stress propres à chaque facteur ne sont pas viables (intersections vides, régime mal défini, perte de SDP) ; aucun facteur latent de marché commun n'est modélisé.
 
-\textbf{(3) Simulation des régimes par uniforme commune.} Tirer l'état suivant de chaque chaîne à partir d'une même uniforme crée une dépendance \emph{comonotone} non estimée, dépendante de l'étiquetage, et incohérente avec l'hypothèse d'indépendance faite à l'estimation.
+\textbf{(3) Simulation des régimes par uniforme commune.} Tirer l'état suivant de chaque chaîne à partir d'une même uniforme crée une dépendance \emph{comonotone} non estimée, dépendante de l'étiquetage, incohérente avec l'hypothèse d'indépendance faite à l'estimation.
 \end{insightbox}
 
 \subsubsection{Point 1 - calibrage par cibles distributionnelles}
 
-Le calibrage des V2F résout un programme de minimum de distance $\hat\Theta=\operatorname{argmin}\ (m^{\mathrm{mod}}(\Theta)-m^{\mathrm{hist}})^{\!\top} W\,(m^{\mathrm{mod}}(\Theta)-m^{\mathrm{hist}})$, à pondération diagonale fixée à dire d'expert (et non la pondération efficiente $W^\star=S^{-1}$). Deux fragilités en découlent. \emph{Mauvais conditionnement} : pour un Ornstein-Uhlenbeck $dx=\kappa(\theta-x)dt+\sigma\,dW$, la dispersion stationnaire $\sigma^2/2\kappa$ n'identifie que le \emph{rapport} $\sigma^2/\kappa$ ; la séparation de $\sigma$ et $\kappa$ repose sur des moments de variation peu informatifs au pas mensuel. \emph{Biais de transitoire} : les valeurs initiales sont figées (courbe initiale, scénarios COR) et non tirées de la loi stationnaire, si bien que la moyenne et la dispersion empiriques de niveau ne convergent pas vers les cibles ; sur une fenêtre de décrue quasi monotone, la dispersion empirique \emph{surestime} la cible, ce qui force $\hat\kappa$ à la baisse et $\hat\sigma$ à la hausse. Ce biais directionnel est précisément celui observé sur les mêmes données (Table~\ref{tab:p3-instab}), et il est maximal lorsque la demi-vie de retour à la moyenne est comparable à la fenêtre (Table~\ref{tab:p3-halflife}).
+Le calibrage des V2F résout un programme de minimum de distance $\hat\Theta=\operatorname{argmin}\ (m^{\mathrm{mod}}(\Theta)-m^{\mathrm{hist}})^{\!\top} W\,(m^{\mathrm{mod}}(\Theta)-m^{\mathrm{hist}})$, à pondération diagonale fixée à dire d'expert. Pour un Ornstein-Uhlenbeck, la dispersion stationnaire $\sigma^2/2\kappa$ n'identifie que le \emph{rapport} $\sigma^2/\kappa$ ; surtout, les valeurs initiales étant figées (courbe initiale, scénarios COR) et non tirées de la loi stationnaire, la dispersion empirique de niveau \emph{surestime} la cible sur une fenêtre de décrue, forçant $\hat\kappa$ à la baisse et $\hat\sigma$ à la hausse. Ce biais directionnel est observé sur les mêmes données (Table~\ref{tab:p3-instab}) et maximal lorsque la demi-vie est comparable à la fenêtre (Table~\ref{tab:p3-halflife}).
 
-\begin{longtable}{P{6.0cm}P{2.6cm}P{2.6cm}P{2.4cm}}
+\begin{table}[H]
+\centering\small
+\renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
+\begin{tabularx}{\linewidth}{R c c c}
 \toprule
 \tablehead{Paramètre (facteur long terme)} & \tablehead{Régression} & \tablehead{Cibles distrib.} & \tablehead{Direction} \\
-\midrule\endfirsthead
-\toprule
-\tablehead{Paramètre (facteur long terme)} & \tablehead{Régression} & \tablehead{Cibles distrib.} & \tablehead{Direction} \\
-\midrule\endhead
-\bottomrule\endfoot
-{\small Inflation - $\kappa_2$ (retour moyenne)} & {\small $69{,}8\,\%$} & {\small $35{,}8\,\%$} & {\small $\div\,1{,}95$} \\
-\rowcolor{nxlightblue}
-{\small Inflation - $\sigma_2$ (volatilité)} & {\small $0{,}5\,\%$} & {\small $1{,}3\,\%$} & {\small $\times\,2{,}6$} \\
-{\small Taux réels - $\kappa_2$ (retour moyenne)} & {\small $33{,}6\,\%$} & {\small $10{,}8\,\%$} & {\small $\div\,3{,}1$} \\
-\rowcolor{nxlightblue}
-{\small Taux réels - $\sigma_2$ (volatilité)} & {\small $0{,}6\,\%$} & {\small $0{,}9\,\%$} & {\small $\times\,1{,}5$} \\
-\end{longtable}
-\vspace{-10pt}
-\tabcaption{Écart entre méthodes d'estimation \emph{sur les mêmes données} (régression linéaire mensuelle vs cibles distributionnelles). Les cibles abaissent systématiquement $\kappa$ et relèvent $\sigma$.}
+\midrule
+\rowcolor{nxlightblue} Inflation - $\kappa_2$ (retour moyenne) & $69{,}8\,\%$ & $35{,}8\,\%$ & $\div\,1{,}95$ \\
+Inflation - $\sigma_2$ (volatilité) & $0{,}5\,\%$ & $1{,}3\,\%$ & $\times\,2{,}6$ \\
+\rowcolor{nxlightblue} Taux réels - $\kappa_2$ (retour moyenne) & $33{,}6\,\%$ & $10{,}8\,\%$ & $\div\,3{,}1$ \\
+Taux réels - $\sigma_2$ (volatilité) & $0{,}6\,\%$ & $0{,}9\,\%$ & $\times\,1{,}5$ \\
+\bottomrule
+\end{tabularx}
+\caption{Écart entre méthodes d'estimation \emph{sur les mêmes données}. Les cibles abaissent systématiquement $\kappa$ et relèvent $\sigma$.}
 \label{tab:p3-instab}
+\end{table}
 
-\begin{longtable}{P{4.6cm}P{3.2cm}P{3.4cm}P{2.6cm}}
+\begin{table}[H]
+\centering\small
+\renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
+\begin{tabularx}{\linewidth}{R c c c}
 \toprule
 \tablehead{Facteur} & \tablehead{$\kappa$ (cibles)} & \tablehead{Demi-vie $\ln 2/\kappa$} & \tablehead{Fenêtre/demi-vie} \\
-\midrule\endfirsthead
-\toprule
-\tablehead{Facteur} & \tablehead{$\kappa$ (cibles)} & \tablehead{Demi-vie $\ln 2/\kappa$} & \tablehead{Fenêtre/demi-vie} \\
-\midrule\endhead
-\bottomrule\endfoot
-{\small Inflation court} & {\small $73{,}9\,\%$} & {\small $\approx 0{,}9$ an} & {\small $\approx 14$} \\
-\rowcolor{nxlightblue}
-{\small Inflation long} & {\small $35{,}8\,\%$} & {\small $\approx 1{,}9$ an} & {\small $\approx 7$} \\
-{\small Taux réels court} & {\small $60{,}0\,\%$} & {\small $\approx 1{,}2$ an} & {\small $\approx 11$} \\
-\rowcolor{nxlightblue}
-{\small Taux réels long} & {\small $10{,}8\,\%$} & {\small $\approx 6{,}4$ ans} & {\small $\approx 2$} \\
-\end{longtable}
-\vspace{-10pt}
-\tabcaption{Demi-vies de retour à la moyenne contre la profondeur de fenêtre ($\approx 13$~ans de points morts). Pour le facteur \emph{long} des taux réels, le processus ne « mixe » qu'environ deux fois : le transitoire domine.}
+\midrule
+\rowcolor{nxlightblue} Inflation court & $73{,}9\,\%$ & $\approx 0{,}9$ an & $\approx 14$ \\
+Inflation long & $35{,}8\,\%$ & $\approx 1{,}9$ an & $\approx 7$ \\
+\rowcolor{nxlightblue} Taux réels court & $60{,}0\,\%$ & $\approx 1{,}2$ an & $\approx 11$ \\
+Taux réels long & $10{,}8\,\%$ & $\approx 6{,}4$ ans & $\approx 2$ \\
+\bottomrule
+\end{tabularx}
+\caption{Demi-vies de retour à la moyenne contre la profondeur de fenêtre ($\approx 13$~ans de points morts). Pour le facteur \emph{long} des taux réels, le processus ne « mixe » qu'environ deux fois.}
 \label{tab:p3-halflife}
+\end{table}
 
-Le dispositif disposant déjà de la densité de transition \emph{exacte} de chaque facteur (gaussienne pour le V2F, $\chi^2$ décentrée pour le CIR), le \emph{maximum de vraisemblance conditionnel} est consistant même en forte persistance et atteint la borne de Cramér-Rao ; il admet de surcroît une \emph{forme fermée} pour les facteurs gaussiens (la cascade de régressions de la revue \emph{est} l'EMV exact). Les corrélations sont alors estimées sur les \emph{résidus standardisés}, stationnaires par construction, ce qui élimine le risque de corrélation fallacieuse (co-tendance des niveaux, que la projection de Higham régularise sans corriger).
+Le dispositif disposant déjà de la densité de transition \emph{exacte} de chaque facteur (gaussienne pour le V2F, $\chi^2$ décentrée pour le CIR), le \emph{maximum de vraisemblance conditionnel} est consistant même en forte persistance, atteint la borne de Cramér-Rao et admet une \emph{forme fermée} pour les facteurs gaussiens (la cascade de régressions \emph{est} l'EMV exact). Les corrélations sont alors estimées sur les \emph{résidus standardisés}, stationnaires par construction, éliminant le risque de corrélation fallacieuse que la projection de Higham régularise sans corriger.
 
 \subsubsection{Point 2 - Hardy estimé séparément et corrélations par état}
 
-La vraisemblance d'un modèle à changement de régime gaussien est \emph{non bornée} (elle diverge quand la variance d'un régime tend vers~0 sur une observation) : le maximum global est dégénéré et la maximisation directe converge vers un maximum local, souvent fallacieux, avec échange d'étiquettes et biais de bord sur les persistances. Le calcul des corrélations stressées sur l'intersection $\mathcal{S}_i\cap\mathcal{S}_j$ des fenêtres de stress propres à chaque facteur est non viable : avec $k$ facteurs en stress une fraction $\pi_i\approx 26\,\%$ du temps, la fraction d'intersection vaut $\approx (0{,}26)^k$, soit \emph{environ un point} pour $k=4$ et $n=240$ ; le support s'évanouit, les blocs estimés sur des supports différents ne sont pas SDP, et conditionner aux états idiosyncratiques biaise la corrélation. Faute de chaîne partagée, le modèle ne peut encoder le caractère \emph{systémique} des crises : la dépendance de queue inter-actifs est sous-estimée, d'où un biais à la baisse des indicateurs ALM et de capital.
+La vraisemblance d'un modèle à changement de régime gaussien est \emph{non bornée} : le maximum global est dégénéré et la maximisation directe converge vers un maximum local, souvent fallacieux, avec échange d'étiquettes. Le calcul des corrélations stressées sur l'intersection $\mathcal{S}_i\cap\mathcal{S}_j$ des fenêtres de stress propres à chaque facteur est non viable : avec $k$ facteurs en stress une fraction $\pi_i\approx 26\,\%$ du temps, la fraction d'intersection vaut $\approx (0{,}26)^k$, soit \emph{environ un point} pour $k=4$ et $n=240$ ; le support s'évanouit et les blocs ne sont pas SDP. Faute de chaîne partagée, le modèle ne peut encoder le caractère \emph{systémique} des crises : la dépendance de queue inter-actifs est sous-estimée, d'où un biais à la baisse des indicateurs ALM et de capital.
 
 \subsubsection{Point 3 - simulation des régimes par uniforme commune}
 
-Le schéma simule l'état suivant de chaque facteur par $\mathcal{R}^{(i)}_{t+h}=F^{-1}_{i,\mathcal{R}^{(i)}_t}(U_t)$ à partir d'une \emph{même} uniforme $U_t$ : c'est le couplage \emph{comonotone} (borne de Fréchet) des indicatrices de régime. Cette dépendance est un \emph{artefact} du couplage et de l'ordre (arbitraire) des états, qu'aucune donnée n'informe ; elle est \emph{dégénérée} (couplage maximal, ne reproduisant aucune matrice de transition jointe cible) et \emph{incohérente} avec l'estimation, qui traite les chaînes comme indépendantes : aucune loi de probabilité unique ne sous-tend les deux phases.
+Le schéma simule l'état suivant de chaque facteur par $\mathcal{R}^{(i)}_{t+h}=F^{-1}_{i,\mathcal{R}^{(i)}_t}(U_t)$ à partir d'une \emph{même} uniforme $U_t$ : c'est le couplage \emph{comonotone} (borne de Fréchet) des indicatrices de régime. Cette dépendance est un \emph{artefact} du couplage et de l'ordre (arbitraire) des états, qu'aucune donnée n'informe ; elle est \emph{dégénérée} et \emph{incohérente} avec l'estimation, qui traite les chaînes comme indépendantes : aucune loi de probabilité unique ne sous-tend les deux phases.
 
 \subsubsection{Cadre alternatif proposé : représentation AR à régime latent commun}
 
@@ -831,39 +1094,31 @@ Les trois points se résolvent d'un seul tenant. Toute EDS du GSE, discrétisée
 \begin{equation*}
 Y^{(i)}_{t+h}=\Phi_i(t,h,\mathcal{E}_t)\,Y^{(i)}_t+c_i(t,h,\mathcal{E}_t)+\Sigma_i(t,h,\mathcal{E}_t)\,\varepsilon^{(i)}_{t+h},
 \end{equation*}
-dont les coefficients dépendent éventuellement d'un \emph{processus de Markov d'état économique commun} $\mathcal{E}_t$ à $K^\star$ états. On distingue le \textbf{Groupe~A} (coefficients insensibles au régime : V2F, Black-Karasinski, CIR, Black-Scholes) et le \textbf{Groupe~B} (sensibles au régime : Hardy). Pour homogénéiser facteurs gaussiens et non gaussiens, on définit le \emph{résidu standardisé} par transformée intégrale de probabilité $\widehat\varepsilon^{(i)}_{t+h}=\Phi^{-1}\!\big(F_i(Y^{(i)}_{t+h}\mid Y^{(i)}_t,\mathcal{E}_t)\big)$ : la dépendance devient une copule gaussienne sur ces scores, fournissant la corrélation des browniens \emph{directement}, sans les formules de passage cible$\to$brownien.
-
-L'estimation est \emph{séquentielle} (de type IFM, consistante et stable) : \textbf{Étape~1} (Groupe~A) maximum de vraisemblance conditionnel exact, en \emph{forme fermée} pour les facteurs gaussiens, puis corrélations $\widehat\Omega^{AA}$ sur résidus PIT ; \textbf{Étape~2} (Groupe~B) algorithme EM / Baum-Welch à régime \emph{commun}, à ascension monotone garantie (étape~M en forme fermée) ; \textbf{Étape~3} corrélations croisées par régime $\widehat\Omega^{AB}(a)$ sur résidus (paramètres figés), puis projection SDP (Higham) régime par régime. Cinq des six familles d'estimateurs admettent une forme fermée (exacte ou par itération EM) ; seul l'EMV du CIR requiert une optimisation, initialisée en forme fermée. Le nombre d'états $K^\star$ est sélectionné par critère d'information (BIC) ou méthode du coude sur la log-vraisemblance, remplaçant les $k$ chaînes séparées à deux états ($2^k$ états joints) par un \emph{unique} régime parcimonieux. À la simulation, on tire un chemin \emph{unique} $\{\mathcal{E}_t\}$ puis des chocs corrélés par régime $\varepsilon_{t+h}=L(\mathcal{E}_t)\,z_{t+h}$ : l'artifice de l'uniforme commune disparaît.
+dont les coefficients dépendent éventuellement d'un \emph{régime de marché commun} $\mathcal{E}_t$ à $K^\star$ états : \textbf{Groupe~A} (insensible au régime : V2F, BK, CIR, BS) et \textbf{Groupe~B} (sensible : Hardy). On définit le \emph{résidu standardisé} par transformée intégrale de probabilité $\widehat\varepsilon^{(i)}_{t+h}=\Phi^{-1}\!\big(F_i(Y^{(i)}_{t+h}\mid Y^{(i)}_t,\mathcal{E}_t)\big)$ : la dépendance devient une copule gaussienne sur ces scores, fournissant la corrélation des browniens \emph{directement}, sans formules de passage. L'estimation est \emph{séquentielle} (IFM) : Étape~1 (Groupe~A) EMV conditionnel exact en forme fermée + corrélations sur résidus ; Étape~2 (Groupe~B) EM / Baum-Welch à régime commun, ascension monotone ; Étape~3 corrélations croisées par régime + projection SDP (Higham). Le nombre d'états $K^\star$ est choisi par BIC / méthode du coude, remplaçant les $2^k$ états joints des chaînes séparées. À la simulation, on tire un chemin \emph{unique} $\{\mathcal{E}_t\}$ puis des chocs corrélés par régime $\varepsilon_{t+h}=L(\mathcal{E}_t)\,z_{t+h}$.
 
 \begin{mabox}[Propriétés du dispositif alternatif]
-\textbf{Cohérence estimation/simulation} : une seule loi (copule gaussienne par régime) sous-tend les deux phases. \textbf{Régimes systémiques} : la chaîne commune reproduit l'entrée \emph{conjointe} des actifs risqués en stress, donc la dépendance de queue. \textbf{Corrélations de stress bien définies} : conditionnellement à $\mathcal{E}_t=a$, sur plein support (ni intersection vide, ni biais de sélection). \textbf{Parcimonie} : $K^\star$ optimal contre l'explosion $2^k$. \textbf{Robustesse} : estimateurs consistants en forte persistance, formes fermées là où elles existent, corrélations sur résidus stationnaires.
+\textbf{Cohérence estimation/simulation} : une seule loi (copule gaussienne par régime) sous-tend les deux phases. \textbf{Régimes systémiques} : la chaîne commune reproduit l'entrée \emph{conjointe} des actifs risqués en stress, donc la dépendance de queue. \textbf{Corrélations de stress bien définies} : conditionnellement à $\mathcal{E}_t=a$, sur plein support. \textbf{Parcimonie} : $K^\star$ optimal contre l'explosion $2^k$. \textbf{Robustesse} : estimateurs consistants en forte persistance, formes fermées là où elles existent.
 \end{mabox}
 
-Ce cadre a été implémenté et appliqué à l'ensemble des facteurs (module de calibrage \texttt{evolution\_methodo}) : la représentation AR à régime commun reproduit les sorties de référence et sélectionne $K^\star$ par BIC/coude, confirmant la faisabilité opérationnelle de l'alternative.
+Ce cadre a été implémenté et appliqué à l'ensemble des facteurs (module \texttt{evolution\_methodo}) : la représentation AR à régime commun reproduit les sorties de référence et sélectionne $K^\star$ par BIC/coude, confirmant la faisabilité opérationnelle de l'alternative.
 
-\subsubsection{Synthèse des points d'attention et correctifs}
-
-\begin{longtable}{P{3.5cm}P{5.0cm}P{5.0cm}}
+\begin{table}[H]
+\centering\small
+\renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{5pt}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{3.4cm} X X}
 \toprule
 \tablehead{Point d'attention} & \tablehead{Conséquence} & \tablehead{Correctif proposé} \\
-\midrule\endfirsthead
-\toprule
-\tablehead{Point d'attention} & \tablehead{Conséquence} & \tablehead{Correctif proposé} \\
-\midrule\endhead
-\bottomrule\endfoot
-{\small Cibles distributionnelles} & {\small Forte variance, mauvais conditionnement ($\sigma^2/\kappa$), instabilité à la fenêtre, perte d'efficience} & {\small EMV conditionnel exact (densité disponible), en forme fermée ; pondération efficiente ; $J$-test} \\
-\rowcolor{nxlightblue}
-{\small Initialisation hors régime stationnaire} & {\small Trajectoire transitoire : biais directionnel ($\hat\kappa\!\downarrow$, $\hat\sigma\!\uparrow$) ; correction $\widehat\Omega^2$ circulaire} & {\small EMV conditionnel (valide en local-de-l'unité) ; résidus standardisés ; tests ADF/PP/KPSS en niveau} \\
-{\small Corrélations / dispersions de niveau} & {\small Co-tendance des niveaux (régression fallacieuse) ; Higham régularise un biais} & {\small Corrélations sur résidus PIT, bruit blanc stationnaire} \\
-\rowcolor{nxlightblue}
-{\small Hardy : vraisemblance brute} & {\small Vraisemblance non bornée, maxima fallacieux, échange d'étiquettes} & {\small EM / Baum-Welch à ascension monotone ; planchers de variance} \\
-{\small Corrélations par intersection de stress} & {\small Intersections vides ($\sim 0{,}26^k$), régime incohérent, non-SDP} & {\small Régime \emph{commun} $\mathcal{E}_t$ ; corrélations par régime sur plein support} \\
-\rowcolor{nxlightblue}
-{\small Calibrage séparé des chaînes} & {\small Pas de facteur latent commun ; explosion $2^k$ ; queue sous-estimée} & {\small MS-VAR à régime latent partagé, $K^\star$ optimal (BIC/coude)} \\
-{\small Simulation par uniforme commune} & {\small Dépendance comonotone non estimée, dépendante de l'étiquetage, incohérente} & {\small Simulation directe : un seul régime, chocs $L(\mathcal{E}_t)z$ par régime} \\
-\end{longtable}
-\vspace{-10pt}
-\tabcaption{Synthèse des points d'attention et du cadre unifié proposé.}
+\midrule
+\rowcolor{nxlightblue} Cibles distributionnelles & Mauvais conditionnement ($\sigma^2/\kappa$), instabilité à la fenêtre, perte d'efficience & EMV conditionnel exact (densité disponible), forme fermée ; pondération efficiente \\
+Initialisation hors régime stationnaire & Biais directionnel ($\hat\kappa\!\downarrow$, $\hat\sigma\!\uparrow$) ; correction circulaire & EMV conditionnel ; résidus standardisés ; tests ADF/PP/KPSS \\
+\rowcolor{nxlightblue} Corrélations de niveau & Co-tendance (régression fallacieuse) ; Higham régularise un biais & Corrélations sur résidus PIT, bruit blanc stationnaire \\
+Hardy : vraisemblance brute & Maxima fallacieux, échange d'étiquettes & EM / Baum-Welch à ascension monotone ; planchers de variance \\
+\rowcolor{nxlightblue} Corrélations par intersection de stress & Intersections vides ($\sim 0{,}26^k$), non-SDP & Régime \emph{commun} $\mathcal{E}_t$ ; corrélations par régime sur plein support \\
+Simulation par uniforme commune & Dépendance comonotone non estimée, incohérente & Simulation directe : un régime, chocs $L(\mathcal{E}_t)z$ par régime \\
+\bottomrule
+\end{tabularx}
+\caption{Synthèse des points d'attention et du cadre unifié proposé.}
+\end{table}
 
 \begin{auditbox}
 Les fragilités identifiées portent sur l'\emph{estimation} et le \emph{couplage}, non sur les EDS retenues. À périmètre de modélisation inchangé, nous recommandons de privilégier le \emph{maximum de vraisemblance conditionnel} (en forme fermée là où il existe) plutôt que les cibles distributionnelles, d'estimer les corrélations sur \emph{résidus standardisés} stationnaires, et d'introduire un \emph{régime de marché commun} (MS-VAR, $K^\star$ par BIC) couplé à une simulation directe et cohérente. Le choix final des méthodes et paramètres demeure de la responsabilité de l'Ircantec.
