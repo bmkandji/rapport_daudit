@@ -535,6 +535,109 @@ Nous recommendons une fenêtre de calibrage de 20 ans plutôt que 15 ans, justif
 \end{auditbox}
 
 \clearpage
+\section{Revue des évolutions du GSE depuis la revue Milliman (2022)}
+\label{sec:evolutions}
+
+La refonte du modèle d'allocation engagée pour l'exercice 2026 fait évoluer le GSE sur quatre dimensions : la \textbf{modélisation} de certains facteurs de risque, la \textbf{méthodologie} de calibrage et de simulation, la \textbf{structure de corrélation} et le \textbf{périmètre des classes d'actifs}. Cette section synthétise ces évolutions par rapport au dispositif documenté lors de la dernière revue Milliman (2022), en rappelle la formulation (formules comprises) et en apprécie la validité et la cohérence. Le détail facteur par facteur est repris dans les sections dédiées ; les renvois sont indiqués.
+
+\subsection{Synthèse des évolutions}
+
+\begingroup\small
+\begin{longtable}{|P{3.0cm}|P{4.3cm}|P{4.7cm}|P{2.0cm}|}
+\hline\rowcolor{nexnavy}
+\thead{Composante} & \thead{Avant - revue Milliman (2022)} & \thead{Après - refonte 2026} & \thead{Nature} \\
+\hline\endfirsthead
+\hline\rowcolor{nexnavy}
+\thead{Composante} & \thead{Avant - revue Milliman (2022)} & \thead{Après - refonte 2026} & \thead{Nature} \\
+\hline\endhead
+\hline\endfoot
+\multicolumn{4}{|l|}{\cellcolor{nxslate}\textcolor{white}{\sffamily\bfseries\small Modélisation des facteurs de risque}} \\ \hline
+{\small ZC nominaux - taux réel $\times$ inflation} & {\small Fisher avec hypothèse d'indépendance : $P^{nom}=P^{r\acute{e}el}P^{inf}$} & {\small Ajout d'un terme de covariance $\rho_{r,i}$ taux réel $\times$ inflation} & {\small Enrichis-sement} \\ \hline
+\rowcolor{nexlight}
+{\small ZC nominaux - taux court $\times$ long} & {\small Corrélation court / long supposée nulle} & {\small Nouveau facteur de covariance $\rho_{r,l}$ dans $\operatorname{Var}[\int r]$} & {\small Nouveau} \\ \hline
+{\small Dette privée (spread)} & {\small Diffusion par CIR ($\sqrt{s_t}$)} & {\small Black-Karasinski / log-Vasicek (positivité, vol.\ élevée)} & {\small Changement de modèle} \\ \hline
+\multicolumn{4}{|l|}{\cellcolor{nxslate}\textcolor{white}{\sffamily\bfseries\small Méthodologie - calibrage et simulation}} \\ \hline
+\rowcolor{nexlight}
+{\small Crédit IG - schéma CIR} & {\small Euler-Deelstra/Deelbaen (non positif)} & {\small Schéma positif : Euler-DIOP (réfléchi) / Alfonsi $E(0)$} & {\small Changement de schéma} \\ \hline
+{\small Crédit IG - calibrage} & {\small Régression d'Euler} & {\small Initialisation par régression puis max.\ de vraisemblance ($\chi^2$ décentré)} & {\small Renforce-ment} \\ \hline
+\rowcolor{nexlight}
+{\small Fenêtre \& données} & {\small Calibrage 2022 (fenêtre 20 ans)} & {\small Recalibrage complet au 31/12/2025 ; fenêtres 15 / 20 ans testées, 20 ans retenue} & {\small Mise à jour} \\ \hline
+\multicolumn{4}{|l|}{\cellcolor{nxslate}\textcolor{white}{\sffamily\bfseries\small Structure de corrélation}} \\ \hline
+{\small Matrice de corrélation} & {\small Périmètre 2022 (hors dette privée et infrastructure)} & {\small Intégration dette privée et infrastructure ; matrice étendue (13 facteurs)} & {\small Extension} \\ \hline
+\rowcolor{nexlight}
+{\small Passage corrél.\ $\to$ browniens} & {\small Formules V2F, BS, CIR} & {\small Dérivation du couple BK (V2F$\times$BK, BS$\times$BK, CIR$\times$BK)} & {\small Nouveau} \\ \hline
+\multicolumn{4}{|l|}{\cellcolor{nxslate}\textcolor{white}{\sffamily\bfseries\small Nouvelles classes d'actifs}} \\ \hline
+{\small Actions émergentes} & {\small Absente} & {\small Hardy RSLN-2 (2 régimes)} & {\small Nouvelle classe} \\ \hline
+\rowcolor{nexlight}
+{\small Infrastructure} & {\small Absente} & {\small Black-Scholes après \emph{unsmoothing} AR(1)} & {\small Nouvelle classe} \\ \hline
+{\small Dette privée (classe)} & {\small Modélisée via le module crédit} & {\small Classe dédiée diffusée par Black-Karasinski} & {\small Nouvelle classe} \\ \hline
+\caption{Synthèse, ligne par ligne, des évolutions du GSE depuis la revue Milliman (2022).}
+\label{tab:evolutions}
+\end{longtable}
+\endgroup
+
+\subsection{Modélisation : pricing des ZC nominaux et dette privée}
+
+\subsubsection*{ZC nominaux - corrections de covariance}
+
+L'approche antérieure reconstruisait le ZC nominal par la relation de Fisher en supposant l'\textbf{indépendance} entre le taux réel et l'inflation. La refonte lève cette hypothèse en introduisant \emph{deux} termes de covariance : (i) entre taux réel et inflation, (ii) entre taux réel court et taux réel long, ce dernier auparavant supposé nul.
+\begin{equation*}
+P^{nom}(t,T) = P^{r\acute{e}el}(t,T)\,P^{inf}(t,T) + \rho_{r,i}\,\sqrt{\operatorname{Var}\!\big[e^{-R_r(t,T)}\big]\operatorname{Var}\!\big[e^{-R_i(t,T)}\big]} ,
+\end{equation*}
+\begin{equation*}
+\operatorname{Var}\!\Big[\textstyle\int_t^T r_u\,du\Big] = \operatorname{Var}[I(t,T)] + \operatorname{Var}[J(t,T)] + 2\,\rho_{r,l}\,\sqrt{\operatorname{Var}[I(t,T)]\,\operatorname{Var}[J(t,T)]} ,
+\end{equation*}
+où $I$ et $J$ sont les composantes browniennes des facteurs court et long du V2F.
+
+\textbf{Validité et cohérence.} L'évolution est \emph{économiquement fondée} : une inflation élevée appelle une remontée des taux directeurs, d'où la corrélation négative observée ($\rho_{r,i}\approx-50\,\%$) ; la dépendance court / long est de même réelle. La dérivation (intégrales de Wiener, théorème de Fubini) est \emph{analytiquement exacte} et a été re-dérivée de façon indépendante (cf.\ \S\ref{sec:zc-corr}). L'impact est matériel mais maîtrisé : $\approx$+10 bp (correction 1), $\approx$+7 bp (correction 2), soit $\approx$+17 bp de rendement sur le ZC 10 ans à volatilité quasi inchangée. Le rendement reste toutefois \emph{sensible} aux corrélations ($\rho_{r,i}=-70\,\%$ et $\rho_{r,l}=+70\,\%\Rightarrow\approx$+23 bp), ce qui justifie de \textbf{calibrer et documenter} $\rho_{r,i}$ et $\rho_{r,l}$ sur cible historique plutôt que sur valeur d'expert.
+
+\subsubsection*{Dette privée - du CIR au Black-Karasinski}
+
+Le spread de dette privée, auparavant diffusé par un CIR, l'est désormais par un modèle log-Vasicek (Black-Karasinski), de discrétisation exacte, avec moyenne ajustée pour intégrer la prime de liquidité :
+\begin{equation*}
+\text{Avant : } ds_t=\kappa(\theta-s_t)\,dt+\sigma\sqrt{s_t}\,dW_t
+\quad\longrightarrow\quad
+\text{Après : } d\ln s_t=k(\theta-\ln s_t)\,dt+\sigma\,dW_t ,
+\end{equation*}
+\begin{equation*}
+\mathbb{E}[s_\infty]=\exp\!\Big(\theta+\tfrac{\sigma^2}{4k}\Big),\qquad \theta=m-\frac{\sigma^2}{4k},\quad m=\ln S^\star \ (\text{base + prime de liquidité}).
+\end{equation*}
+
+\textbf{Validité et cohérence.} Le passage au log-Vasicek garantit la \emph{stricte positivité} du spread et capte des \emph{volatilités élevées} ($\sigma$ du log-spread $\approx 49,7\,\%$ vs $24,1\,\%$ en 2022), cohérentes avec le caractère explosif des spreads de dette privée ; en backtest, la volatilité diffusée par BK dépasse celle du CIR ($\approx$+226 bp), ce qui conforte le choix du modèle pour cette classe. Le calibrage par régression (rendement $\approx 4,6\,\%$ contre $4,05\,\%$ par cibles distributionnelles) est retenu de façon argumentée. \emph{Point d'attention} : la forte hausse de $\sigma$ appelle un suivi de la dispersion long terme (cf.\ section \emph{Dette privée}).
+
+\subsection{Méthodologie : schéma de simulation du crédit et recalibrage}
+
+Le spread crédit IG (CIR) était simulé par le schéma d'Euler-Deelstra/Deelbaen, qui n'assure pas la positivité dès que la condition de Feller $\sigma^2\le 2\kappa\theta$ n'est pas vérifiée. La refonte retient un schéma \emph{préservant la positivité} - schéma réfléchi d'Euler-DIOP ou schéma d'Alfonsi $E(0)$ :
+\begin{equation*}
+\bar s_{t+\Delta}=\Big(\big(1-\tfrac{\kappa}{2}\Delta\big)\sqrt{\bar s_t}+\frac{\sigma\,\Delta W_t}{2\,(1-\tfrac{\kappa}{2}\Delta)}\Big)^{\!2}+\Big(\kappa\theta-\tfrac{\sigma^2}{4}\Big)\Delta ,\qquad \text{valide sous } \sigma^2\le 4\kappa\theta .
+\end{equation*}
+Le calibrage est par ailleurs renforcé : initialisation par régression d'Euler puis maximum de vraisemblance exact (loi conditionnelle du $\chi^2$ décentré).
+
+\textbf{Validité et cohérence.} L'évolution \emph{corrige un défaut} du schéma antérieur (probabilité non nulle de spreads négatifs) tout en conservant une convergence forte (ordre $\approx 0,47$ pour DIOP, ordre 1 pour Alfonsi $E(0)$). La condition affaiblie $\sigma^2\le 4\kappa\theta$ devra être vérifiée sur les paramètres en production. Le recalibrage complet au 31/12/2025, avec test des fenêtres 15 et 20 ans et choix de la fenêtre \textbf{20 ans}, est cohérent avec la justification transverse (couverture de plusieurs cycles, alignement sur l'horizon de passif, cf.\ \S\ref{sec:fenetre}).
+
+\subsection{Corrélation : intégration des nouvelles classes}
+
+Le passage des corrélations historiques aux corrélations des browniens s'appuie sur l'écriture, propre à chaque modèle $P$, de chaque facteur observable sous la forme $X^{P}=a^{P}\,W+b^{P}$ (avec $W$ brownien), qui rend explicite la transformation $\rho^{hist}\to\rho^{GSE}$. La refonte \emph{dérive le couple Black-Karasinski} (V2F$\times$BK, BS$\times$BK, CIR$\times$BK) et intègre la dette privée et l'infrastructure, portant la matrice à 13 facteurs (15 avec régimes stressés), sur données arrêtées au 31/12/2025 :
+\begin{equation*}
+\rho^{GSE} = F^{-1}_{\mathcal{P}_1,\mathcal{P}_2}\big(\rho^{historique}\big), \qquad \rho^{GSE} \xrightarrow{\text{Higham}} \rho^{SDP} .
+\end{equation*}
+
+\textbf{Validité et cohérence.} La construction (copule gaussienne, conversion analytique par couple de modèles, régularisation de semi-définie positivité) est \emph{cohérente} et les corrélations obtenues sont économiquement plausibles (Spread $\times$ Dette privée $\approx 90,8\,\%$ ; Action Euro $\times$ Dette privée $\approx -72,5\,\%$). \emph{Points d'attention} (cf.\ \S\ref{sec:zc-corr}) : la décorrélation interne des V2F (court $\times$ long $=0$) et l'adossement du facteur court au facteur long ne sont pas justifiés empiriquement, et le couple Action Monde $\times$ Action Monde stressée à $0\,\%$ reste à confirmer (convention ou anomalie).
+
+\subsection{Nouvelles classes d'actifs}
+
+Trois classes intègrent désormais le périmètre de diffusion : les \textbf{actions émergentes} (Hardy RSLN-2 à deux régimes, comme les actions Euro et Monde), l'\textbf{infrastructure} et la \textbf{dette privée} (\emph{supra}). L'immobilier, l'infrastructure et les actions non cotées, peu liquides, présentent une autocorrélation d'ordre 1 incompatible avec l'hypothèse d'indépendance de Black-Scholes ; un \emph{unsmoothing} AR(1) la corrige avant calibrage :
+\begin{equation*}
+\tilde r_t=\frac{r_t-\hat a\,r_{t-1}}{1-\hat a},\qquad \hat a=\hat\rho_1 \ (\text{autocorrélation d'ordre 1 estimée}).
+\end{equation*}
+
+\textbf{Validité et cohérence.} Les modélisations sont \emph{homogènes} aux classes existantes (RSLN-2 pour les actions, Black-Scholes \emph{unsmoothé} pour les actifs réels), ce qui assure la cohérence du dispositif. Les calibrages sont \emph{ordonnés} comme attendu (volatilité émergent $>$ Euro $>$ Monde ; infrastructure plus volatile que l'immobilier), et l'élargissement de l'univers investissable renforce la diversification de l'allocation.
+
+\begin{insightbox}[Appréciation d'ensemble des évolutions]
+Les évolutions introduites depuis la revue Milliman (2022) sont \textbf{bien fondées} sur les plans économique et mathématique, \textbf{analytiquement exactes} (re-dérivation indépendante des termes de covariance, des schémas et des formules de passage) et \textbf{cohérentes} avec l'architecture du GSE. Les principaux points d'attention - sans remise en cause du dispositif - portent sur le calibrage et la documentation des corrélations $\rho_{r,i}$ et $\rho_{r,l}$, le suivi de la forte hausse de volatilité de la dette privée, la vérification de la condition $\sigma^2\le 4\kappa\theta$ du schéma crédit, et la justification des hypothèses structurelles de corrélation (termes fixés à zéro et adossement court / long).
+\end{insightbox}
+
+\clearpage
 \section{Démarche et référentiel d'audit}
 
 \subsection{Référentiel d'analyse}
