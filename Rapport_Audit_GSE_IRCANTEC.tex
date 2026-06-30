@@ -23,11 +23,10 @@
 
 % --------- MISE EN PAGE -----------------------------------------------------
 \usepackage[a4paper,top=32mm,bottom=22mm,left=25mm,right=25mm,
-            headheight=19mm,headsep=6mm,footskip=14mm]{geometry}
-\usepackage{setspace}
-\setstretch{1.08}
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{5pt}
+            headheight=19mm,headsep=6mm]{geometry}
+% Charte v2 : pas de \setstretch ni de \parskip — interligne et espacement
+% des paragraphes laissés aux valeurs LaTeX par défaut (paragraphes indentés),
+% conformément au template du skill nexialog-note-technique-latex.
 
 % --------- COULEURS : palette officielle Nexialog v2 ------------------------
 \usepackage{xcolor,colortbl}
@@ -79,8 +78,8 @@
 \usepackage{xurl}               % coupure des URLs longs
 \usepackage{hyperref}
 
-% Listes : on conserve les puces tiret du document source.
-\setlist[itemize]{label=--, leftmargin=1.2em, itemsep=2pt, topsep=3pt}
+% Listes : bullets désindentés (charte v2, BCG/McKinsey-like), réglage global.
+\setlist{leftmargin=*, labelindent=0pt, itemsep=2pt, topsep=4pt}
 
 % --------- EN-TÊTE / PIED (charte v2 : logo + filet fin) --------------------
 \pagestyle{fancy}
@@ -96,8 +95,8 @@
 % --------- STYLES DE SECTION (Montserrat navy, charte v2) -------------------
 % \sffamily force Montserrat. Hiérarchie portée par la taille (pas de filet).
 \titleformat{\section}{\sffamily\Large\bfseries\color{nxnavy}}{\thesection.}{0.5em}{}
-\titleformat{\subsection}{\sffamily\large\bfseries\color{nxnavy}}{\thesubsection.}{0.5em}{}
-\titleformat{\subsubsection}{\sffamily\normalsize\bfseries\color{nxnavy}}{\thesubsubsection.}{0.5em}{}
+\titleformat{\subsection}{\sffamily\large\bfseries\color{nxnavy}}{}{0em}{\thesubsection.~}
+\titleformat{\subsubsection}{\sffamily\normalsize\bfseries\color{nxnavy}}{}{0em}{\thesubsubsection.~}
 
 % --------- TABLE DES MATIÈRES via etoc (charte v2) --------------------------
 % H1 rouge Nexialog, H2/H3 bleu navy, le tout en Montserrat, liens cliquables.
@@ -202,8 +201,9 @@
 
 % --------- COMMANDES & STYLES DE TABLEAUX (du document, restylés v2) --------
 \newcolumntype{P}[1]{>{\RaggedRight\arraybackslash}p{#1}}
-\arrayrulecolor{tabborder}
-\renewcommand{\arraystretch}{1.35}
+% Charte v2 : règles booktabs par défaut (noires), interligne de tableau 1.4
+% (cf. rapport_Audit_GSE_CDC_Phase1, skill nexialog-note-technique-latex).
+\renewcommand{\arraystretch}{1.4}
 % En-tête de tableau sur fond navy (texte blanc, Montserrat)
 \newcommand{\thead}[1]{\textcolor{white}{\sffamily\bfseries\small #1}}
 % En-tête de tableau sur fond clair / booktabs (texte navy, Montserrat)
@@ -556,34 +556,34 @@ La refonte du modèle d'allocation engagée pour l'exercice 2026 fait évoluer l
 \subsection{Synthèse des évolutions}
 
 \begingroup\small
-\begin{longtable}{|P{3.0cm}|P{4.3cm}|P{4.7cm}|P{2.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Composante} & \thead{Avant - revue Milliman (2022)} & \thead{Après - refonte 2026} & \thead{Nature} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Composante} & \thead{Avant - revue Milliman (2022)} & \thead{Après - refonte 2026} & \thead{Nature} \\
-\hline\endhead
-\hline\endfoot
-\multicolumn{4}{|l|}{\cellcolor{nxslate}\textcolor{white}{\sffamily\bfseries\small Modélisation des facteurs de risque}} \\ \hline
-{\small ZC nominaux - taux réel $\times$ inflation} & {\small Fisher avec hypothèse d'indépendance : $P^{nom}=P^{r\acute{e}el}P^{inf}$} & {\small Ajout d'un terme de covariance $\rho_{r,i}$ taux réel $\times$ inflation} & {\small Enrichis-sement} \\ \hline
-\rowcolor{nexlight}
-{\small ZC nominaux - taux court $\times$ long} & {\small Corrélation court / long supposée nulle} & {\small Nouveau facteur de covariance $\rho_{r,l}$ dans $\operatorname{Var}[\int r]$} & {\small Nouveau} \\ \hline
-{\small Dette privée (spread)} & {\small Diffusion par CIR ($\sqrt{s_t}$)} & {\small Black-Karasinski / log-Vasicek (positivité, vol.\ élevée)} & {\small Changement de modèle} \\ \hline
-\multicolumn{4}{|l|}{\cellcolor{nxslate}\textcolor{white}{\sffamily\bfseries\small Méthodologie - calibrage et simulation}} \\ \hline
-\rowcolor{nexlight}
-{\small Crédit IG - schéma CIR} & {\small Euler-Deelstra/Deelbaen (non positif)} & {\small Schéma positif : Euler-DIOP (réfléchi) / Alfonsi $E(0)$} & {\small Changement de schéma} \\ \hline
-{\small Crédit IG - calibrage} & {\small Régression d'Euler} & {\small Initialisation par régression puis max.\ de vraisemblance ($\chi^2$ décentré)} & {\small Renforce-ment} \\ \hline
-\rowcolor{nexlight}
-{\small Fenêtre \& données} & {\small Calibrage 2022 (fenêtre 20 ans)} & {\small Recalibrage complet au 31/12/2025 ; fenêtres 15 / 20 ans testées, 20 ans retenue} & {\small Mise à jour} \\ \hline
-\multicolumn{4}{|l|}{\cellcolor{nxslate}\textcolor{white}{\sffamily\bfseries\small Structure de corrélation}} \\ \hline
-{\small Matrice de corrélation} & {\small Périmètre 2022 (hors dette privée et infrastructure)} & {\small Intégration dette privée et infrastructure ; matrice étendue (13 facteurs)} & {\small Extension} \\ \hline
-\rowcolor{nexlight}
-{\small Passage corrél.\ $\to$ browniens} & {\small Formules V2F, BS, CIR} & {\small Dérivation du couple BK (V2F$\times$BK, BS$\times$BK, CIR$\times$BK)} & {\small Nouveau} \\ \hline
-\multicolumn{4}{|l|}{\cellcolor{nxslate}\textcolor{white}{\sffamily\bfseries\small Nouvelles classes d'actifs}} \\ \hline
-{\small Actions émergentes} & {\small Absente} & {\small Hardy RSLN-2 (2 régimes)} & {\small Nouvelle classe} \\ \hline
-\rowcolor{nexlight}
-{\small Infrastructure} & {\small Absente} & {\small Black-Scholes après \emph{unsmoothing} AR(1)} & {\small Nouvelle classe} \\ \hline
-{\small Dette privée (classe)} & {\small Modélisée via le module crédit} & {\small Classe dédiée diffusée par Black-Karasinski} & {\small Nouvelle classe} \\ \hline
+\begin{longtable}{P{3.0cm}P{4.3cm}P{4.7cm}P{2.0cm}}
+\toprule
+\tablehead{Composante} & \tablehead{Avant - revue Milliman (2022)} & \tablehead{Après - refonte 2026} & \tablehead{Nature} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Composante} & \tablehead{Avant - revue Milliman (2022)} & \tablehead{Après - refonte 2026} & \tablehead{Nature} \\
+\midrule\endhead
+\bottomrule\endfoot
+\multicolumn{4}{l}{\cellcolor{nxslate}\textcolor{white}{\sffamily\bfseries\small Modélisation des facteurs de risque}} \\
+{\small ZC nominaux - taux réel $\times$ inflation} & {\small Fisher avec hypothèse d'indépendance : $P^{nom}=P^{r\acute{e}el}P^{inf}$} & {\small Ajout d'un terme de covariance $\rho_{r,i}$ taux réel $\times$ inflation} & {\small Enrichis-sement} \\
+\rowcolor{nxlightblue}
+{\small ZC nominaux - taux court $\times$ long} & {\small Corrélation court / long supposée nulle} & {\small Nouveau facteur de covariance $\rho_{r,l}$ dans $\operatorname{Var}[\int r]$} & {\small Nouveau} \\
+{\small Dette privée (spread)} & {\small Diffusion par CIR ($\sqrt{s_t}$)} & {\small Black-Karasinski / log-Vasicek (positivité, vol.\ élevée)} & {\small Changement de modèle} \\
+\multicolumn{4}{l}{\cellcolor{nxslate}\textcolor{white}{\sffamily\bfseries\small Méthodologie - calibrage et simulation}} \\
+\rowcolor{nxlightblue}
+{\small Crédit IG - schéma CIR} & {\small Euler-Deelstra/Deelbaen (non positif)} & {\small Schéma positif : Euler-DIOP (réfléchi) / Alfonsi $E(0)$} & {\small Changement de schéma} \\
+{\small Crédit IG - calibrage} & {\small Régression d'Euler} & {\small Initialisation par régression puis max.\ de vraisemblance ($\chi^2$ décentré)} & {\small Renforce-ment} \\
+\rowcolor{nxlightblue}
+{\small Fenêtre \& données} & {\small Calibrage 2022 (fenêtre 20 ans)} & {\small Recalibrage complet au 31/12/2025 ; fenêtres 15 / 20 ans testées, 20 ans retenue} & {\small Mise à jour} \\
+\multicolumn{4}{l}{\cellcolor{nxslate}\textcolor{white}{\sffamily\bfseries\small Structure de corrélation}} \\
+{\small Matrice de corrélation} & {\small Périmètre 2022 (hors dette privée et infrastructure)} & {\small Intégration dette privée et infrastructure ; matrice étendue (13 facteurs)} & {\small Extension} \\
+\rowcolor{nxlightblue}
+{\small Passage corrél.\ $\to$ browniens} & {\small Formules V2F, BS, CIR} & {\small Dérivation du couple BK (V2F$\times$BK, BS$\times$BK, CIR$\times$BK)} & {\small Nouveau} \\
+\multicolumn{4}{l}{\cellcolor{nxslate}\textcolor{white}{\sffamily\bfseries\small Nouvelles classes d'actifs}} \\
+{\small Actions émergentes} & {\small Absente} & {\small Hardy RSLN-2 (2 régimes)} & {\small Nouvelle classe} \\
+\rowcolor{nxlightblue}
+{\small Infrastructure} & {\small Absente} & {\small Black-Scholes après \emph{unsmoothing} AR(1)} & {\small Nouvelle classe} \\
+{\small Dette privée (classe)} & {\small Modélisée via le module crédit} & {\small Classe dédiée diffusée par Black-Karasinski} & {\small Nouvelle classe} \\
 \caption{Synthèse, ligne par ligne, des évolutions du GSE depuis la revue Milliman (2022).}
 \label{tab:evolutions}
 \end{longtable}
@@ -668,27 +668,27 @@ L'audit applique de manière homogène, à chaque composante, le référentiel s
 \subsection{Batterie de tests et indicateurs de validation}
 \label{sec:tests}
 
-\begin{longtable}{|P{3.4cm}|P{5.2cm}|P{4.0cm}|P{2.2cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Application} & \thead{Seuil indicatif} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Application} & \thead{Seuil indicatif} \\
-\hline\endhead
-\hline\endfoot
-{\small Shapiro-Wilk / Jarque-Bera} & {\small Normalité des résidus ou des log-rendements conditionnels} & {\small Toutes classes} & {\small p-value $>$ 5\,\%} \\ \hline
-\rowcolor{nexlight}
-{\small QQ-plot} & {\small Adéquation distributionnelle (queues)} & {\small Toutes classes} & {\small Alignement sur la bissectrice} \\ \hline
-{\small Ljung-Box / ACF (1--12)} & {\small Autocorrélation résiduelle ; contrôle post-unsmoothing} & {\small Toutes classes ; immobilier, non coté, infra} & {\small p-value $>$ 5\,\% ; ACF(1) $\approx$ 0} \\ \hline
-\rowcolor{nexlight}
-{\small Rapprochement des cibles} & {\small Écart cibles historiques vs induites par le modèle} & {\small V2F, BK, corrélations} & {\small Écart relatif $<$ [x]\,\%} \\ \hline
-{\small Backtesting des moments simulés} & {\small Convergence trajectoires simulées vs paramètres d'entrée} & {\small Toutes classes ; quantiles 25 / 75\,\%} & {\small Écart $<$ [x] bp / pp} \\ \hline
-\rowcolor{nexlight}
-{\small Matrice simulée vs cible} & {\small Restitution des corrélations en sortie} & {\small Module corrélations} & {\small Écart absolu $<$ [x] pts} \\ \hline
-{\small Stabilité inter-fenêtres} & {\small Variation des paramètres 15 vs 20 ans} & {\small Toutes classes} & {\small Variation commentée} \\ \hline
-\rowcolor{nexlight}
-{\small Condition de Feller / contrôles de schéma} & {\small Validité du schéma (positivité, convergence, monotonie)} & {\small CIR, Black-Karasinski} & {\small Condition vérifiée ou schéma justifié} \\ \hline
-{\small Réplication des paramètres (run indépendant)} & {\small Écart paramètres recalculés vs production} & {\small Toutes composantes} & {\small Écart $<$ [tolérance]} \\ \hline
+\begin{longtable}{P{3.4cm}P{5.2cm}P{4.0cm}P{2.2cm}}
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Application} & \tablehead{Seuil indicatif} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Application} & \tablehead{Seuil indicatif} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Shapiro-Wilk / Jarque-Bera} & {\small Normalité des résidus ou des log-rendements conditionnels} & {\small Toutes classes} & {\small p-value $>$ 5\,\%} \\
+\rowcolor{nxlightblue}
+{\small QQ-plot} & {\small Adéquation distributionnelle (queues)} & {\small Toutes classes} & {\small Alignement sur la bissectrice} \\
+{\small Ljung-Box / ACF (1--12)} & {\small Autocorrélation résiduelle ; contrôle post-unsmoothing} & {\small Toutes classes ; immobilier, non coté, infra} & {\small p-value $>$ 5\,\% ; ACF(1) $\approx$ 0} \\
+\rowcolor{nxlightblue}
+{\small Rapprochement des cibles} & {\small Écart cibles historiques vs induites par le modèle} & {\small V2F, BK, corrélations} & {\small Écart relatif $<$ [x]\,\%} \\
+{\small Backtesting des moments simulés} & {\small Convergence trajectoires simulées vs paramètres d'entrée} & {\small Toutes classes ; quantiles 25 / 75\,\%} & {\small Écart $<$ [x] bp / pp} \\
+\rowcolor{nxlightblue}
+{\small Matrice simulée vs cible} & {\small Restitution des corrélations en sortie} & {\small Module corrélations} & {\small Écart absolu $<$ [x] pts} \\
+{\small Stabilité inter-fenêtres} & {\small Variation des paramètres 15 vs 20 ans} & {\small Toutes classes} & {\small Variation commentée} \\
+\rowcolor{nxlightblue}
+{\small Condition de Feller / contrôles de schéma} & {\small Validité du schéma (positivité, convergence, monotonie)} & {\small CIR, Black-Karasinski} & {\small Condition vérifiée ou schéma justifié} \\
+{\small Réplication des paramètres (run indépendant)} & {\small Écart paramètres recalculés vs production} & {\small Toutes composantes} & {\small Écart $<$ [tolérance]} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Batterie de tests et indicateurs de validation}
@@ -697,20 +697,20 @@ L'audit applique de manière homogène, à chaque composante, le référentiel s
 
 Le moteur Monte-Carlo (MATLAB) est paramétré comme suit pour l'exercice 2026 \ph{[valeurs extraites du classeur, à confirmer]} :
 
-\begin{longtable}{|P{4.8cm}|P{3.0cm}|P{4.8cm}|P{3.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Paramètre} & \thead{Valeur} & \thead{Paramètre} & \thead{Valeur} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Paramètre} & \thead{Valeur} & \thead{Paramètre} & \thead{Valeur} \\
-\hline\endhead
-\hline\endfoot
-{\small Nombre de simulations} & {\small 5\,000} & {\small Pas de temps $dt$} & {\small $1/12$ (mensuel)} \\ \hline
-\rowcolor{nexlight}
-{\small Horizon de projection} & {\small 35 ans \ph{[ALM $\sim$30 ans]}} & {\small Fenêtre de calibrage} & {\small 20 ans} \\ \hline
-{\small Schéma CIR (crédit)} & {\small Alfonsi} & {\small Réserve initiale} & {\small $\approx$ 18,63 Md\euro{}} \\ \hline
-\rowcolor{nexlight}
-{\small Corrélation taux court / taux long} & {\small $-22,65\,\%$} & {\small Nb. de classes corrélées} & {\small 15} \\ \hline
+\begin{longtable}{P{4.8cm}P{3.0cm}P{4.8cm}P{3.0cm}}
+\toprule
+\tablehead{Paramètre} & \tablehead{Valeur} & \tablehead{Paramètre} & \tablehead{Valeur} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Paramètre} & \tablehead{Valeur} & \tablehead{Paramètre} & \tablehead{Valeur} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Nombre de simulations} & {\small 5\,000} & {\small Pas de temps $dt$} & {\small $1/12$ (mensuel)} \\
+\rowcolor{nxlightblue}
+{\small Horizon de projection} & {\small 35 ans \ph{[ALM $\sim$30 ans]}} & {\small Fenêtre de calibrage} & {\small 20 ans} \\
+{\small Schéma CIR (crédit)} & {\small Alfonsi} & {\small Réserve initiale} & {\small $\approx$ 18,63 Md\euro{}} \\
+\rowcolor{nxlightblue}
+{\small Corrélation taux court / taux long} & {\small $-22,65\,\%$} & {\small Nb. de classes corrélées} & {\small 15} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Paramètres du moteur de simulation (onglet \texttt{Paramètre GSE20})}\clearpage
@@ -725,53 +725,53 @@ dq_t^{s} = \kappa_1\,(q_t^{l} - q_t^{s})\,dt + \sigma_1\,dW_t^1, \qquad dq_t^{l}
 \textbf{Calibrage} par cibles distributionnelles (volatilité des variations de taux, corrélation inter-maturités, écart-type des taux) sur les maturités 2 et 10 ans, initialisation par double régression linéaire, optimisation par Nelder-Mead. \textbf{Simulation} par schéma de discrétisation exact de la solution du processus d'Ornstein-Uhlenbeck bivarié (incréments gaussiens corrélés).
 \subsubsection{Données et fenêtre de calibrage}
 Calibrage sur la structure par terme d'inflation point mort (BEIR), à pas mensuel.
-\begin{longtable}{|P{2.6cm}|P{2.0cm}|P{4.6cm}|P{1.4cm}|P{2.6cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Driver} & \thead{Source} & \thead{Ticker / série} & \thead{Fréq.} & \thead{Première date} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Driver} & \thead{Source} & \thead{Ticker / série} & \thead{Fréq.} & \thead{Première date} \\
-\hline\endhead
-\hline\endfoot
-{\small Inflation (BEIR)} & {\small Bloomberg} & {\small GTFRFII2YR / GTFRFII10YR Corp} & {\small Mens.} & {\small 30/12/2005} \\ \hline
+\begin{longtable}{P{2.6cm}P{2.0cm}P{4.6cm}P{1.4cm}P{2.6cm}}
+\toprule
+\tablehead{Driver} & \tablehead{Source} & \tablehead{Ticker / série} & \tablehead{Fréq.} & \tablehead{Première date} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Driver} & \tablehead{Source} & \tablehead{Ticker / série} & \tablehead{Fréq.} & \tablehead{Première date} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Inflation (BEIR)} & {\small Bloomberg} & {\small GTFRFII2YR / GTFRFII10YR Corp} & {\small Mens.} & {\small 30/12/2005} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Données de calibrage - inflation}
 La fenêtre de \textbf{20 ans} (arrêtée au 31/12/2025) est retenue, conformément à la justification transverse de la Section~\ref{sec:fenetre}.
 \subsubsection{Implémentation}
-\begin{longtable}{|P{3.6cm}|P{3.0cm}|P{4.2cm}|P{3.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Étape} & \thead{Langage / outil} & \thead{Localisation} & \thead{Statut vérification} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Étape} & \thead{Langage / outil} & \thead{Localisation} & \thead{Statut vérification} \\
-\hline\endhead
-\hline\endfoot
-{\small Calibrage des paramètres} & {\small R} & {\small \ph{[chemin / script R]}} & {\small \ph{[à vérifier]}} \\ \hline
-\rowcolor{nexlight}
-{\small Simulation des trajectoires} & {\small MATLAB} & {\small \ph{[module GSE MATLAB]}} & {\small \ph{[à vérifier]}} \\ \hline
+\begin{longtable}{P{3.6cm}P{3.0cm}P{4.2cm}P{3.0cm}}
+\toprule
+\tablehead{Étape} & \tablehead{Langage / outil} & \tablehead{Localisation} & \tablehead{Statut vérification} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Étape} & \tablehead{Langage / outil} & \tablehead{Localisation} & \tablehead{Statut vérification} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Calibrage des paramètres} & {\small R} & {\small \ph{[chemin / script R]}} & {\small \ph{[à vérifier]}} \\
+\rowcolor{nxlightblue}
+{\small Simulation des trajectoires} & {\small MATLAB} & {\small \ph{[module GSE MATLAB]}} & {\small \ph{[à vérifier]}} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Localisation des implémentations et statut de vérification}
 \subsubsection{Paramètres en production (allocation 2026 vs 2022)}
-\begin{longtable}{|P{6.0cm}|P{2.6cm}|P{2.2cm}|P{3.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Paramètre} & \thead{2026 (20 ans)} & \thead{2022} & \thead{Commentaire} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Paramètre} & \thead{2026 (20 ans)} & \thead{2022} & \thead{Commentaire} \\
-\hline\endhead
-\hline\endfoot
-{\small $\kappa_2$ - vitesse retour moyenne (LT)} & {\small 26,18\,\%} & {\small 35,8\,\%} & {\small Facteur long terme} \\ \hline
-\rowcolor{nexlight}
-{\small $\sigma_2$ - volatilité (LT)} & {\small 1,06\,\%} & {\small 1,3\,\%} & {\small } \\ \hline
-{\small $\mu_l$ - moyenne LT} & {\small 1,75\,\%} & {\small 1,75\,\%} & {\small Cible COR (inchangée)} \\ \hline
-\rowcolor{nexlight}
-{\small Valeur initiale (LT)} & {\small 1,806\,\%} & {\small 1,751\,\%} & {\small } \\ \hline
-{\small $\kappa_1$ - vitesse retour moyenne (CT)} & {\small 78,01\,\%} & {\small 73,9\,\%} & {\small Facteur court terme} \\ \hline
-\rowcolor{nexlight}
-{\small $\sigma_1$ - volatilité (CT)} & {\small 1,567\,\%} & {\small 1,4\,\%} & {\small } \\ \hline
-{\small Valeur initiale (CT)} & {\small 1,167\,\%} & {\small 1,725\,\%} & {\small } \\ \hline
+\begin{longtable}{P{6.0cm}P{2.6cm}P{2.2cm}P{3.0cm}}
+\toprule
+\tablehead{Paramètre} & \tablehead{2026 (20 ans)} & \tablehead{2022} & \tablehead{Commentaire} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Paramètre} & \tablehead{2026 (20 ans)} & \tablehead{2022} & \tablehead{Commentaire} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small $\kappa_2$ - vitesse retour moyenne (LT)} & {\small 26,18\,\%} & {\small 35,8\,\%} & {\small Facteur long terme} \\
+\rowcolor{nxlightblue}
+{\small $\sigma_2$ - volatilité (LT)} & {\small 1,06\,\%} & {\small 1,3\,\%} & {\small } \\
+{\small $\mu_l$ - moyenne LT} & {\small 1,75\,\%} & {\small 1,75\,\%} & {\small Cible COR (inchangée)} \\
+\rowcolor{nxlightblue}
+{\small Valeur initiale (LT)} & {\small 1,806\,\%} & {\small 1,751\,\%} & {\small } \\
+{\small $\kappa_1$ - vitesse retour moyenne (CT)} & {\small 78,01\,\%} & {\small 73,9\,\%} & {\small Facteur court terme} \\
+\rowcolor{nxlightblue}
+{\small $\sigma_1$ - volatilité (CT)} & {\small 1,567\,\%} & {\small 1,4\,\%} & {\small } \\
+{\small Valeur initiale (CT)} & {\small 1,167\,\%} & {\small 1,725\,\%} & {\small } \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Paramètres en production - valeurs extraites du classeur \texttt{Template\_Allocationv2.xlsm}}
@@ -786,23 +786,23 @@ La fenêtre de \textbf{20 ans} (arrêtée au 31/12/2025) est retenue, conformém
 \end{auditbox}
 \subsection{Axe 2 - Validation des modèles et des données (tests)}
 Cette Axe restitue la validation conduite sur le modèle et les données, au moyen de la batterie de tests décrite en Section~\ref{sec:tests}.
-\begin{longtable}{|P{3.6cm}|P{4.2cm}|P{2.3cm}|P{2.3cm}|P{2.2cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Résultat} & \thead{Seuil / cible} & \thead{Conclusion} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Résultat} & \thead{Seuil / cible} & \thead{Conclusion} \\
-\hline\endhead
-\hline\endfoot
-{\small Shapiro-Wilk / Jarque-Bera} & {\small Normalité des résidus} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small QQ-plot} & {\small Adéquation distributionnelle} & {\small [cf. figure]} & {\small Visuel} & {\small [OK / KO]} \\ \hline
-{\small Ljung-Box / ACF (1--12)} & {\small Autocorrélation résiduelle} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small Rapprochement des cibles} & {\small Cibles historiques vs modèle} & {\small [écarts]} & {\small $<$ [x]\,\%} & {\small [OK / KO]} \\ \hline
-{\small Backtesting des moments simulés} & {\small Convergence moyenne / volatilité} & {\small [écarts]} & {\small $<$ [x] bp} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small Réplication paramètres (run indépendant)} & {\small Écart vs production} & {\small [écart]} & {\small $<$ [tol.]} & {\small [OK / KO]} \\ \hline
+\begin{longtable}{P{3.6cm}P{4.2cm}P{2.3cm}P{2.3cm}P{2.2cm}}
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Résultat} & \tablehead{Seuil / cible} & \tablehead{Conclusion} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Résultat} & \tablehead{Seuil / cible} & \tablehead{Conclusion} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Shapiro-Wilk / Jarque-Bera} & {\small Normalité des résidus} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small QQ-plot} & {\small Adéquation distributionnelle} & {\small [cf. figure]} & {\small Visuel} & {\small [OK / KO]} \\
+{\small Ljung-Box / ACF (1--12)} & {\small Autocorrélation résiduelle} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small Rapprochement des cibles} & {\small Cibles historiques vs modèle} & {\small [écarts]} & {\small $<$ [x]\,\%} & {\small [OK / KO]} \\
+{\small Backtesting des moments simulés} & {\small Convergence moyenne / volatilité} & {\small [écarts]} & {\small $<$ [x] bp} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small Réplication paramètres (run indépendant)} & {\small Écart vs production} & {\small [écart]} & {\small $<$ [tol.]} & {\small [OK / KO]} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Synthèse des tests de validation - inflation}
@@ -811,18 +811,18 @@ Cette Axe restitue la validation conduite sur le modèle et les données, au moy
 \figureph{Trajectoire moyenne simulée et quantiles 25\,\% / 75\,\% vs cibles}
 \subsection{Axe 3 - Points d'attention et approches alternatives}
 Sans remettre en cause le dispositif en production, nous identifions les points d'attention suivants et proposons des approches alternatives potentiellement plus pertinentes sur le plan économique et mathématique.
-\begin{longtable}{|P{1.1cm}|P{3.8cm}|P{5.0cm}|P{4.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Point d'attention} & \thead{Approche / modèle alternatif proposé} & \thead{Bénéfice attendu} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Point d'attention} & \thead{Approche / modèle alternatif proposé} & \thead{Bénéfice attendu} \\
-\hline\endhead
-\hline\endfoot
-{\small IN-A1} & {\small Cible $\mu_l$ fixée à dire d'expert (COR) hors calibrage statistique} & {\small Documenter / encadrer la cible par un intervalle ; analyse de sensibilité de l'allocation à $\mu_l$} & {\small Traçabilité ; maîtrise du risque d'indexation} \\ \hline
-\rowcolor{nexlight}
-{\small IN-A2} & {\small V2F gaussien : pas de garantie de cohérence des queues d'inflation (épisode 2022)} & {\small Modèle à volatilité stochastique ou à sauts ; cible additionnelle sur les quantiles extrêmes} & {\small Meilleure capture des scénarios d'inflation élevée} \\ \hline
-{\small IN-A3} & {\small Corrélation $\rho$ entre browniens fixée à 0 dans la remédiation} & {\small Estimer $\rho$ ou le calibrer sur une cible de corrélation CT/LT} & {\small Structure de dépendance interne plus réaliste} \\ \hline
+\begin{longtable}{P{1.1cm}P{3.8cm}P{5.0cm}P{4.0cm}}
+\toprule
+\tablehead{Réf.} & \tablehead{Point d'attention} & \tablehead{Approche / modèle alternatif proposé} & \tablehead{Bénéfice attendu} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Réf.} & \tablehead{Point d'attention} & \tablehead{Approche / modèle alternatif proposé} & \tablehead{Bénéfice attendu} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small IN-A1} & {\small Cible $\mu_l$ fixée à dire d'expert (COR) hors calibrage statistique} & {\small Documenter / encadrer la cible par un intervalle ; analyse de sensibilité de l'allocation à $\mu_l$} & {\small Traçabilité ; maîtrise du risque d'indexation} \\
+\rowcolor{nxlightblue}
+{\small IN-A2} & {\small V2F gaussien : pas de garantie de cohérence des queues d'inflation (épisode 2022)} & {\small Modèle à volatilité stochastique ou à sauts ; cible additionnelle sur les quantiles extrêmes} & {\small Meilleure capture des scénarios d'inflation élevée} \\
+{\small IN-A3} & {\small Corrélation $\rho$ entre browniens fixée à 0 dans la remédiation} & {\small Estimer $\rho$ ou le calibrer sur une cible de corrélation CT/LT} & {\small Structure de dépendance interne plus réaliste} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Points d'attention et alternatives - Inflation}
@@ -839,57 +839,57 @@ dr_t = \kappa_1\,(l_t - r_t)\,dt + \sigma_1\,dW_t^1, \qquad dl_t = \kappa_2\,(\m
 \textbf{Calibrage} par cibles distributionnelles (mêmes cibles que l'inflation), initialisation par double régression, Nelder-Mead. Les taux réels sont reconstruits à partir des taux nominaux et de l'inflation par la relation de Fisher. \textbf{Simulation} par schéma exact V2F.
 \subsubsection{Données et fenêtre de calibrage}
 Taux réels implicités des taux nominaux (zéro-coupons) et de l'inflation (BEIR), à pas mensuel.
-\begin{longtable}{|P{2.6cm}|P{2.0cm}|P{4.6cm}|P{1.4cm}|P{2.6cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Driver} & \thead{Source} & \thead{Ticker / série} & \thead{Fréq.} & \thead{Première date} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Driver} & \thead{Source} & \thead{Ticker / série} & \thead{Fréq.} & \thead{Première date} \\
-\hline\endhead
-\hline\endfoot
-{\small Taux nominaux} & {\small Bloomberg} & {\small GFRN2 / GFRN10 Index} & {\small Mens.} & {\small 30/12/2005} \\ \hline
-\rowcolor{nexlight}
-{\small Inflation (BEIR)} & {\small Bloomberg} & {\small GTFRFII2YR / GTFRFII10YR Corp} & {\small Mens.} & {\small 30/12/2005} \\ \hline
-{\small Taux réels} & {\small Dérivé} & {\small Relation de Fisher $(1+R^n)/(1+i)-1$} & {\small Mens.} & {\small -} \\ \hline
+\begin{longtable}{P{2.6cm}P{2.0cm}P{4.6cm}P{1.4cm}P{2.6cm}}
+\toprule
+\tablehead{Driver} & \tablehead{Source} & \tablehead{Ticker / série} & \tablehead{Fréq.} & \tablehead{Première date} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Driver} & \tablehead{Source} & \tablehead{Ticker / série} & \tablehead{Fréq.} & \tablehead{Première date} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Taux nominaux} & {\small Bloomberg} & {\small GFRN2 / GFRN10 Index} & {\small Mens.} & {\small 30/12/2005} \\
+\rowcolor{nxlightblue}
+{\small Inflation (BEIR)} & {\small Bloomberg} & {\small GTFRFII2YR / GTFRFII10YR Corp} & {\small Mens.} & {\small 30/12/2005} \\
+{\small Taux réels} & {\small Dérivé} & {\small Relation de Fisher $(1+R^n)/(1+i)-1$} & {\small Mens.} & {\small -} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Données de calibrage - taux réels}
 La fenêtre de \textbf{20 ans} (arrêtée au 31/12/2025) est retenue, conformément à la justification transverse de la Section~\ref{sec:fenetre}.
 \subsubsection{Implémentation}
-\begin{longtable}{|P{3.6cm}|P{3.0cm}|P{4.2cm}|P{3.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Étape} & \thead{Langage / outil} & \thead{Localisation} & \thead{Statut vérification} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Étape} & \thead{Langage / outil} & \thead{Localisation} & \thead{Statut vérification} \\
-\hline\endhead
-\hline\endfoot
-{\small Calibrage des paramètres} & {\small R} & {\small \ph{[script R]}} & {\small \ph{[à vérifier]}} \\ \hline
-\rowcolor{nexlight}
-{\small Reconstruction Fisher} & {\small \ph{[R / MATLAB ?]}} & {\small \ph{[à préciser]}} & {\small \ph{[à vérifier]}} \\ \hline
-{\small Simulation des trajectoires} & {\small MATLAB} & {\small \ph{[module GSE]}} & {\small \ph{[à vérifier]}} \\ \hline
+\begin{longtable}{P{3.6cm}P{3.0cm}P{4.2cm}P{3.0cm}}
+\toprule
+\tablehead{Étape} & \tablehead{Langage / outil} & \tablehead{Localisation} & \tablehead{Statut vérification} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Étape} & \tablehead{Langage / outil} & \tablehead{Localisation} & \tablehead{Statut vérification} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Calibrage des paramètres} & {\small R} & {\small \ph{[script R]}} & {\small \ph{[à vérifier]}} \\
+\rowcolor{nxlightblue}
+{\small Reconstruction Fisher} & {\small \ph{[R / MATLAB ?]}} & {\small \ph{[à préciser]}} & {\small \ph{[à vérifier]}} \\
+{\small Simulation des trajectoires} & {\small MATLAB} & {\small \ph{[module GSE]}} & {\small \ph{[à vérifier]}} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Localisation des implémentations et statut de vérification}
 \subsubsection{Paramètres en production (allocation 2026 vs 2022)}
-\begin{longtable}{|P{6.0cm}|P{2.6cm}|P{2.2cm}|P{3.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Paramètre} & \thead{2026 (20 ans)} & \thead{2022} & \thead{Commentaire} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Paramètre} & \thead{2026 (20 ans)} & \thead{2022} & \thead{Commentaire} \\
-\hline\endhead
-\hline\endfoot
-{\small $\kappa_2$ - vitesse retour moyenne (LT)} & {\small 11,89\,\%} & {\small 10,8\,\%} & {\small Facteur long terme} \\ \hline
-\rowcolor{nexlight}
-{\small $\sigma_2$ - volatilité (LT)} & {\small 1,086\,\%} & {\small 0,9\,\%} & {\small } \\ \hline
-{\small $\mu$ - moyenne LT} & {\small 0,41\,\%} & {\small $-$0,2\,\%} & {\small Passe en territoire positif} \\ \hline
-\rowcolor{nexlight}
-{\small Valeur initiale (LT)} & {\small 1,82\,\%} & {\small $-$1,515\,\%} & {\small Forte révision (remontée des taux)} \\ \hline
-{\small $\kappa_1$ - vitesse retour moyenne (CT)} & {\small 61,75\,\%} & {\small 60,0\,\%} & {\small Facteur court terme} \\ \hline
-\rowcolor{nexlight}
-{\small $\sigma_1$ - volatilité (CT)} & {\small 1,545\,\%} & {\small 1,3\,\%} & {\small } \\ \hline
-{\small Valeur initiale (CT)} & {\small 1,146\,\%} & {\small $-$2,379\,\%} & {\small Forte révision} \\ \hline
+\begin{longtable}{P{6.0cm}P{2.6cm}P{2.2cm}P{3.0cm}}
+\toprule
+\tablehead{Paramètre} & \tablehead{2026 (20 ans)} & \tablehead{2022} & \tablehead{Commentaire} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Paramètre} & \tablehead{2026 (20 ans)} & \tablehead{2022} & \tablehead{Commentaire} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small $\kappa_2$ - vitesse retour moyenne (LT)} & {\small 11,89\,\%} & {\small 10,8\,\%} & {\small Facteur long terme} \\
+\rowcolor{nxlightblue}
+{\small $\sigma_2$ - volatilité (LT)} & {\small 1,086\,\%} & {\small 0,9\,\%} & {\small } \\
+{\small $\mu$ - moyenne LT} & {\small 0,41\,\%} & {\small $-$0,2\,\%} & {\small Passe en territoire positif} \\
+\rowcolor{nxlightblue}
+{\small Valeur initiale (LT)} & {\small 1,82\,\%} & {\small $-$1,515\,\%} & {\small Forte révision (remontée des taux)} \\
+{\small $\kappa_1$ - vitesse retour moyenne (CT)} & {\small 61,75\,\%} & {\small 60,0\,\%} & {\small Facteur court terme} \\
+\rowcolor{nxlightblue}
+{\small $\sigma_1$ - volatilité (CT)} & {\small 1,545\,\%} & {\small 1,3\,\%} & {\small } \\
+{\small Valeur initiale (CT)} & {\small 1,146\,\%} & {\small $-$2,379\,\%} & {\small Forte révision} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Paramètres en production - valeurs extraites du classeur \texttt{Template\_Allocationv2.xlsm}}
@@ -904,23 +904,23 @@ La fenêtre de \textbf{20 ans} (arrêtée au 31/12/2025) est retenue, conformém
 \end{auditbox}
 \subsection{Axe 2 - Validation des modèles et des données (tests)}
 Cette Axe restitue la validation conduite sur le modèle et les données, au moyen de la batterie de tests décrite en Section~\ref{sec:tests}.
-\begin{longtable}{|P{3.6cm}|P{4.2cm}|P{2.3cm}|P{2.3cm}|P{2.2cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Résultat} & \thead{Seuil / cible} & \thead{Conclusion} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Résultat} & \thead{Seuil / cible} & \thead{Conclusion} \\
-\hline\endhead
-\hline\endfoot
-{\small Shapiro-Wilk / Jarque-Bera} & {\small Normalité des résidus} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small QQ-plot} & {\small Adéquation distributionnelle} & {\small [cf. figure]} & {\small Visuel} & {\small [OK / KO]} \\ \hline
-{\small Ljung-Box / ACF (1--12)} & {\small Autocorrélation résiduelle} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small Rapprochement des cibles} & {\small Cibles historiques vs modèle} & {\small [écarts]} & {\small $<$ [x]\,\%} & {\small [OK / KO]} \\ \hline
-{\small Backtesting des moments simulés} & {\small Convergence moyenne / volatilité} & {\small [écarts]} & {\small $<$ [x] bp} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small Réplication paramètres (run indépendant)} & {\small Écart vs production} & {\small [écart]} & {\small $<$ [tol.]} & {\small [OK / KO]} \\ \hline
+\begin{longtable}{P{3.6cm}P{4.2cm}P{2.3cm}P{2.3cm}P{2.2cm}}
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Résultat} & \tablehead{Seuil / cible} & \tablehead{Conclusion} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Résultat} & \tablehead{Seuil / cible} & \tablehead{Conclusion} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Shapiro-Wilk / Jarque-Bera} & {\small Normalité des résidus} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small QQ-plot} & {\small Adéquation distributionnelle} & {\small [cf. figure]} & {\small Visuel} & {\small [OK / KO]} \\
+{\small Ljung-Box / ACF (1--12)} & {\small Autocorrélation résiduelle} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small Rapprochement des cibles} & {\small Cibles historiques vs modèle} & {\small [écarts]} & {\small $<$ [x]\,\%} & {\small [OK / KO]} \\
+{\small Backtesting des moments simulés} & {\small Convergence moyenne / volatilité} & {\small [écarts]} & {\small $<$ [x] bp} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small Réplication paramètres (run indépendant)} & {\small Écart vs production} & {\small [écart]} & {\small $<$ [tol.]} & {\small [OK / KO]} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Synthèse des tests de validation - taux réels}
@@ -929,18 +929,18 @@ Cette Axe restitue la validation conduite sur le modèle et les données, au moy
 \figureph{Trajectoire moyenne simulée et quantiles 25\,\% / 75\,\% vs cibles}
 \subsection{Axe 3 - Points d'attention et approches alternatives}
 Sans remettre en cause le dispositif en production, nous identifions les points d'attention suivants et proposons des approches alternatives potentiellement plus pertinentes sur le plan économique et mathématique.
-\begin{longtable}{|P{1.1cm}|P{3.8cm}|P{5.0cm}|P{4.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Point d'attention} & \thead{Approche / modèle alternatif proposé} & \thead{Bénéfice attendu} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Point d'attention} & \thead{Approche / modèle alternatif proposé} & \thead{Bénéfice attendu} \\
-\hline\endhead
-\hline\endfoot
-{\small TR-A1} & {\small Abandon de l'\og effet miroir \fg{} : révision très forte de la valeur initiale et de $\mu$ (cf. 2022)} & {\small Documenter la transition ; cohérence du point de départ avec la courbe initiale} & {\small Robustesse du niveau initial des taux} \\ \hline
-\rowcolor{nexlight}
-{\small TR-A2} & {\small Reconstruction Fisher : conventions et primes d'inflation incorporées dans le BEIR} & {\small Confronter aux OATi directes ; expliciter la prime de risque d'inflation} & {\small Cohérence réel / nominal / inflation} \\ \hline
-{\small TR-A3} & {\small V2F autorise des taux réels arbitrairement négatifs sur 30 ans} & {\small Acceptable, mais à encadrer (bornes $\pm$90\,\% présentes dans le classeur)} & {\small Maîtrise des scénarios extrêmes} \\ \hline
+\begin{longtable}{P{1.1cm}P{3.8cm}P{5.0cm}P{4.0cm}}
+\toprule
+\tablehead{Réf.} & \tablehead{Point d'attention} & \tablehead{Approche / modèle alternatif proposé} & \tablehead{Bénéfice attendu} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Réf.} & \tablehead{Point d'attention} & \tablehead{Approche / modèle alternatif proposé} & \tablehead{Bénéfice attendu} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small TR-A1} & {\small Abandon de l'\og effet miroir \fg{} : révision très forte de la valeur initiale et de $\mu$ (cf. 2022)} & {\small Documenter la transition ; cohérence du point de départ avec la courbe initiale} & {\small Robustesse du niveau initial des taux} \\
+\rowcolor{nxlightblue}
+{\small TR-A2} & {\small Reconstruction Fisher : conventions et primes d'inflation incorporées dans le BEIR} & {\small Confronter aux OATi directes ; expliciter la prime de risque d'inflation} & {\small Cohérence réel / nominal / inflation} \\
+{\small TR-A3} & {\small V2F autorise des taux réels arbitrairement négatifs sur 30 ans} & {\small Acceptable, mais à encadrer (bornes $\pm$90\,\% présentes dans le classeur)} & {\small Maîtrise des scénarios extrêmes} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Points d'attention et alternatives - Taux réels}
@@ -956,53 +956,53 @@ P^{nom}(t,T) = P^{r\acute{e}el}(t,T)\,P^{inf}(t,T) + \rho_{r,i}\,\sqrt{\operator
 \textbf{Pas de calibrage propre} : la courbe hérite des paramètres taux réels / inflation (Sections~3 et~4) et des corrélations issues du module dédié (Section~13). \textbf{Pricing / simulation} par formules fermées V2F le long des trajectoires, complétées des corrections de covariance ci-dessous.
 \subsubsection{Données et fenêtre de calibrage}
 Hérité des sections inflation et taux réels ; corrélations $\rho_{r,i}$ (taux réel / inflation) et $\rho_{r,l}$ (taux court / taux long) issues du module corrélations.
-\begin{longtable}{|P{2.6cm}|P{2.0cm}|P{4.6cm}|P{1.4cm}|P{2.6cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Driver} & \thead{Source} & \thead{Ticker / série} & \thead{Fréq.} & \thead{Première date} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Driver} & \thead{Source} & \thead{Ticker / série} & \thead{Fréq.} & \thead{Première date} \\
-\hline\endhead
-\hline\endfoot
-{\small Corrél. taux réel $\times$ inflation $\rho_{r,i}$} & {\small Module corrél.} & {\small Hist. $\approx -50\,\%$ ; sensi. $-70\,\%$} & {\small Mens.} & {\small -} \\ \hline
-\rowcolor{nexlight}
-{\small Corrél. taux court $\times$ long $\rho_{r,l}$} & {\small Production} & {\small $-22,65\,\%$ ; sensi. $+70\,\%$} & {\small -} & {\small -} \\ \hline
-{\small Primes de risque $\gamma_1, \gamma_2$} & {\small Cibles de niveau} & {\small \ph{[à documenter]}} & {\small -} & {\small -} \\ \hline
+\begin{longtable}{P{2.6cm}P{2.0cm}P{4.6cm}P{1.4cm}P{2.6cm}}
+\toprule
+\tablehead{Driver} & \tablehead{Source} & \tablehead{Ticker / série} & \tablehead{Fréq.} & \tablehead{Première date} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Driver} & \tablehead{Source} & \tablehead{Ticker / série} & \tablehead{Fréq.} & \tablehead{Première date} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Corrél. taux réel $\times$ inflation $\rho_{r,i}$} & {\small Module corrél.} & {\small Hist. $\approx -50\,\%$ ; sensi. $-70\,\%$} & {\small Mens.} & {\small -} \\
+\rowcolor{nxlightblue}
+{\small Corrél. taux court $\times$ long $\rho_{r,l}$} & {\small Production} & {\small $-22,65\,\%$ ; sensi. $+70\,\%$} & {\small -} & {\small -} \\
+{\small Primes de risque $\gamma_1, \gamma_2$} & {\small Cibles de niveau} & {\small \ph{[à documenter]}} & {\small -} & {\small -} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Données de calibrage - courbe des taux nominaux, pricing des zéro-coupons et corrections de corrélation}
 La fenêtre de \textbf{20 ans} (arrêtée au 31/12/2025) est retenue, conformément à la justification transverse de la Section~\ref{sec:fenetre}.
 \subsubsection{Implémentation}
-\begin{longtable}{|P{3.6cm}|P{3.0cm}|P{4.2cm}|P{3.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Étape} & \thead{Langage / outil} & \thead{Localisation} & \thead{Statut vérification} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Étape} & \thead{Langage / outil} & \thead{Localisation} & \thead{Statut vérification} \\
-\hline\endhead
-\hline\endfoot
-{\small Calcul prix ZC + corrections} & {\small \ph{[à préciser : MATLAB ?]}} & {\small \ph{[à préciser]}} & {\small \ph{[à vérifier]}} \\ \hline
-\rowcolor{nexlight}
-{\small Test de sensibilité ($\rho$)} & {\small \ph{[à préciser]}} & {\small \ph{[à préciser]}} & {\small \ph{[à vérifier]}} \\ \hline
+\begin{longtable}{P{3.6cm}P{3.0cm}P{4.2cm}P{3.0cm}}
+\toprule
+\tablehead{Étape} & \tablehead{Langage / outil} & \tablehead{Localisation} & \tablehead{Statut vérification} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Étape} & \tablehead{Langage / outil} & \tablehead{Localisation} & \tablehead{Statut vérification} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Calcul prix ZC + corrections} & {\small \ph{[à préciser : MATLAB ?]}} & {\small \ph{[à préciser]}} & {\small \ph{[à vérifier]}} \\
+\rowcolor{nxlightblue}
+{\small Test de sensibilité ($\rho$)} & {\small \ph{[à préciser]}} & {\small \ph{[à préciser]}} & {\small \ph{[à vérifier]}} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Localisation des implémentations et statut de vérification}
 \subsubsection{Paramètres en production (allocation 2026 vs 2022)}
-\begin{longtable}{|P{5.6cm}|P{2.6cm}|P{2.2cm}|P{3.4cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Configuration de pricing} & \thead{Effet rdt (bp, 10 ans)} & \thead{Effet vol. (bp)} & \thead{Commentaire} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Configuration de pricing} & \thead{Effet rdt (bp, 10 ans)} & \thead{Effet vol. (bp)} & \thead{Commentaire} \\
-\hline\endhead
-\hline\endfoot
-{\small (1) Covariance taux réel $\times$ inflation ($\rho_{r,i} \approx -50\%$)} & {\small $\approx$ +10} & {\small $\approx$ 0} & {\small Vs hypothèse d'indépendance} \\ \hline
-\rowcolor{nexlight}
-{\small (2) Covariance taux court $\times$ long ($\rho_{r,l}$)} & {\small $\approx$ +7} & {\small $\approx$ 0} & {\small Nouveau facteur de covariance} \\ \hline
-{\small Cumul (1)+(2)} & {\small $\approx$ +17} & {\small $\approx$ 0} & {\small Rendement ZC nominal 10 ans} \\ \hline
-\rowcolor{nexlight}
-{\small Sensibilité $\rho_{r,i}=-70\%$} & {\small $\approx$ +15} & {\small \ph{[à compl.]}} & {\small Test de sensibilité} \\ \hline
-{\small Sensibilité $\rho_{r,i}=-70\%$ \& $\rho_{r,l}=+70\%$} & {\small $\approx$ +23} & {\small \ph{[à compl.]}} & {\small Test combiné} \\ \hline
+\begin{longtable}{P{5.6cm}P{2.6cm}P{2.2cm}P{3.4cm}}
+\toprule
+\tablehead{Configuration de pricing} & \tablehead{Effet rdt (bp, 10 ans)} & \tablehead{Effet vol. (bp)} & \tablehead{Commentaire} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Configuration de pricing} & \tablehead{Effet rdt (bp, 10 ans)} & \tablehead{Effet vol. (bp)} & \tablehead{Commentaire} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small (1) Covariance taux réel $\times$ inflation ($\rho_{r,i} \approx -50\%$)} & {\small $\approx$ +10} & {\small $\approx$ 0} & {\small Vs hypothèse d'indépendance} \\
+\rowcolor{nxlightblue}
+{\small (2) Covariance taux court $\times$ long ($\rho_{r,l}$)} & {\small $\approx$ +7} & {\small $\approx$ 0} & {\small Nouveau facteur de covariance} \\
+{\small Cumul (1)+(2)} & {\small $\approx$ +17} & {\small $\approx$ 0} & {\small Rendement ZC nominal 10 ans} \\
+\rowcolor{nxlightblue}
+{\small Sensibilité $\rho_{r,i}=-70\%$} & {\small $\approx$ +15} & {\small \ph{[à compl.]}} & {\small Test de sensibilité} \\
+{\small Sensibilité $\rho_{r,i}=-70\%$ \& $\rho_{r,l}=+70\%$} & {\small $\approx$ +23} & {\small \ph{[à compl.]}} & {\small Test combiné} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Paramètres en production - valeurs extraites du classeur \texttt{Template\_Allocationv2.xlsm}}
@@ -1032,23 +1032,23 @@ L'approche antérieure factorisait le prix du ZC nominal en supposant l'\textbf{
 
 La matrice de corrélation des browniens (onglet \texttt{Correlation 55}) repose sur un ensemble d'hypothèses structurelles qu'il convient d'auditer, certaines corrélations étant \textbf{fixées à zéro}, d'autres \textbf{adossées} (égalées) à des corrélations déjà estimées :
 
-\begin{longtable}{|P{3.6cm}|P{4.6cm}|P{2.4cm}|P{4.6cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Hypothèse} & \thead{Couples concernés} & \thead{Valeur} & \thead{Justification documentée} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Hypothèse} & \thead{Couples concernés} & \thead{Valeur} & \thead{Justification documentée} \\
-\hline\endhead
-\hline\endfoot
-{\small Décorrélation interne d'un V2F} & {\small Inflation CT $\times$ Inflation LT ; Taux réel CT $\times$ Taux réel LT} & {\small 0\,\%} & {\small Convention de modélisation (browniens $W^1 \perp W^2$ du V2F) ; \textbf{non justifiée empiriquement}} \\ \hline
-\rowcolor{nexlight}
-{\small Adossement du facteur court au facteur long} & {\small Corrélations du facteur \emph{court} (infl. CT, taux réel CT) avec toutes les autres classes} & {\small $=$ corrél. du facteur \emph{long} correspondant} & {\small Le court hérite des corrélations du long (ex. Action $\times$ Infl.\,CT $=$ Action $\times$ Infl.\,LT $= 21,5\%$)} \\ \hline
-{\small Décorrélation croisée inter-V2F} & {\small Infl.\,LT $\times$ Taux réel CT ; Infl.\,CT $\times$ Taux réel LT} & {\small 0\,\%} & {\small Seul le couple long/long (Infl.\,LT $\times$ Taux réel LT $= -22,65\%$) porte la dépendance inflation / taux réel} \\ \hline
-\rowcolor{nexlight}
-{\small Corrélation identique aux 2 facteurs d'un V2F} & {\small Formules de passage $\rho^{hist}\to\rho^{GSE}$ (V2F $\times$ autre driver)} & {\small $\rho_{\varepsilon^1} = \rho_{\varepsilon^2}$} & {\small Hypothèse simplificatrice des formules de passage (cf. annexes Milliman 2022)} \\ \hline
-{\small Corrélation taux court / taux long (pricing ZC)} & {\small $\rho_{r,l}$ dans $\operatorname{Var}[\int r]$} & {\small $-22,65\,\%$} & {\small Auparavant supposée nulle ; introduite en 2026 pour le pricing} \\ \hline
-\rowcolor{nexlight}
-{\small Action stressée $\times$ action normale} & {\small Action Euro/Monde normale $\times$ stressée} & {\small 0\,\% \ph{[à vérifier]}} & {\small Non utilisée dans la simulation (régimes séparés) - convention à confirmer} \\ \hline
+\begin{longtable}{P{3.6cm}P{4.6cm}P{2.4cm}P{4.6cm}}
+\toprule
+\tablehead{Hypothèse} & \tablehead{Couples concernés} & \tablehead{Valeur} & \tablehead{Justification documentée} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Hypothèse} & \tablehead{Couples concernés} & \tablehead{Valeur} & \tablehead{Justification documentée} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Décorrélation interne d'un V2F} & {\small Inflation CT $\times$ Inflation LT ; Taux réel CT $\times$ Taux réel LT} & {\small 0\,\%} & {\small Convention de modélisation (browniens $W^1 \perp W^2$ du V2F) ; \textbf{non justifiée empiriquement}} \\
+\rowcolor{nxlightblue}
+{\small Adossement du facteur court au facteur long} & {\small Corrélations du facteur \emph{court} (infl. CT, taux réel CT) avec toutes les autres classes} & {\small $=$ corrél. du facteur \emph{long} correspondant} & {\small Le court hérite des corrélations du long (ex. Action $\times$ Infl.\,CT $=$ Action $\times$ Infl.\,LT $= 21,5\%$)} \\
+{\small Décorrélation croisée inter-V2F} & {\small Infl.\,LT $\times$ Taux réel CT ; Infl.\,CT $\times$ Taux réel LT} & {\small 0\,\%} & {\small Seul le couple long/long (Infl.\,LT $\times$ Taux réel LT $= -22,65\%$) porte la dépendance inflation / taux réel} \\
+\rowcolor{nxlightblue}
+{\small Corrélation identique aux 2 facteurs d'un V2F} & {\small Formules de passage $\rho^{hist}\to\rho^{GSE}$ (V2F $\times$ autre driver)} & {\small $\rho_{\varepsilon^1} = \rho_{\varepsilon^2}$} & {\small Hypothèse simplificatrice des formules de passage (cf. annexes Milliman 2022)} \\
+{\small Corrélation taux court / taux long (pricing ZC)} & {\small $\rho_{r,l}$ dans $\operatorname{Var}[\int r]$} & {\small $-22,65\,\%$} & {\small Auparavant supposée nulle ; introduite en 2026 pour le pricing} \\
+\rowcolor{nxlightblue}
+{\small Action stressée $\times$ action normale} & {\small Action Euro/Monde normale $\times$ stressée} & {\small 0\,\% \ph{[à vérifier]}} & {\small Non utilisée dans la simulation (régimes séparés) - convention à confirmer} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Hypothèses structurelles sur les corrélations : termes fixés à 0 et termes adossés}
@@ -1066,21 +1066,21 @@ La matrice de corrélation des browniens (onglet \texttt{Correlation 55}) repose
 
 \subsection{Axe 2 - Validation des modèles et des données (tests)}
 Cette Axe restitue la validation conduite sur le modèle et les données, au moyen de la batterie de tests décrite en Section~\ref{sec:tests}.
-\begin{longtable}{|P{3.6cm}|P{4.2cm}|P{2.3cm}|P{2.3cm}|P{2.2cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Résultat} & \thead{Seuil / cible} & \thead{Conclusion} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Résultat} & \thead{Seuil / cible} & \thead{Conclusion} \\
-\hline\endhead
-\hline\endfoot
-{\small Vérif. formules $A, B_1, B_2$} & {\small Exactitude du pricing fermé V2F} & {\small [OK / écarts]} & {\small Identité analytique} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small Vérif. terme de covariance (1)} & {\small Exactitude de la correction Fisher $\rho_{r,i}$} & {\small [OK / écarts]} & {\small Identité analytique} & {\small [OK / KO]} \\ \hline
-{\small Vérif. terme de covariance (2)} & {\small Exactitude du terme $\rho_{r,l}\sqrt{\operatorname{Var}[I]\operatorname{Var}[J]}$} & {\small [OK / écarts]} & {\small Identité analytique} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small Contre-implémentation MC} & {\small Prix simulé vs formule fermée} & {\small [écart bp]} & {\small $<$ [x] bp} & {\small [OK / KO]} \\ \hline
-{\small Sensibilité $\rho$} & {\small Impact sur rendement ZC} & {\small [cf. tableau]} & {\small Documenté} & {\small [OK / KO]} \\ \hline
+\begin{longtable}{P{3.6cm}P{4.2cm}P{2.3cm}P{2.3cm}P{2.2cm}}
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Résultat} & \tablehead{Seuil / cible} & \tablehead{Conclusion} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Résultat} & \tablehead{Seuil / cible} & \tablehead{Conclusion} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Vérif. formules $A, B_1, B_2$} & {\small Exactitude du pricing fermé V2F} & {\small [OK / écarts]} & {\small Identité analytique} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small Vérif. terme de covariance (1)} & {\small Exactitude de la correction Fisher $\rho_{r,i}$} & {\small [OK / écarts]} & {\small Identité analytique} & {\small [OK / KO]} \\
+{\small Vérif. terme de covariance (2)} & {\small Exactitude du terme $\rho_{r,l}\sqrt{\operatorname{Var}[I]\operatorname{Var}[J]}$} & {\small [OK / écarts]} & {\small Identité analytique} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small Contre-implémentation MC} & {\small Prix simulé vs formule fermée} & {\small [écart bp]} & {\small $<$ [x] bp} & {\small [OK / KO]} \\
+{\small Sensibilité $\rho$} & {\small Impact sur rendement ZC} & {\small [cf. tableau]} & {\small Documenté} & {\small [OK / KO]} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Synthèse des tests de validation - courbe des taux nominaux, pricing des zéro-coupons et corrections de corrélation}
@@ -1088,20 +1088,20 @@ Cette Axe restitue la validation conduite sur le modèle et les données, au moy
 \figureph{Sensibilité du rendement ZC à $\rho_{r,i}$ et $\rho_{r,l}$}
 \subsection{Axe 3 - Points d'attention et approches alternatives}
 Sans remettre en cause le dispositif en production, nous identifions les points d'attention suivants et proposons des approches alternatives potentiellement plus pertinentes sur le plan économique et mathématique.
-\begin{longtable}{|P{1.1cm}|P{3.8cm}|P{5.0cm}|P{4.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Point d'attention} & \thead{Approche / modèle alternatif proposé} & \thead{Bénéfice attendu} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Point d'attention} & \thead{Approche / modèle alternatif proposé} & \thead{Bénéfice attendu} \\
-\hline\endhead
-\hline\endfoot
-{\small ZC-A1} & {\small Corrélation $\rho_{r,i}$ taux réel / inflation : impact matériel ($\sim$+10 à +15 bp)} & {\small Calibrer $\rho_{r,i}$ sur cible historique plutôt que valeur d'expert ; suivi dans le temps} & {\small Pricing ZC robuste et traçable} \\ \hline
-\rowcolor{nexlight}
-{\small ZC-A2} & {\small Primes de risque $\gamma_1, \gamma_2$ supposées constantes} & {\small Primes dépendantes de la maturité ou du temps ; calibrage multi-points de courbe} & {\small Meilleur ajustement de la courbe initiale} \\ \hline
-{\small ZC-A3} & {\small Approximation de Fisher (additivité) pour des taux non négligeables} & {\small Relation de Fisher exacte ; quantifier l'erreur résiduelle} & {\small Précision du pricing} \\ \hline
-\rowcolor{nexlight}
-{\small ZC-A4} & {\small Absence de garantie de non-arbitrage le long des trajectoires} & {\small Contrôle de cohérence risque-neutre ; reprojection des prix} & {\small Cohérence financière} \\ \hline
+\begin{longtable}{P{1.1cm}P{3.8cm}P{5.0cm}P{4.0cm}}
+\toprule
+\tablehead{Réf.} & \tablehead{Point d'attention} & \tablehead{Approche / modèle alternatif proposé} & \tablehead{Bénéfice attendu} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Réf.} & \tablehead{Point d'attention} & \tablehead{Approche / modèle alternatif proposé} & \tablehead{Bénéfice attendu} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small ZC-A1} & {\small Corrélation $\rho_{r,i}$ taux réel / inflation : impact matériel ($\sim$+10 à +15 bp)} & {\small Calibrer $\rho_{r,i}$ sur cible historique plutôt que valeur d'expert ; suivi dans le temps} & {\small Pricing ZC robuste et traçable} \\
+\rowcolor{nxlightblue}
+{\small ZC-A2} & {\small Primes de risque $\gamma_1, \gamma_2$ supposées constantes} & {\small Primes dépendantes de la maturité ou du temps ; calibrage multi-points de courbe} & {\small Meilleur ajustement de la courbe initiale} \\
+{\small ZC-A3} & {\small Approximation de Fisher (additivité) pour des taux non négligeables} & {\small Relation de Fisher exacte ; quantifier l'erreur résiduelle} & {\small Précision du pricing} \\
+\rowcolor{nxlightblue}
+{\small ZC-A4} & {\small Absence de garantie de non-arbitrage le long des trajectoires} & {\small Contrôle de cohérence risque-neutre ; reprojection des prix} & {\small Cohérence financière} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Points d'attention et alternatives - Courbe des taux nominaux, pricing des zéro-coupons et corrections de corrélation}
@@ -1118,54 +1118,54 @@ ds_t = \kappa\,(\theta - s_t)\,dt + \sigma\,\sqrt{s_t}\,dW_t .
 \textbf{Calibrage} en deux étapes : initialisation par régression linéaire (approximation d'Euler) puis maximum de vraisemblance exact (loi conditionnelle du chi-2 décentré). \textbf{Simulation} par schéma d'Alfonsi $E(0)$, à pas mensuel (le classeur indique \og Alfonsi \fg{} comme schéma CIR retenu).
 \subsubsection{Données et fenêtre de calibrage}
 Spread IG bucket 5--7 ans, à pas mensuel.
-\begin{longtable}{|P{2.6cm}|P{2.0cm}|P{4.6cm}|P{1.4cm}|P{2.6cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Driver} & \thead{Source} & \thead{Ticker / série} & \thead{Fréq.} & \thead{Première date} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Driver} & \thead{Source} & \thead{Ticker / série} & \thead{Fréq.} & \thead{Première date} \\
-\hline\endhead
-\hline\endfoot
-{\small Spread IG (5--7 ans)} & {\small Bloomberg} & {\small H06270EU Index} & {\small Mens.} & {\small 29/12/2000} \\ \hline
-\rowcolor{nexlight}
-{\small CDS (prime de contrepartie)} & {\small \ph{[source]}} & {\small \ph{[ticker]}} & {\small Mens.} & {\small \ph{[date]}} \\ \hline
+\begin{longtable}{P{2.6cm}P{2.0cm}P{4.6cm}P{1.4cm}P{2.6cm}}
+\toprule
+\tablehead{Driver} & \tablehead{Source} & \tablehead{Ticker / série} & \tablehead{Fréq.} & \tablehead{Première date} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Driver} & \tablehead{Source} & \tablehead{Ticker / série} & \tablehead{Fréq.} & \tablehead{Première date} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Spread IG (5--7 ans)} & {\small Bloomberg} & {\small H06270EU Index} & {\small Mens.} & {\small 29/12/2000} \\
+\rowcolor{nxlightblue}
+{\small CDS (prime de contrepartie)} & {\small \ph{[source]}} & {\small \ph{[ticker]}} & {\small Mens.} & {\small \ph{[date]}} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Données de calibrage - crédit - spreads obligataires investment grade}
 La fenêtre de \textbf{20 ans} (arrêtée au 31/12/2025) est retenue, conformément à la justification transverse de la Section~\ref{sec:fenetre}.
 \subsubsection{Implémentation}
-\begin{longtable}{|P{3.6cm}|P{3.0cm}|P{4.2cm}|P{3.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Étape} & \thead{Langage / outil} & \thead{Localisation} & \thead{Statut vérification} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Étape} & \thead{Langage / outil} & \thead{Localisation} & \thead{Statut vérification} \\
-\hline\endhead
-\hline\endfoot
-{\small Calibrage des paramètres} & {\small R} & {\small \ph{[script R]}} & {\small \ph{[à vérifier]}} \\ \hline
-\rowcolor{nexlight}
-{\small Simulation (schéma Alfonsi)} & {\small MATLAB} & {\small \ph{[module GSE]}} & {\small \ph{[à vérifier]}} \\ \hline
+\begin{longtable}{P{3.6cm}P{3.0cm}P{4.2cm}P{3.0cm}}
+\toprule
+\tablehead{Étape} & \tablehead{Langage / outil} & \tablehead{Localisation} & \tablehead{Statut vérification} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Étape} & \tablehead{Langage / outil} & \tablehead{Localisation} & \tablehead{Statut vérification} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Calibrage des paramètres} & {\small R} & {\small \ph{[script R]}} & {\small \ph{[à vérifier]}} \\
+\rowcolor{nxlightblue}
+{\small Simulation (schéma Alfonsi)} & {\small MATLAB} & {\small \ph{[module GSE]}} & {\small \ph{[à vérifier]}} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Localisation des implémentations et statut de vérification}
 \subsubsection{Paramètres en production (allocation 2026 vs 2022)}
-\begin{longtable}{|P{6.0cm}|P{2.6cm}|P{2.2cm}|P{3.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Paramètre} & \thead{2026 (20 ans)} & \thead{2022} & \thead{Commentaire} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Paramètre} & \thead{2026 (20 ans)} & \thead{2022} & \thead{Commentaire} \\
-\hline\endhead
-\hline\endfoot
-{\small $\kappa$ - vitesse retour moyenne} & {\small 52,59\,\%} & {\small 38,0\,\%} & {\small } \\ \hline
-\rowcolor{nexlight}
-{\small $\sigma$ - volatilité} & {\small 5,167\,\%} & {\small 4,8\,\%} & {\small } \\ \hline
-{\small $\theta$ - moyenne LT} & {\small 1,42\,\%} & {\small 1,3\,\%} & {\small } \\ \hline
-\rowcolor{nexlight}
-{\small Valeur initiale} & {\small 0,786\,\%} & {\small 0,926\,\%} & {\small Niveau de spread au 31/12} \\ \hline
-{\small Taux de défaut annuel} & {\small 0,224\,\%} & {\small 0,2\,\%} & {\small À dire d'expert (hors périmètre)} \\ \hline
-\rowcolor{nexlight}
-{\small Taux de recouvrement} & {\small 50,0\,\%} & {\small 50,0\,\%} & {\small À dire d'expert (hors périmètre)} \\ \hline
+\begin{longtable}{P{6.0cm}P{2.6cm}P{2.2cm}P{3.0cm}}
+\toprule
+\tablehead{Paramètre} & \tablehead{2026 (20 ans)} & \tablehead{2022} & \tablehead{Commentaire} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Paramètre} & \tablehead{2026 (20 ans)} & \tablehead{2022} & \tablehead{Commentaire} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small $\kappa$ - vitesse retour moyenne} & {\small 52,59\,\%} & {\small 38,0\,\%} & {\small } \\
+\rowcolor{nxlightblue}
+{\small $\sigma$ - volatilité} & {\small 5,167\,\%} & {\small 4,8\,\%} & {\small } \\
+{\small $\theta$ - moyenne LT} & {\small 1,42\,\%} & {\small 1,3\,\%} & {\small } \\
+\rowcolor{nxlightblue}
+{\small Valeur initiale} & {\small 0,786\,\%} & {\small 0,926\,\%} & {\small Niveau de spread au 31/12} \\
+{\small Taux de défaut annuel} & {\small 0,224\,\%} & {\small 0,2\,\%} & {\small À dire d'expert (hors périmètre)} \\
+\rowcolor{nxlightblue}
+{\small Taux de recouvrement} & {\small 50,0\,\%} & {\small 50,0\,\%} & {\small À dire d'expert (hors périmètre)} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Paramètres en production - valeurs extraites du classeur \texttt{Template\_Allocationv2.xlsm}}
@@ -1180,26 +1180,26 @@ La fenêtre de \textbf{20 ans} (arrêtée au 31/12/2025) est retenue, conformém
 \end{auditbox}
 \subsection{Axe 2 - Validation des modèles et des données (tests)}
 Cette Axe restitue la validation conduite sur le modèle et les données, au moyen de la batterie de tests décrite en Section~\ref{sec:tests}.
-\begin{longtable}{|P{3.6cm}|P{4.2cm}|P{2.3cm}|P{2.3cm}|P{2.2cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Résultat} & \thead{Seuil / cible} & \thead{Conclusion} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Résultat} & \thead{Seuil / cible} & \thead{Conclusion} \\
-\hline\endhead
-\hline\endfoot
-{\small Shapiro-Wilk / Jarque-Bera} & {\small Normalité des résidus} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small QQ-plot} & {\small Adéquation distributionnelle} & {\small [cf. figure]} & {\small Visuel} & {\small [OK / KO]} \\ \hline
-{\small Ljung-Box / ACF (1--12)} & {\small Autocorrélation résiduelle} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small Rapprochement des cibles} & {\small Cibles historiques vs modèle} & {\small [écarts]} & {\small $<$ [x]\,\%} & {\small [OK / KO]} \\ \hline
-{\small Backtesting des moments simulés} & {\small Convergence moyenne / volatilité} & {\small [écarts]} & {\small $<$ [x] bp} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small Réplication paramètres (run indépendant)} & {\small Écart vs production} & {\small [écart]} & {\small $<$ [tol.]} & {\small [OK / KO]} \\ \hline
-{\small Condition $\sigma^2 < 4\kappa\theta$ (Alfonsi)} & {\small Validité du schéma $E(0)$} & {\small [vérifiée / non]} & {\small $\sigma^2 < 4\kappa\theta$} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small Convergence du schéma} & {\small Convergence forte / faible} & {\small [ordres]} & {\small Documenté} & {\small [OK / KO]} \\ \hline
+\begin{longtable}{P{3.6cm}P{4.2cm}P{2.3cm}P{2.3cm}P{2.2cm}}
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Résultat} & \tablehead{Seuil / cible} & \tablehead{Conclusion} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Résultat} & \tablehead{Seuil / cible} & \tablehead{Conclusion} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Shapiro-Wilk / Jarque-Bera} & {\small Normalité des résidus} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small QQ-plot} & {\small Adéquation distributionnelle} & {\small [cf. figure]} & {\small Visuel} & {\small [OK / KO]} \\
+{\small Ljung-Box / ACF (1--12)} & {\small Autocorrélation résiduelle} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small Rapprochement des cibles} & {\small Cibles historiques vs modèle} & {\small [écarts]} & {\small $<$ [x]\,\%} & {\small [OK / KO]} \\
+{\small Backtesting des moments simulés} & {\small Convergence moyenne / volatilité} & {\small [écarts]} & {\small $<$ [x] bp} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small Réplication paramètres (run indépendant)} & {\small Écart vs production} & {\small [écart]} & {\small $<$ [tol.]} & {\small [OK / KO]} \\
+{\small Condition $\sigma^2 < 4\kappa\theta$ (Alfonsi)} & {\small Validité du schéma $E(0)$} & {\small [vérifiée / non]} & {\small $\sigma^2 < 4\kappa\theta$} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small Convergence du schéma} & {\small Convergence forte / faible} & {\small [ordres]} & {\small Documenté} & {\small [OK / KO]} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Synthèse des tests de validation - crédit - spreads obligataires investment grade}
@@ -1208,18 +1208,18 @@ Cette Axe restitue la validation conduite sur le modèle et les données, au moy
 \figureph{Trajectoire moyenne simulée et quantiles 25\,\% / 75\,\% vs cibles}
 \subsection{Axe 3 - Points d'attention et approches alternatives}
 Sans remettre en cause le dispositif en production, nous identifions les points d'attention suivants et proposons des approches alternatives potentiellement plus pertinentes sur le plan économique et mathématique.
-\begin{longtable}{|P{1.1cm}|P{3.8cm}|P{5.0cm}|P{4.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Point d'attention} & \thead{Approche / modèle alternatif proposé} & \thead{Bénéfice attendu} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Point d'attention} & \thead{Approche / modèle alternatif proposé} & \thead{Bénéfice attendu} \\
-\hline\endhead
-\hline\endfoot
-{\small CR-A1} & {\small Forte révision de $\kappa$ (52,6\,\% vs 38,0\,\%) : instabilité du calibrage} & {\small Vraisemblance profilée ; intervalle de confiance ; correction du biais de réversion en échantillon fini} & {\small Robustesse de la dispersion LT des spreads} \\ \hline
-\rowcolor{nexlight}
-{\small CR-A2} & {\small Un seul facteur de spread (IG) ; pas de risque de migration} & {\small Multi-rating (HY) avec corrélations ; modèle JLT pour les migrations} & {\small Granularité du risque de crédit} \\ \hline
-{\small CR-A3} & {\small Intensité de défaut déterministe} & {\small CIR sur l'intensité de défaut, cohérent avec les spreads en monde réel} & {\small Cohérence défaut / spread} \\ \hline
+\begin{longtable}{P{1.1cm}P{3.8cm}P{5.0cm}P{4.0cm}}
+\toprule
+\tablehead{Réf.} & \tablehead{Point d'attention} & \tablehead{Approche / modèle alternatif proposé} & \tablehead{Bénéfice attendu} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Réf.} & \tablehead{Point d'attention} & \tablehead{Approche / modèle alternatif proposé} & \tablehead{Bénéfice attendu} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small CR-A1} & {\small Forte révision de $\kappa$ (52,6\,\% vs 38,0\,\%) : instabilité du calibrage} & {\small Vraisemblance profilée ; intervalle de confiance ; correction du biais de réversion en échantillon fini} & {\small Robustesse de la dispersion LT des spreads} \\
+\rowcolor{nxlightblue}
+{\small CR-A2} & {\small Un seul facteur de spread (IG) ; pas de risque de migration} & {\small Multi-rating (HY) avec corrélations ; modèle JLT pour les migrations} & {\small Granularité du risque de crédit} \\
+{\small CR-A3} & {\small Intensité de défaut déterministe} & {\small CIR sur l'intensité de défaut, cohérent avec les spreads en monde réel} & {\small Cohérence défaut / spread} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Points d'attention et alternatives - Crédit - spreads obligataires Investment Grade}\clearpage
@@ -1235,50 +1235,50 @@ d\ln(s_t) = k\,\big(\theta - \ln s_t\big)\,dt + \sigma\,dW_t .
 \subsubsection{Données et fenêtre de calibrage}
 L'indice utilisé pour le Spread de dette privée est le Bloomberg Pan-European High Yield Total Return Index Value, à pas mensuel 
 Une prime de liquidité fixée à dire d'expert (cf. Section~\ref{sec:liqui}).
-\begin{longtable}{|P{2.6cm}|P{2.0cm}|P{4.6cm}|P{1.4cm}|P{2.6cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Driver} & \thead{Source} & \thead{Ticker / série} & \thead{Fréq.} & \thead{Première date} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Driver} & \thead{Source} & \thead{Ticker / série} & \thead{Fréq.} & \thead{Première date} \\
-\hline\endhead
-\hline\endfoot
-{\small Spread dette privée} & {\small Bloomberg} & {\small LP01TREU Index} & {\small Mens.} & {\small 29/12/2000} \\ \hline
+\begin{longtable}{P{2.6cm}P{2.0cm}P{4.6cm}P{1.4cm}P{2.6cm}}
+\toprule
+\tablehead{Driver} & \tablehead{Source} & \tablehead{Ticker / série} & \tablehead{Fréq.} & \tablehead{Première date} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Driver} & \tablehead{Source} & \tablehead{Ticker / série} & \tablehead{Fréq.} & \tablehead{Première date} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Spread dette privée} & {\small Bloomberg} & {\small LP01TREU Index} & {\small Mens.} & {\small 29/12/2000} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Données de calibrage - dette privée}
 La fenêtre de \textbf{20 ans} (arrêtée au 31/12/2025) est retenue, conformément à la justification transverse de la Section~\ref{sec:fenetre}.
 \subsubsection{Implémentation}
-\begin{longtable}{|P{3.6cm}|P{3.0cm}|P{4.2cm}|P{3.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Étape} & \thead{Langage / outil} & \thead{Localisation} & \thead{Statut vérification} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Étape} & \thead{Langage / outil} & \thead{Localisation} & \thead{Statut vérification} \\
-\hline\endhead
-\hline\endfoot
-{\small Calibrage des paramètres} & {\small Excel} & {\small \texttt{Spread liqui dette prive}} & {\small \ph{[à vérifier]}} \\ \hline
-\rowcolor{nexlight}
-{\small Simulation des trajectoires} & {\small MATLAB} & {\small \ph{[module GSE]}} & {\small \ph{[à vérifier]}} \\ \hline
+\begin{longtable}{P{3.6cm}P{3.0cm}P{4.2cm}P{3.0cm}}
+\toprule
+\tablehead{Étape} & \tablehead{Langage / outil} & \tablehead{Localisation} & \tablehead{Statut vérification} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Étape} & \tablehead{Langage / outil} & \tablehead{Localisation} & \tablehead{Statut vérification} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Calibrage des paramètres} & {\small Excel} & {\small \texttt{Spread liqui dette prive}} & {\small \ph{[à vérifier]}} \\
+\rowcolor{nxlightblue}
+{\small Simulation des trajectoires} & {\small MATLAB} & {\small \ph{[module GSE]}} & {\small \ph{[à vérifier]}} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Localisation des implémentations et statut de vérification}
 \subsubsection{Paramètres en production (allocation 2026 vs 2022)}
-\begin{longtable}{|P{6.0cm}|P{2.6cm}|P{2.2cm}|P{3.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Paramètre} & \thead{2026 (20 ans)} & \thead{2022} & \thead{Commentaire} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Paramètre} & \thead{2026 (20 ans)} & \thead{2022} & \thead{Commentaire} \\
-\hline\endhead
-\hline\endfoot
-{\small $k$ - vitesse retour moyenne} & {\small 43,64\,\%} & {\small 34,7\,\%} & {\small Sur log-spread} \\ \hline
-\rowcolor{nexlight}
-{\small $\sigma$ - volatilité (log-spread)} & {\small 49,67\,\%} & {\small 24,1\,\%} & {\small Forte hausse} \\ \hline
-{\small $\theta$ - moyenne (log-spread)} & {\small $-$3,109} & {\small $-$3,072} & {\small } \\ \hline
-\rowcolor{nexlight}
-{\small Valeur initiale} & {\small 2,814\,\%} & {\small 2,91\,\%} & {\small Niveau de spread} \\ \hline
-{\small Prime de liquidité (surplus)} & {\small 4,64\,\%} & {\small -} & {\small Dire d'expert + ajustement $\theta$} \\ \hline
+\begin{longtable}{P{6.0cm}P{2.6cm}P{2.2cm}P{3.0cm}}
+\toprule
+\tablehead{Paramètre} & \tablehead{2026 (20 ans)} & \tablehead{2022} & \tablehead{Commentaire} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Paramètre} & \tablehead{2026 (20 ans)} & \tablehead{2022} & \tablehead{Commentaire} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small $k$ - vitesse retour moyenne} & {\small 43,64\,\%} & {\small 34,7\,\%} & {\small Sur log-spread} \\
+\rowcolor{nxlightblue}
+{\small $\sigma$ - volatilité (log-spread)} & {\small 49,67\,\%} & {\small 24,1\,\%} & {\small Forte hausse} \\
+{\small $\theta$ - moyenne (log-spread)} & {\small $-$3,109} & {\small $-$3,072} & {\small } \\
+\rowcolor{nxlightblue}
+{\small Valeur initiale} & {\small 2,814\,\%} & {\small 2,91\,\%} & {\small Niveau de spread} \\
+{\small Prime de liquidité (surplus)} & {\small 4,64\,\%} & {\small -} & {\small Dire d'expert + ajustement $\theta$} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Paramètres en production - valeurs extraites du classeur \texttt{Template\_Allocationv2.xlsm}}
@@ -1293,23 +1293,23 @@ La fenêtre de \textbf{20 ans} (arrêtée au 31/12/2025) est retenue, conformém
 \end{auditbox}
 \subsection{Axe 2 - Validation des modèles et des données (tests)}
 Cette Axe restitue la validation conduite sur le modèle et les données, au moyen de la batterie de tests décrite en Section~\ref{sec:tests}.
-\begin{longtable}{|P{3.6cm}|P{4.2cm}|P{2.3cm}|P{2.3cm}|P{2.2cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Résultat} & \thead{Seuil / cible} & \thead{Conclusion} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Résultat} & \thead{Seuil / cible} & \thead{Conclusion} \\
-\hline\endhead
-\hline\endfoot
-{\small Shapiro-Wilk / Jarque-Bera} & {\small Normalité des résidus} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small QQ-plot} & {\small Adéquation distributionnelle} & {\small [cf. figure]} & {\small Visuel} & {\small [OK / KO]} \\ \hline
-{\small Ljung-Box / ACF (1--12)} & {\small Autocorrélation résiduelle} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small Rapprochement des cibles} & {\small Cibles historiques vs modèle} & {\small [écarts]} & {\small $<$ [x]\,\%} & {\small [OK / KO]} \\ \hline
-{\small Backtesting des moments simulés} & {\small Convergence moyenne / volatilité} & {\small [écarts]} & {\small $<$ [x] bp} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small Réplication paramètres (run indépendant)} & {\small Écart vs production} & {\small [écart]} & {\small $<$ [tol.]} & {\small [OK / KO]} \\ \hline
+\begin{longtable}{P{3.6cm}P{4.2cm}P{2.3cm}P{2.3cm}P{2.2cm}}
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Résultat} & \tablehead{Seuil / cible} & \tablehead{Conclusion} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Résultat} & \tablehead{Seuil / cible} & \tablehead{Conclusion} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Shapiro-Wilk / Jarque-Bera} & {\small Normalité des résidus} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small QQ-plot} & {\small Adéquation distributionnelle} & {\small [cf. figure]} & {\small Visuel} & {\small [OK / KO]} \\
+{\small Ljung-Box / ACF (1--12)} & {\small Autocorrélation résiduelle} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small Rapprochement des cibles} & {\small Cibles historiques vs modèle} & {\small [écarts]} & {\small $<$ [x]\,\%} & {\small [OK / KO]} \\
+{\small Backtesting des moments simulés} & {\small Convergence moyenne / volatilité} & {\small [écarts]} & {\small $<$ [x] bp} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small Réplication paramètres (run indépendant)} & {\small Écart vs production} & {\small [écart]} & {\small $<$ [tol.]} & {\small [OK / KO]} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Synthèse des tests de validation - dette privée}
@@ -1318,18 +1318,18 @@ Cette Axe restitue la validation conduite sur le modèle et les données, au moy
 \figureph{Trajectoire moyenne simulée et quantiles 25\,\% / 75\,\% vs cibles}
 \subsection{Axe 3 - Points d'attention et approches alternatives}
 Sans remettre en cause le dispositif en production, nous identifions les points d'attention suivants et proposons des approches alternatives potentiellement plus pertinentes sur le plan économique et mathématique.
-\begin{longtable}{|P{1.1cm}|P{3.8cm}|P{5.0cm}|P{4.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Point d'attention} & \thead{Approche / modèle alternatif proposé} & \thead{Bénéfice attendu} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Point d'attention} & \thead{Approche / modèle alternatif proposé} & \thead{Bénéfice attendu} \\
-\hline\endhead
-\hline\endfoot
-{\small DP-A1} & {\small Très forte hausse et instabilité de $\sigma$ (49,7\,\% vs 24,1\,\%)} & {\small Vérifier la fenêtre et l'indice ; intervalle de confiance ; cibles distributionnelles en alternative} & {\small Maîtrise de la volatilité diffusée} \\ \hline
-\rowcolor{nexlight}
-{\small DP-A2} & {\small Caractère log-normal potentiellement explosif sur 30 ans} & {\small Contrôle des moments d'ordre supérieur ; mean-reversion renforcée} & {\small Stabilité des projections longues} \\ \hline
-{\small DP-A3} & {\small Proxy coté (leveraged loans) pour de la dette privée non cotée} & {\small Indice plus représentatif ou ajustement de prime ; unsmoothing si lissage} & {\small Adéquation au portefeuille réel} \\ \hline
+\begin{longtable}{P{1.1cm}P{3.8cm}P{5.0cm}P{4.0cm}}
+\toprule
+\tablehead{Réf.} & \tablehead{Point d'attention} & \tablehead{Approche / modèle alternatif proposé} & \tablehead{Bénéfice attendu} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Réf.} & \tablehead{Point d'attention} & \tablehead{Approche / modèle alternatif proposé} & \tablehead{Bénéfice attendu} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small DP-A1} & {\small Très forte hausse et instabilité de $\sigma$ (49,7\,\% vs 24,1\,\%)} & {\small Vérifier la fenêtre et l'indice ; intervalle de confiance ; cibles distributionnelles en alternative} & {\small Maîtrise de la volatilité diffusée} \\
+\rowcolor{nxlightblue}
+{\small DP-A2} & {\small Caractère log-normal potentiellement explosif sur 30 ans} & {\small Contrôle des moments d'ordre supérieur ; mean-reversion renforcée} & {\small Stabilité des projections longues} \\
+{\small DP-A3} & {\small Proxy coté (leveraged loans) pour de la dette privée non cotée} & {\small Indice plus représentatif ou ajustement de prime ; unsmoothing si lissage} & {\small Adéquation au portefeuille réel} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Points d'attention et alternatives - Dette privée}
@@ -1346,53 +1346,53 @@ La prime de liquidité distingue, au sein du spread, la composante de risque de 
 \textbf{Calcul} : estimation de la moyenne long terme des spreads (CDS et obligataire), différentiel donnant la prime de liquidité ; pour la dette privée, résolution de $\theta$ pour atteindre le surplus cible. \textbf{Pas de simulation propre} : la prime est intégrée au niveau des spreads diffusés.
 \subsubsection{Données et fenêtre de calibrage}
 Séries CDS et spreads obligataires (crédit) ; spread de dette privée (LP01TREU). Prime dette privée à dire d'expert.
-\begin{longtable}{|P{2.6cm}|P{2.0cm}|P{4.6cm}|P{1.4cm}|P{2.6cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Driver} & \thead{Source} & \thead{Ticker / série} & \thead{Fréq.} & \thead{Première date} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Driver} & \thead{Source} & \thead{Ticker / série} & \thead{Fréq.} & \thead{Première date} \\
-\hline\endhead
-\hline\endfoot
-{\small CDS} & {\small \ph{[source]}} & {\small \ph{[ticker]}} & {\small Mens.} & {\small \ph{[date]}} \\ \hline
-\rowcolor{nexlight}
-{\small Spread oblig. / dette privée} & {\small Bloomberg} & {\small H06270EU / LP01TREU} & {\small Mens.} & {\small 29/12/2000} \\ \hline
+\begin{longtable}{P{2.6cm}P{2.0cm}P{4.6cm}P{1.4cm}P{2.6cm}}
+\toprule
+\tablehead{Driver} & \tablehead{Source} & \tablehead{Ticker / série} & \tablehead{Fréq.} & \tablehead{Première date} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Driver} & \tablehead{Source} & \tablehead{Ticker / série} & \tablehead{Fréq.} & \tablehead{Première date} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small CDS} & {\small \ph{[source]}} & {\small \ph{[ticker]}} & {\small Mens.} & {\small \ph{[date]}} \\
+\rowcolor{nxlightblue}
+{\small Spread oblig. / dette privée} & {\small Bloomberg} & {\small H06270EU / LP01TREU} & {\small Mens.} & {\small 29/12/2000} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Données de calibrage - prime de liquidité}
 La fenêtre de \textbf{20 ans} (arrêtée au 31/12/2025) est retenue, conformément à la justification transverse de la Section~\ref{sec:fenetre}.
 \subsubsection{Implémentation}
-\begin{longtable}{|P{3.6cm}|P{3.0cm}|P{4.2cm}|P{3.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Étape} & \thead{Langage / outil} & \thead{Localisation} & \thead{Statut vérification} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Étape} & \thead{Langage / outil} & \thead{Localisation} & \thead{Statut vérification} \\
-\hline\endhead
-\hline\endfoot
-{\small Calcul prime de liquidité} & {\small Excel} & {\small \texttt{Spread liqui dette prive}} & {\small \ph{[à vérifier]}} \\ \hline
+\begin{longtable}{P{3.6cm}P{3.0cm}P{4.2cm}P{3.0cm}}
+\toprule
+\tablehead{Étape} & \tablehead{Langage / outil} & \tablehead{Localisation} & \tablehead{Statut vérification} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Étape} & \tablehead{Langage / outil} & \tablehead{Localisation} & \tablehead{Statut vérification} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Calcul prime de liquidité} & {\small Excel} & {\small \texttt{Spread liqui dette prive}} & {\small \ph{[à vérifier]}} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Localisation des implémentations et statut de vérification}
 \subsubsection{Paramètres en production (allocation 2026 vs 2022)}
-\begin{longtable}{|P{5.2cm}|P{2.6cm}|P{2.6cm}|P{3.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Grandeur} & \thead{CDS} & \thead{Spread 20 ans} & \thead{Commentaire} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Grandeur} & \thead{CDS} & \thead{Spread 20 ans} & \thead{Commentaire} \\
-\hline\endhead
-\hline\endfoot
-{\small Vitesse retour moyenne $k$} & {\small 1,234} & {\small 0,436} & {\small Sur log-spread} \\ \hline
-\rowcolor{nexlight}
-{\small Volatilité $\sigma$} & {\small 65,97\,\%} & {\small 49,67\,\%} & {\small } \\ \hline
-{\small Moyenne $\theta$ (log)} & {\small $-$3,461} & {\small $-$3,156} & {\small } \\ \hline
-\rowcolor{nexlight}
-{\small Moyenne LT du spread} & {\small 2,875\,\%} & {\small 3,699\,\%} & {\small } \\ \hline
-{\small Prime liquidité High Yield} & {\small -} & {\small 0,824\,\%} & {\small Calculée} \\ \hline
-\rowcolor{nexlight}
-{\small Prime liquidité dette privée} & {\small -} & {\small 1,0\,\%} & {\small Dire d'expert} \\ \hline
-{\small Surplus de moyenne} & {\small -} & {\small 4,639\,\%} & {\small Intégré à $\theta$} \\ \hline
+\begin{longtable}{P{5.2cm}P{2.6cm}P{2.6cm}P{3.0cm}}
+\toprule
+\tablehead{Grandeur} & \tablehead{CDS} & \tablehead{Spread 20 ans} & \tablehead{Commentaire} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Grandeur} & \tablehead{CDS} & \tablehead{Spread 20 ans} & \tablehead{Commentaire} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Vitesse retour moyenne $k$} & {\small 1,234} & {\small 0,436} & {\small Sur log-spread} \\
+\rowcolor{nxlightblue}
+{\small Volatilité $\sigma$} & {\small 65,97\,\%} & {\small 49,67\,\%} & {\small } \\
+{\small Moyenne $\theta$ (log)} & {\small $-$3,461} & {\small $-$3,156} & {\small } \\
+\rowcolor{nxlightblue}
+{\small Moyenne LT du spread} & {\small 2,875\,\%} & {\small 3,699\,\%} & {\small } \\
+{\small Prime liquidité High Yield} & {\small -} & {\small 0,824\,\%} & {\small Calculée} \\
+\rowcolor{nxlightblue}
+{\small Prime liquidité dette privée} & {\small -} & {\small 1,0\,\%} & {\small Dire d'expert} \\
+{\small Surplus de moyenne} & {\small -} & {\small 4,639\,\%} & {\small Intégré à $\theta$} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Paramètres en production - valeurs extraites du classeur \texttt{Template\_Allocationv2.xlsm}}
@@ -1407,35 +1407,35 @@ La fenêtre de \textbf{20 ans} (arrêtée au 31/12/2025) est retenue, conformém
 \end{auditbox}
 \subsection{Axe 2 - Validation des modèles et des données (tests)}
 Cette Axe restitue la validation conduite sur le modèle et les données, au moyen de la batterie de tests décrite en Section~\ref{sec:tests}.
-\begin{longtable}{|P{3.6cm}|P{4.2cm}|P{2.3cm}|P{2.3cm}|P{2.2cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Résultat} & \thead{Seuil / cible} & \thead{Conclusion} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Résultat} & \thead{Seuil / cible} & \thead{Conclusion} \\
-\hline\endhead
-\hline\endfoot
-{\small Cohérence du différentiel} & {\small Prime $\geq$ 0 ; ordre de grandeur de place} & {\small [valeur]} & {\small Plausible} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small Stabilité de la prime} & {\small Sensibilité à la fenêtre (15 vs 20 ans)} & {\small [écart]} & {\small Commenté} & {\small [OK / KO]} \\ \hline
-{\small Réplication (run indépendant)} & {\small Écart vs production} & {\small [écart]} & {\small $<$ [tol.]} & {\small [OK / KO]} \\ \hline
+\begin{longtable}{P{3.6cm}P{4.2cm}P{2.3cm}P{2.3cm}P{2.2cm}}
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Résultat} & \tablehead{Seuil / cible} & \tablehead{Conclusion} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Résultat} & \tablehead{Seuil / cible} & \tablehead{Conclusion} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Cohérence du différentiel} & {\small Prime $\geq$ 0 ; ordre de grandeur de place} & {\small [valeur]} & {\small Plausible} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small Stabilité de la prime} & {\small Sensibilité à la fenêtre (15 vs 20 ans)} & {\small [écart]} & {\small Commenté} & {\small [OK / KO]} \\
+{\small Réplication (run indépendant)} & {\small Écart vs production} & {\small [écart]} & {\small $<$ [tol.]} & {\small [OK / KO]} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Synthèse des tests de validation - prime de liquidité}
 \subsection{Axe 3 - Points d'attention et approches alternatives}
 Sans remettre en cause le dispositif en production, nous identifions les points d'attention suivants et proposons des approches alternatives potentiellement plus pertinentes sur le plan économique et mathématique.
-\begin{longtable}{|P{1.1cm}|P{3.8cm}|P{5.0cm}|P{4.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Point d'attention} & \thead{Approche / modèle alternatif proposé} & \thead{Bénéfice attendu} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Point d'attention} & \thead{Approche / modèle alternatif proposé} & \thead{Bénéfice attendu} \\
-\hline\endhead
-\hline\endfoot
-{\small LQ-A1} & {\small Prime de liquidité dette privée fixée à dire d'expert (1,0\,\%)} & {\small Documenter le rationnel ; encadrer par un intervalle ; benchmark de place} & {\small Traçabilité et auditabilité} \\ \hline
-\rowcolor{nexlight}
-{\small LQ-A2} & {\small Prime constante dans le temps} & {\small Prime de liquidité variable selon le cycle / régime de marché} & {\small Réalisme en conditions stressées} \\ \hline
-{\small LQ-A3} & {\small Séparation contrepartie / liquidité dépendante de la qualité des CDS} & {\small Vérifier l'appariement CDS / obligataire (rating, maturité, séniorité)} & {\small Robustesse de la décomposition} \\ \hline
+\begin{longtable}{P{1.1cm}P{3.8cm}P{5.0cm}P{4.0cm}}
+\toprule
+\tablehead{Réf.} & \tablehead{Point d'attention} & \tablehead{Approche / modèle alternatif proposé} & \tablehead{Bénéfice attendu} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Réf.} & \tablehead{Point d'attention} & \tablehead{Approche / modèle alternatif proposé} & \tablehead{Bénéfice attendu} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small LQ-A1} & {\small Prime de liquidité dette privée fixée à dire d'expert (1,0\,\%)} & {\small Documenter le rationnel ; encadrer par un intervalle ; benchmark de place} & {\small Traçabilité et auditabilité} \\
+\rowcolor{nxlightblue}
+{\small LQ-A2} & {\small Prime constante dans le temps} & {\small Prime de liquidité variable selon le cycle / régime de marché} & {\small Réalisme en conditions stressées} \\
+{\small LQ-A3} & {\small Séparation contrepartie / liquidité dépendante de la qualité des CDS} & {\small Vérifier l'appariement CDS / obligataire (rating, maturité, séniorité)} & {\small Robustesse de la décomposition} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Points d'attention et alternatives - Prime de liquidité}
@@ -1451,56 +1451,56 @@ Les actions cotées sont diffusées par le modèle de Hardy à changement de ré
 \textbf{Calibrage} par maximum de vraisemblance (récursion de type filtre de Hamilton, cf. Hardy 2001) sur les log-rendements mensuels, sans identification a priori des régimes. \textbf{Simulation} par Black-Scholes conditionnel au régime, à pas mensuel, départ au régime stationnaire.
 \subsubsection{Données et fenêtre de calibrage}
 Indices MSCI en rendement total (NR), à pas mensuel.
-\begin{longtable}{|P{2.6cm}|P{2.0cm}|P{4.6cm}|P{1.4cm}|P{2.6cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Driver} & \thead{Source} & \thead{Ticker / série} & \thead{Fréq.} & \thead{Première date} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Driver} & \thead{Source} & \thead{Ticker / série} & \thead{Fréq.} & \thead{Première date} \\
-\hline\endhead
-\hline\endfoot
-{\small Action Euro} & {\small Bloomberg} & {\small MSDEE15N Index} & {\small Mens.} & {\small 29/12/2000} \\ \hline
-\rowcolor{nexlight}
-{\small Action Monde ex-Europe} & {\small Bloomberg} & {\small MSDEWEUN Index} & {\small Mens.} & {\small 29/12/2000} \\ \hline
-{\small Action Émergent} & {\small Bloomberg} & {\small MSDEEEMN Index} & {\small Mens.} & {\small 29/12/2000} \\ \hline
+\begin{longtable}{P{2.6cm}P{2.0cm}P{4.6cm}P{1.4cm}P{2.6cm}}
+\toprule
+\tablehead{Driver} & \tablehead{Source} & \tablehead{Ticker / série} & \tablehead{Fréq.} & \tablehead{Première date} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Driver} & \tablehead{Source} & \tablehead{Ticker / série} & \tablehead{Fréq.} & \tablehead{Première date} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Action Euro} & {\small Bloomberg} & {\small MSDEE15N Index} & {\small Mens.} & {\small 29/12/2000} \\
+\rowcolor{nxlightblue}
+{\small Action Monde ex-Europe} & {\small Bloomberg} & {\small MSDEWEUN Index} & {\small Mens.} & {\small 29/12/2000} \\
+{\small Action Émergent} & {\small Bloomberg} & {\small MSDEEEMN Index} & {\small Mens.} & {\small 29/12/2000} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Données de calibrage - actions cotées - euro, monde ex-europe, émergent}
 La fenêtre de \textbf{20 ans} (arrêtée au 31/12/2025) est retenue, conformément à la justification transverse de la Section~\ref{sec:fenetre}.
 \subsubsection{Implémentation}
-\begin{longtable}{|P{3.6cm}|P{3.0cm}|P{4.2cm}|P{3.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Étape} & \thead{Langage / outil} & \thead{Localisation} & \thead{Statut vérification} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Étape} & \thead{Langage / outil} & \thead{Localisation} & \thead{Statut vérification} \\
-\hline\endhead
-\hline\endfoot
-{\small Calibrage des paramètres} & {\small R} & {\small \ph{[script R]}} & {\small \ph{[à vérifier]}} \\ \hline
-\rowcolor{nexlight}
-{\small Simulation des trajectoires} & {\small MATLAB} & {\small \ph{[module GSE]}} & {\small \ph{[à vérifier]}} \\ \hline
+\begin{longtable}{P{3.6cm}P{3.0cm}P{4.2cm}P{3.0cm}}
+\toprule
+\tablehead{Étape} & \tablehead{Langage / outil} & \tablehead{Localisation} & \tablehead{Statut vérification} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Étape} & \tablehead{Langage / outil} & \tablehead{Localisation} & \tablehead{Statut vérification} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Calibrage des paramètres} & {\small R} & {\small \ph{[script R]}} & {\small \ph{[à vérifier]}} \\
+\rowcolor{nxlightblue}
+{\small Simulation des trajectoires} & {\small MATLAB} & {\small \ph{[module GSE]}} & {\small \ph{[à vérifier]}} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Localisation des implémentations et statut de vérification}
 \subsubsection{Paramètres en production (allocation 2026 vs 2022)}
-\begin{longtable}{|P{5.4cm}|P{2.8cm}|P{2.8cm}|P{2.8cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Paramètre (20 ans)} & \thead{Euro} & \thead{Monde} & \thead{Émergent} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Paramètre (20 ans)} & \thead{Euro} & \thead{Monde} & \thead{Émergent} \\
-\hline\endhead
-\hline\endfoot
-{\small $p_{1\to2}$ (sortie régime 1)} & {\small 14,83\,\%} & {\small 14,73\,\%} & {\small 15,31\,\%} \\ \hline
-\rowcolor{nexlight}
-{\small $p_{2\to1}$ (sortie régime 2)} & {\small 5,27\,\%} & {\small 5,64\,\%} & {\small 4,80\,\%} \\ \hline
-{\small Moyenne régime 1 (stressé)} & {\small $-$13,17\,\%} & {\small $-$12,18\,\%} & {\small $-$13,61\,\%} \\ \hline
-\rowcolor{nexlight}
-{\small Volatilité régime 1 (stressé)} & {\small 21,76\,\%} & {\small 19,83\,\%} & {\small 27,05\,\%} \\ \hline
-{\small Moyenne régime 2 (normal)} & {\small 13,61\,\%} & {\small 18,01\,\%} & {\small 13,13\,\%} \\ \hline
-\rowcolor{nexlight}
-{\small Volatilité régime 2 (normal)} & {\small 9,52\,\%} & {\small 9,08\,\%} & {\small 11,06\,\%} \\ \hline
-{\small Proba. stationnaire de stress} & {\small 26,24\,\%} & {\small 27,68\,\%} & {\small 23,85\,\%} \\ \hline
+\begin{longtable}{P{5.4cm}P{2.8cm}P{2.8cm}P{2.8cm}}
+\toprule
+\tablehead{Paramètre (20 ans)} & \tablehead{Euro} & \tablehead{Monde} & \tablehead{Émergent} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Paramètre (20 ans)} & \tablehead{Euro} & \tablehead{Monde} & \tablehead{Émergent} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small $p_{1\to2}$ (sortie régime 1)} & {\small 14,83\,\%} & {\small 14,73\,\%} & {\small 15,31\,\%} \\
+\rowcolor{nxlightblue}
+{\small $p_{2\to1}$ (sortie régime 2)} & {\small 5,27\,\%} & {\small 5,64\,\%} & {\small 4,80\,\%} \\
+{\small Moyenne régime 1 (stressé)} & {\small $-$13,17\,\%} & {\small $-$12,18\,\%} & {\small $-$13,61\,\%} \\
+\rowcolor{nxlightblue}
+{\small Volatilité régime 1 (stressé)} & {\small 21,76\,\%} & {\small 19,83\,\%} & {\small 27,05\,\%} \\
+{\small Moyenne régime 2 (normal)} & {\small 13,61\,\%} & {\small 18,01\,\%} & {\small 13,13\,\%} \\
+\rowcolor{nxlightblue}
+{\small Volatilité régime 2 (normal)} & {\small 9,52\,\%} & {\small 9,08\,\%} & {\small 11,06\,\%} \\
+{\small Proba. stationnaire de stress} & {\small 26,24\,\%} & {\small 27,68\,\%} & {\small 23,85\,\%} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Paramètres en production - valeurs extraites du classeur \texttt{Template\_Allocationv2.xlsm}}
@@ -1515,26 +1515,26 @@ La fenêtre de \textbf{20 ans} (arrêtée au 31/12/2025) est retenue, conformém
 \end{auditbox}
 \subsection{Axe 2 - Validation des modèles et des données (tests)}
 Cette Axe restitue la validation conduite sur le modèle et les données, au moyen de la batterie de tests décrite en Section~\ref{sec:tests}.
-\begin{longtable}{|P{3.6cm}|P{4.2cm}|P{2.3cm}|P{2.3cm}|P{2.2cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Résultat} & \thead{Seuil / cible} & \thead{Conclusion} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Résultat} & \thead{Seuil / cible} & \thead{Conclusion} \\
-\hline\endhead
-\hline\endfoot
-{\small Shapiro-Wilk / Jarque-Bera} & {\small Normalité des résidus} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small QQ-plot} & {\small Adéquation distributionnelle} & {\small [cf. figure]} & {\small Visuel} & {\small [OK / KO]} \\ \hline
-{\small Ljung-Box / ACF (1--12)} & {\small Autocorrélation résiduelle} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small Rapprochement des cibles} & {\small Cibles historiques vs modèle} & {\small [écarts]} & {\small $<$ [x]\,\%} & {\small [OK / KO]} \\ \hline
-{\small Backtesting des moments simulés} & {\small Convergence moyenne / volatilité} & {\small [écarts]} & {\small $<$ [x] bp} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small Réplication paramètres (run indépendant)} & {\small Écart vs production} & {\small [écart]} & {\small $<$ [tol.]} & {\small [OK / KO]} \\ \hline
-{\small Convergence des $p_{ij}$ simulés} & {\small Restitution des probabilités de transition} & {\small [écarts]} & {\small $<$ [x] pts} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small Prime de risque / vol. LT} & {\small Cohérence vs empirique et projections de place} & {\small [valeurs]} & {\small Ordres de grandeur} & {\small [OK / KO]} \\ \hline
+\begin{longtable}{P{3.6cm}P{4.2cm}P{2.3cm}P{2.3cm}P{2.2cm}}
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Résultat} & \tablehead{Seuil / cible} & \tablehead{Conclusion} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Résultat} & \tablehead{Seuil / cible} & \tablehead{Conclusion} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Shapiro-Wilk / Jarque-Bera} & {\small Normalité des résidus} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small QQ-plot} & {\small Adéquation distributionnelle} & {\small [cf. figure]} & {\small Visuel} & {\small [OK / KO]} \\
+{\small Ljung-Box / ACF (1--12)} & {\small Autocorrélation résiduelle} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small Rapprochement des cibles} & {\small Cibles historiques vs modèle} & {\small [écarts]} & {\small $<$ [x]\,\%} & {\small [OK / KO]} \\
+{\small Backtesting des moments simulés} & {\small Convergence moyenne / volatilité} & {\small [écarts]} & {\small $<$ [x] bp} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small Réplication paramètres (run indépendant)} & {\small Écart vs production} & {\small [écart]} & {\small $<$ [tol.]} & {\small [OK / KO]} \\
+{\small Convergence des $p_{ij}$ simulés} & {\small Restitution des probabilités de transition} & {\small [écarts]} & {\small $<$ [x] pts} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small Prime de risque / vol. LT} & {\small Cohérence vs empirique et projections de place} & {\small [valeurs]} & {\small Ordres de grandeur} & {\small [OK / KO]} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Synthèse des tests de validation - actions cotées - euro, monde ex-europe, émergent}
@@ -1545,18 +1545,18 @@ Cette Axe restitue la validation conduite sur le modèle et les données, au moy
 
 Sans remettre en cause le dispositif en production, nous identifions les points d'attention suivants et proposons des approches alternatives potentiellement plus pertinentes sur le plan économique et mathématique.
 
-\begin{longtable}{|P{1.1cm}|P{3.8cm}|P{5.0cm}|P{4.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Point d'attention} & \thead{Approche / modèle alternatif proposé} & \thead{Bénéfice attendu} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Point d'attention} & \thead{Approche / modèle alternatif proposé} & \thead{Bénéfice attendu} \\
-\hline\endhead
-\hline\endfoot
-{\small AC-A1} & {\small RSLN-2 à 2 régimes : queues éventuellement sous-estimées} & {\small RSLN-3 (3 régimes) ou modèle à sauts ; cible additionnelle sur les quantiles} & {\small Meilleure capture des crises} \\ \hline
-\rowcolor{nexlight}
-{\small AC-A2} & {\small Indices NR : effet de change non explicitement modélisé (Monde, Émergent)} & {\small Distinguer rendement local et effet de change ; couverture partielle} & {\small Réalisme de l'exposition} \\ \hline
-{\small AC-A3} & {\small Action Monde corrélée par abattement à l'Euro (cf. corrélations)} & {\small Calibrage direct des corrélations de l'action Monde} & {\small Contrôle de la structure de dépendance} \\ \hline
+\begin{longtable}{P{1.1cm}P{3.8cm}P{5.0cm}P{4.0cm}}
+\toprule
+\tablehead{Réf.} & \tablehead{Point d'attention} & \tablehead{Approche / modèle alternatif proposé} & \tablehead{Bénéfice attendu} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Réf.} & \tablehead{Point d'attention} & \tablehead{Approche / modèle alternatif proposé} & \tablehead{Bénéfice attendu} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small AC-A1} & {\small RSLN-2 à 2 régimes : queues éventuellement sous-estimées} & {\small RSLN-3 (3 régimes) ou modèle à sauts ; cible additionnelle sur les quantiles} & {\small Meilleure capture des crises} \\
+\rowcolor{nxlightblue}
+{\small AC-A2} & {\small Indices NR : effet de change non explicitement modélisé (Monde, Émergent)} & {\small Distinguer rendement local et effet de change ; couverture partielle} & {\small Réalisme de l'exposition} \\
+{\small AC-A3} & {\small Action Monde corrélée par abattement à l'Euro (cf. corrélations)} & {\small Calibrage direct des corrélations de l'action Monde} & {\small Contrôle de la structure de dépendance} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Points d'attention et alternatives - Actions cotées - Euro, Monde ex-Europe, Émergent}
@@ -1583,15 +1583,15 @@ Pour représenter l'exposition au private equity, il a été retenu le LPX50TR I
 
 Ce choix constitue une approche de modélisation pragmatique, dans la mesure où il permet de limiter les biais de sous-estimation de la volatilité liés au phénomène de stale pricing, inhérent à cette classe d'actifs.
 
-\begin{longtable}{|P{2.6cm}|P{2.0cm}|P{4.6cm}|P{1.4cm}|P{2.6cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Driver} & \thead{Source} & \thead{Ticker / série} & \thead{Fréq.} & \thead{Première date} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Driver} & \thead{Source} & \thead{Ticker / série} & \thead{Fréq.} & \thead{Première date} \\
-\hline\endhead
-\hline\endfoot
-{\small Action non cotée} & {\small Bloomberg} & {\small LPX50TR Index} & {\small Mens.} & {\small 29/12/2000} \\ \hline
+\begin{longtable}{P{2.6cm}P{2.0cm}P{4.6cm}P{1.4cm}P{2.6cm}}
+\toprule
+\tablehead{Driver} & \tablehead{Source} & \tablehead{Ticker / série} & \tablehead{Fréq.} & \tablehead{Première date} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Driver} & \tablehead{Source} & \tablehead{Ticker / série} & \tablehead{Fréq.} & \tablehead{Première date} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Action non cotée} & {\small Bloomberg} & {\small LPX50TR Index} & {\small Mens.} & {\small 29/12/2000} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Données de calibrage - actions non cotées (private equity, composite)}
@@ -1639,35 +1639,35 @@ La calibration repose alors sur trois étapes. Tout d’abord, les paramètres d
 Cette approche permet de conserver un cadre Black-Scholes/Hardy tout en assurant une interprétation économique plus fidèle.
 
 \subsubsection{Implémentation}
-\begin{longtable}{|P{3.6cm}|P{3.0cm}|P{4.2cm}|P{3.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Étape} & \thead{Langage / outil} & \thead{Localisation} & \thead{Statut vérification} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Étape} & \thead{Langage / outil} & \thead{Localisation} & \thead{Statut vérification} \\
-\hline\endhead
-\hline\endfoot
-{\small Calibrage (unsmoothing + BS)} & {\small Excel} & {\small \ph{[onglet / classeur]}} & {\small \ph{[à vérifier]}} \\ \hline
-\rowcolor{nexlight}
-{\small Simulation des trajectoires} & {\small MATLAB} & {\small \ph{[module GSE]}} & {\small \ph{[à vérifier]}} \\ \hline
+\begin{longtable}{P{3.6cm}P{3.0cm}P{4.2cm}P{3.0cm}}
+\toprule
+\tablehead{Étape} & \tablehead{Langage / outil} & \tablehead{Localisation} & \tablehead{Statut vérification} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Étape} & \tablehead{Langage / outil} & \tablehead{Localisation} & \tablehead{Statut vérification} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Calibrage (unsmoothing + BS)} & {\small Excel} & {\small \ph{[onglet / classeur]}} & {\small \ph{[à vérifier]}} \\
+\rowcolor{nxlightblue}
+{\small Simulation des trajectoires} & {\small MATLAB} & {\small \ph{[module GSE]}} & {\small \ph{[à vérifier]}} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Localisation des implémentations et statut de vérification}
 \subsubsection{Paramètres en production (allocation 2026 vs 2022)}
-\begin{longtable}{|P{6.4cm}|P{2.8cm}|P{4.4cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Paramètre} & \thead{2026 (20 ans)} & \thead{Commentaire} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Paramètre} & \thead{2026 (20 ans)} & \thead{Commentaire} \\
-\hline\endhead
-\hline\endfoot
-{\small $\mu$ - rendement moyen (PE)} & {\small 7,18\,\%} & {\small Régime faible volatilité : 5,971\,\%} \\ \hline
-\rowcolor{nexlight}
-{\small $\sigma$ - volatilité (post-unsmoothing)} & {\small 29,70\,\%} & {\small Régime faible volatilité : 15,0\,\%} \\ \hline
-{\small Rendement \og Ncote composite \fg{} (sortie)} & {\small 6,71\,\%} & {\small Onglet OutPut (PE + dette privée)} \\ \hline
-\rowcolor{nexlight}
-{\small Volatilité \og Ncote composite \fg{} (sortie)} & {\small 15,89\,\%} & {\small Onglet OutPut} \\ \hline
+\begin{longtable}{P{6.4cm}P{2.8cm}P{4.4cm}}
+\toprule
+\tablehead{Paramètre} & \tablehead{2026 (20 ans)} & \tablehead{Commentaire} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Paramètre} & \tablehead{2026 (20 ans)} & \tablehead{Commentaire} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small $\mu$ - rendement moyen (PE)} & {\small 7,18\,\%} & {\small Régime faible volatilité : 5,971\,\%} \\
+\rowcolor{nxlightblue}
+{\small $\sigma$ - volatilité (post-unsmoothing)} & {\small 29,70\,\%} & {\small Régime faible volatilité : 15,0\,\%} \\
+{\small Rendement \og Ncote composite \fg{} (sortie)} & {\small 6,71\,\%} & {\small Onglet OutPut (PE + dette privée)} \\
+\rowcolor{nxlightblue}
+{\small Volatilité \og Ncote composite \fg{} (sortie)} & {\small 15,89\,\%} & {\small Onglet OutPut} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Paramètres en production - valeurs extraites du classeur \texttt{Template\_Allocationv2.xlsm}}
@@ -1682,24 +1682,24 @@ Cette approche permet de conserver un cadre Black-Scholes/Hardy tout en assurant
 \end{auditbox}
 \subsection{Axe 2 - Validation des modèles et des données (tests)}
 Cette Axe restitue la validation conduite sur le modèle et les données, au moyen de la batterie de tests décrite en Section~\ref{sec:tests}.
-\begin{longtable}{|P{3.6cm}|P{4.2cm}|P{2.3cm}|P{2.3cm}|P{2.2cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Résultat} & \thead{Seuil / cible} & \thead{Conclusion} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Résultat} & \thead{Seuil / cible} & \thead{Conclusion} \\
-\hline\endhead
-\hline\endfoot
-{\small Shapiro-Wilk / Jarque-Bera} & {\small Normalité des résidus} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small QQ-plot} & {\small Adéquation distributionnelle} & {\small [cf. figure]} & {\small Visuel} & {\small [OK / KO]} \\ \hline
-{\small Ljung-Box / ACF (1--12)} & {\small Autocorrélation résiduelle} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small Rapprochement des cibles} & {\small Cibles historiques vs modèle} & {\small [écarts]} & {\small $<$ [x]\,\%} & {\small [OK / KO]} \\ \hline
-{\small Backtesting des moments simulés} & {\small Convergence moyenne / volatilité} & {\small [écarts]} & {\small $<$ [x] bp} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small Réplication paramètres (run indépendant)} & {\small Écart vs production} & {\small [écart]} & {\small $<$ [tol.]} & {\small [OK / KO]} \\ \hline
-{\small ACF post-unsmoothing} & {\small Annulation de l'autocorrélation d'ordre 1 ; ordres $\geq$ 2} & {\small [ACF(1)]} & {\small ACF(1) $\approx$ 0} & {\small [OK / KO]} \\ \hline
+\begin{longtable}{P{3.6cm}P{4.2cm}P{2.3cm}P{2.3cm}P{2.2cm}}
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Résultat} & \tablehead{Seuil / cible} & \tablehead{Conclusion} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Résultat} & \tablehead{Seuil / cible} & \tablehead{Conclusion} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Shapiro-Wilk / Jarque-Bera} & {\small Normalité des résidus} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small QQ-plot} & {\small Adéquation distributionnelle} & {\small [cf. figure]} & {\small Visuel} & {\small [OK / KO]} \\
+{\small Ljung-Box / ACF (1--12)} & {\small Autocorrélation résiduelle} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small Rapprochement des cibles} & {\small Cibles historiques vs modèle} & {\small [écarts]} & {\small $<$ [x]\,\%} & {\small [OK / KO]} \\
+{\small Backtesting des moments simulés} & {\small Convergence moyenne / volatilité} & {\small [écarts]} & {\small $<$ [x] bp} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small Réplication paramètres (run indépendant)} & {\small Écart vs production} & {\small [écart]} & {\small $<$ [tol.]} & {\small [OK / KO]} \\
+{\small ACF post-unsmoothing} & {\small Annulation de l'autocorrélation d'ordre 1 ; ordres $\geq$ 2} & {\small [ACF(1)]} & {\small ACF(1) $\approx$ 0} & {\small [OK / KO]} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Synthèse des tests de validation - actions non cotées (private equity, composite)}
@@ -1708,18 +1708,18 @@ Cette Axe restitue la validation conduite sur le modèle et les données, au moy
 \figureph{Trajectoire moyenne simulée et quantiles 25\,\% / 75\,\% vs cibles}
 \subsection{Axe 3 - Points d'attention et approches alternatives}
 Sans remettre en cause le dispositif en production, nous identifions les points d'attention suivants et proposons des approches alternatives potentiellement plus pertinentes sur le plan économique et mathématique.
-\begin{longtable}{|P{1.1cm}|P{3.8cm}|P{5.0cm}|P{4.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Point d'attention} & \thead{Approche / modèle alternatif proposé} & \thead{Bénéfice attendu} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Point d'attention} & \thead{Approche / modèle alternatif proposé} & \thead{Bénéfice attendu} \\
-\hline\endhead
-\hline\endfoot
-{\small PE-A1} & {\small Proxy coté (bêta de marché élevé) pour du non coté} & {\small Indice plus représentatif (millésimes, stratégies) ou modèle à bêta ajusté} & {\small Adéquation au portefeuille réel} \\ \hline
-\rowcolor{nexlight}
-{\small PE-A2} & {\small Unsmoothing limité à l'ordre 1} & {\small Unsmoothing aux ordres supérieurs (cf. Lizieri et al. 2012)} & {\small Volatilité non biaisée} \\ \hline
-{\small PE-A3} & {\small Agrégation \og composite \fg{} PE + dette privée} & {\small Documenter la pondération et la cohérence de l'agrégat} & {\small Traçabilité de la classe composite} \\ \hline
+\begin{longtable}{P{1.1cm}P{3.8cm}P{5.0cm}P{4.0cm}}
+\toprule
+\tablehead{Réf.} & \tablehead{Point d'attention} & \tablehead{Approche / modèle alternatif proposé} & \tablehead{Bénéfice attendu} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Réf.} & \tablehead{Point d'attention} & \tablehead{Approche / modèle alternatif proposé} & \tablehead{Bénéfice attendu} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small PE-A1} & {\small Proxy coté (bêta de marché élevé) pour du non coté} & {\small Indice plus représentatif (millésimes, stratégies) ou modèle à bêta ajusté} & {\small Adéquation au portefeuille réel} \\
+\rowcolor{nxlightblue}
+{\small PE-A2} & {\small Unsmoothing limité à l'ordre 1} & {\small Unsmoothing aux ordres supérieurs (cf. Lizieri et al. 2012)} & {\small Volatilité non biaisée} \\
+{\small PE-A3} & {\small Agrégation \og composite \fg{} PE + dette privée} & {\small Documenter la pondération et la cohérence de l'agrégat} & {\small Traçabilité de la classe composite} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Points d'attention et alternatives - Actions non cotées (Private Equity, composite)}
@@ -1737,49 +1737,49 @@ L'immobilier est diffusé par un Black-Scholes sur série unsmoothée, sous hypo
 \subsubsection{Données et fenêtre de calibrage}
 L’indice \href{https://www.ieif.fr/immobilier-non-cote}{\textcolor{nexnavy}{EDHEC IEIF Immobilier d’entreprise France – IEIF (Immobilier non coté)}} (Immobilier non coté) est un indice de prix de l’immobilier d’entreprise français, calculé sur une base mensuelle. La première date d’observation remonte au 30/06/2008. L’exposition immobilière ayant peu évolué en termes de composition, cet indice demeure cohérent et pertinent pour les besoins de modélisation.
 
-\begin{longtable}{|P{2.6cm}|P{2.0cm}|P{4.6cm}|P{1.4cm}|P{2.6cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Driver} & \thead{Source} & \thead{Ticker / série} & \thead{Fréq.} & \thead{Première date} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Driver} & \thead{Source} & \thead{Ticker / série} & \thead{Fréq.} & \thead{Première date} \\
-\hline\endhead
-\hline\endfoot
-{\small Immobilier} & {\small EDHEC IEIF (ieif.fr)} & {\small Indice immobilier entreprise France} & {\small Mensuel} & {\small 30/06/2008} \\ \hline
+\begin{longtable}{P{2.6cm}P{2.0cm}P{4.6cm}P{1.4cm}P{2.6cm}}
+\toprule
+\tablehead{Driver} & \tablehead{Source} & \tablehead{Ticker / série} & \tablehead{Fréq.} & \tablehead{Première date} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Driver} & \tablehead{Source} & \tablehead{Ticker / série} & \tablehead{Fréq.} & \tablehead{Première date} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Immobilier} & {\small EDHEC IEIF (ieif.fr)} & {\small Indice immobilier entreprise France} & {\small Mensuel} & {\small 30/06/2008} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Données de calibrage - immobilier}
 La fenêtre de \textbf{20 ans} (arrêtée au 31/12/2025) est retenue, conformément à la justification transverse de la Section~\ref{sec:fenetre}.
 \subsubsection{Implémentation}
-\begin{longtable}{|P{3.6cm}|P{3.0cm}|P{4.2cm}|P{3.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Étape} & \thead{Langage / outil} & \thead{Localisation} & \thead{Statut vérification} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Étape} & \thead{Langage / outil} & \thead{Localisation} & \thead{Statut vérification} \\
-\hline\endhead
-\hline\endfoot
-{\small Calibrage (unsmoothing + BS)} & {\small Excel} & {\small \ph{[onglet / classeur]}} & {\small \ph{[à vérifier]}} \\ \hline
-\rowcolor{nexlight}
-{\small Simulation des trajectoires} & {\small MATLAB} & {\small \ph{[module GSE]}} & {\small \ph{[à vérifier]}} \\ \hline
+\begin{longtable}{P{3.6cm}P{3.0cm}P{4.2cm}P{3.0cm}}
+\toprule
+\tablehead{Étape} & \tablehead{Langage / outil} & \tablehead{Localisation} & \tablehead{Statut vérification} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Étape} & \tablehead{Langage / outil} & \tablehead{Localisation} & \tablehead{Statut vérification} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Calibrage (unsmoothing + BS)} & {\small Excel} & {\small \ph{[onglet / classeur]}} & {\small \ph{[à vérifier]}} \\
+\rowcolor{nxlightblue}
+{\small Simulation des trajectoires} & {\small MATLAB} & {\small \ph{[module GSE]}} & {\small \ph{[à vérifier]}} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Localisation des implémentations et statut de vérification}
 \subsubsection{Paramètres en production (allocation 2026 vs 2022)}
-\begin{longtable}{|P{6.0cm}|P{2.6cm}|P{2.2cm}|P{3.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Paramètre} & \thead{2026 (20 ans)} & \thead{2022} & \thead{Commentaire} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Paramètre} & \thead{2026 (20 ans)} & \thead{2022} & \thead{Commentaire} \\
-\hline\endhead
-\hline\endfoot
-{\small $\mu$ - rendement moyen} & {\small 5,633\,\%} & {\small 6,288\,\%} & {\small } \\ \hline
-\rowcolor{nexlight}
-{\small $\sigma$ - volatilité (post-unsmoothing)} & {\small 6,128\,\%} & {\small 7,9\,\%} & {\small } \\ \hline
-{\small Rendement (sortie OutPut)} & {\small 5,613\,\%} & {\small -} & {\small Restitution simulation} \\ \hline
-\rowcolor{nexlight}
-{\small Volatilité (sortie OutPut)} & {\small 6,158\,\%} & {\small -} & {\small Restitution simulation} \\ \hline
+\begin{longtable}{P{6.0cm}P{2.6cm}P{2.2cm}P{3.0cm}}
+\toprule
+\tablehead{Paramètre} & \tablehead{2026 (20 ans)} & \tablehead{2022} & \tablehead{Commentaire} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Paramètre} & \tablehead{2026 (20 ans)} & \tablehead{2022} & \tablehead{Commentaire} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small $\mu$ - rendement moyen} & {\small 5,633\,\%} & {\small 6,288\,\%} & {\small } \\
+\rowcolor{nxlightblue}
+{\small $\sigma$ - volatilité (post-unsmoothing)} & {\small 6,128\,\%} & {\small 7,9\,\%} & {\small } \\
+{\small Rendement (sortie OutPut)} & {\small 5,613\,\%} & {\small -} & {\small Restitution simulation} \\
+\rowcolor{nxlightblue}
+{\small Volatilité (sortie OutPut)} & {\small 6,158\,\%} & {\small -} & {\small Restitution simulation} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Paramètres en production - valeurs extraites du classeur \texttt{Template\_Allocationv2.xlsm}}
@@ -1797,24 +1797,24 @@ Les moyennes diffèrent entre le calibrage proposé et le calibrage réalisé in
 
 Concernant la volatilité, celle-ci est estimée à partir de la série lissée dans les deux approches. Les écarts observés proviennent de la méthode d’estimation utilisée : l’une repose sur un estimateur corrigé de la volatilité, tandis que l’autre utilise un estimateur non biaisé. Cette différence méthodologique conduit à une volatilité légèrement plus élevée dans le premier cas.
 
-\begin{longtable}{|P{3.6cm}|P{4.2cm}|P{2.3cm}|P{2.3cm}|P{2.2cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Résultat} & \thead{Seuil / cible} & \thead{Conclusion} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Résultat} & \thead{Seuil / cible} & \thead{Conclusion} \\
-\hline\endhead
-\hline\endfoot
-{\small Shapiro-Wilk / Jarque-Bera} & {\small Normalité des résidus} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small QQ-plot} & {\small Adéquation distributionnelle} & {\small [cf. figure]} & {\small Visuel} & {\small [OK / KO]} \\ \hline
-{\small Ljung-Box / ACF (1--12)} & {\small Autocorrélation résiduelle} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small Rapprochement des cibles} & {\small Cibles historiques vs modèle} & {\small [écarts]} & {\small $<$ [x]\,\%} & {\small [OK / KO]} \\ \hline
-{\small Backtesting des moments simulés} & {\small Convergence moyenne / volatilité} & {\small [écarts]} & {\small $<$ [x] bp} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small Réplication paramètres (run indépendant)} & {\small Écart vs production} & {\small [écart]} & {\small $<$ [tol.]} & {\small [OK / KO]} \\ \hline
-{\small ACF post-unsmoothing} & {\small Annulation de l'autocorrélation d'ordre 1} & {\small [valeurs]} & {\small ACF(1) $\approx$ 0} & {\small [OK / KO]} \\ \hline
+\begin{longtable}{P{3.6cm}P{4.2cm}P{2.3cm}P{2.3cm}P{2.2cm}}
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Résultat} & \tablehead{Seuil / cible} & \tablehead{Conclusion} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Résultat} & \tablehead{Seuil / cible} & \tablehead{Conclusion} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Shapiro-Wilk / Jarque-Bera} & {\small Normalité des résidus} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small QQ-plot} & {\small Adéquation distributionnelle} & {\small [cf. figure]} & {\small Visuel} & {\small [OK / KO]} \\
+{\small Ljung-Box / ACF (1--12)} & {\small Autocorrélation résiduelle} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small Rapprochement des cibles} & {\small Cibles historiques vs modèle} & {\small [écarts]} & {\small $<$ [x]\,\%} & {\small [OK / KO]} \\
+{\small Backtesting des moments simulés} & {\small Convergence moyenne / volatilité} & {\small [écarts]} & {\small $<$ [x] bp} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small Réplication paramètres (run indépendant)} & {\small Écart vs production} & {\small [écart]} & {\small $<$ [tol.]} & {\small [OK / KO]} \\
+{\small ACF post-unsmoothing} & {\small Annulation de l'autocorrélation d'ordre 1} & {\small [valeurs]} & {\small ACF(1) $\approx$ 0} & {\small [OK / KO]} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Synthèse des tests de validation - immobilier}
@@ -1823,18 +1823,18 @@ Concernant la volatilité, celle-ci est estimée à partir de la série lissée 
 \figureph{Trajectoire moyenne simulée et quantiles 25\,\% / 75\,\% vs cibles}
 \subsection{Axe 3 - Points d'attention et approches alternatives}
 Sans remettre en cause le dispositif en production, nous identifions les points d'attention suivants et proposons des approches alternatives potentiellement plus pertinentes sur le plan économique et mathématique.
-\begin{longtable}{|P{1.1cm}|P{3.8cm}|P{5.0cm}|P{4.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Point d'attention} & \thead{Approche / modèle alternatif proposé} & \thead{Bénéfice attendu} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Point d'attention} & \thead{Approche / modèle alternatif proposé} & \thead{Bénéfice attendu} \\
-\hline\endhead
-\hline\endfoot
-{\small IM-A1} & {\small BS gaussien : cycles immobiliers longs et retour à la moyenne non modélisés} & {\small Modèle à retour à la moyenne sur le rendement ou à régimes} & {\small Réalisme des cycles immobiliers} \\ \hline
-\rowcolor{nexlight}
-{\small IM-A2} & {\small Profondeur 2008+ : fenêtre \og 20 ans \fg{} tronquée à $\sim$17 ans} & {\small Clarifier la fenêtre effective ; cibles d'expert de long terme} & {\small Cohérence de la fenêtre} \\ \hline
-{\small IM-A3} & {\small Volatilité 6\,\% post-unsmoothing possiblement sous-estimée} & {\small Unsmoothing aux ordres supérieurs ; comparaison à l'immobilier coté} & {\small Couple rendement / risque non biaisé} \\ \hline
+\begin{longtable}{P{1.1cm}P{3.8cm}P{5.0cm}P{4.0cm}}
+\toprule
+\tablehead{Réf.} & \tablehead{Point d'attention} & \tablehead{Approche / modèle alternatif proposé} & \tablehead{Bénéfice attendu} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Réf.} & \tablehead{Point d'attention} & \tablehead{Approche / modèle alternatif proposé} & \tablehead{Bénéfice attendu} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small IM-A1} & {\small BS gaussien : cycles immobiliers longs et retour à la moyenne non modélisés} & {\small Modèle à retour à la moyenne sur le rendement ou à régimes} & {\small Réalisme des cycles immobiliers} \\
+\rowcolor{nxlightblue}
+{\small IM-A2} & {\small Profondeur 2008+ : fenêtre \og 20 ans \fg{} tronquée à $\sim$17 ans} & {\small Clarifier la fenêtre effective ; cibles d'expert de long terme} & {\small Cohérence de la fenêtre} \\
+{\small IM-A3} & {\small Volatilité 6\,\% post-unsmoothing possiblement sous-estimée} & {\small Unsmoothing aux ordres supérieurs ; comparaison à l'immobilier coté} & {\small Couple rendement / risque non biaisé} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Points d'attention et alternatives - Immobilier}
@@ -1858,49 +1858,49 @@ Le calibrage repose sur une procédure d'unsmoothing AR(1) suivie d'une régress
 Pour répresenter l'exposition au infrastructure , il a été retenu l'indice NMX30TR. Le \href{https://www.lpx-group.com/wp-content/uploads/2025/02/Guide-to-the-NMX-Equity-Indices.pdf}
 {\textcolor{nexnavy}{NMX30 Infrastructure Global}} est un indice boursier mondial qui mesure la performance des 30 plus grandes et plus liquides sociétés d’infrastructures de base cotées en bourse. Les données fournies ont une fréquence mensuel et commence au 29/12/2000.
 
-\begin{longtable}{|P{2.6cm}|P{2.0cm}|P{4.6cm}|P{1.4cm}|P{2.6cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Driver} & \thead{Source} & \thead{Ticker / série} & \thead{Fréq.} & \thead{Première date} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Driver} & \thead{Source} & \thead{Ticker / série} & \thead{Fréq.} & \thead{Première date} \\
-\hline\endhead
-\hline\endfoot
-{\small Infrastructure} & {\small Bloomberg} & {\small NMX30T Index} & {\small Mens.} & {\small 29/12/2000} \\ \hline
+\begin{longtable}{P{2.6cm}P{2.0cm}P{4.6cm}P{1.4cm}P{2.6cm}}
+\toprule
+\tablehead{Driver} & \tablehead{Source} & \tablehead{Ticker / série} & \tablehead{Fréq.} & \tablehead{Première date} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Driver} & \tablehead{Source} & \tablehead{Ticker / série} & \tablehead{Fréq.} & \tablehead{Première date} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Infrastructure} & {\small Bloomberg} & {\small NMX30T Index} & {\small Mens.} & {\small 29/12/2000} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Données de calibrage - infrastructure}
 La fenêtre de 20 ans (arrêtée au 31/12/2025) est retenue, conformément à la justification transverse de la Section~\ref{sec:fenetre}.
 \subsubsection{Implémentation}
-\begin{longtable}{|P{3.6cm}|P{3.0cm}|P{4.2cm}|P{3.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Étape} & \thead{Langage / outil} & \thead{Localisation} & \thead{Statut vérification} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Étape} & \thead{Langage / outil} & \thead{Localisation} & \thead{Statut vérification} \\
-\hline\endhead
-\hline\endfoot
-{\small Calibrage (unsmoothing + BS)} & {\small Excel} & {\small \ph{[onglet / classeur]}} & {\small \ph{[à vérifier]}} \\ \hline
-\rowcolor{nexlight}
-{\small Simulation des trajectoires} & {\small MATLAB} & {\small \ph{[module GSE]}} & {\small \ph{[à vérifier]}} \\ \hline
+\begin{longtable}{P{3.6cm}P{3.0cm}P{4.2cm}P{3.0cm}}
+\toprule
+\tablehead{Étape} & \tablehead{Langage / outil} & \tablehead{Localisation} & \tablehead{Statut vérification} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Étape} & \tablehead{Langage / outil} & \tablehead{Localisation} & \tablehead{Statut vérification} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Calibrage (unsmoothing + BS)} & {\small Excel} & {\small \ph{[onglet / classeur]}} & {\small \ph{[à vérifier]}} \\
+\rowcolor{nxlightblue}
+{\small Simulation des trajectoires} & {\small MATLAB} & {\small \ph{[module GSE]}} & {\small \ph{[à vérifier]}} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Localisation des implémentations et statut de vérification}
 \subsubsection{Paramètres en production (allocation 2026 vs 2022)}
-\begin{longtable}{|P{6.0cm}|P{2.6cm}|P{2.2cm}|P{3.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Paramètre} & \thead{2026 (20 ans)} & \thead{2022} & \thead{Commentaire} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Paramètre} & \thead{2026 (20 ans)} & \thead{2022} & \thead{Commentaire} \\
-\hline\endhead
-\hline\endfoot
-{\small $\mu$ - rendement moyen} & {\small 6,516\,\%} & {\small 7,626\,\%} & {\small } \\ \hline
-\rowcolor{nexlight}
-{\small $\sigma$ - volatilité (post-unsmoothing)} & {\small 13,498\,\%} & {\small 18,459\,\%} & {\small } \\ \hline
-{\small Rendement (sortie OutPut)} & {\small 6,55\,\%} & {\small -} & {\small Restitution simulation} \\ \hline
-\rowcolor{nexlight}
-{\small Volatilité (sortie OutPut)} & {\small 13,578\,\%} & {\small -} & {\small Restitution simulation} \\ \hline
+\begin{longtable}{P{6.0cm}P{2.6cm}P{2.2cm}P{3.0cm}}
+\toprule
+\tablehead{Paramètre} & \tablehead{2026 (20 ans)} & \tablehead{2022} & \tablehead{Commentaire} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Paramètre} & \tablehead{2026 (20 ans)} & \tablehead{2022} & \tablehead{Commentaire} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small $\mu$ - rendement moyen} & {\small 6,516\,\%} & {\small 7,626\,\%} & {\small } \\
+\rowcolor{nxlightblue}
+{\small $\sigma$ - volatilité (post-unsmoothing)} & {\small 13,498\,\%} & {\small 18,459\,\%} & {\small } \\
+{\small Rendement (sortie OutPut)} & {\small 6,55\,\%} & {\small -} & {\small Restitution simulation} \\
+\rowcolor{nxlightblue}
+{\small Volatilité (sortie OutPut)} & {\small 13,578\,\%} & {\small -} & {\small Restitution simulation} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Paramètres en production - valeurs extraites du classeur \texttt{Template\_Allocationv2.xlsm}}
@@ -1915,24 +1915,24 @@ La fenêtre de 20 ans (arrêtée au 31/12/2025) est retenue, conformément à la
 \end{auditbox}
 \subsection{Axe 2 - Validation des modèles et des données (tests)}
 Cette Axe restitue la validation conduite sur le modèle et les données, au moyen de la batterie de tests décrite en Section~\ref{sec:tests}.
-\begin{longtable}{|P{3.6cm}|P{4.2cm}|P{2.3cm}|P{2.3cm}|P{2.2cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Résultat} & \thead{Seuil / cible} & \thead{Conclusion} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Résultat} & \thead{Seuil / cible} & \thead{Conclusion} \\
-\hline\endhead
-\hline\endfoot
-{\small Shapiro-Wilk / Jarque-Bera} & {\small Normalité des résidus} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small QQ-plot} & {\small Adéquation distributionnelle} & {\small [cf. figure]} & {\small Visuel} & {\small [OK / KO]} \\ \hline
-{\small Ljung-Box / ACF (1--12)} & {\small Autocorrélation résiduelle} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small Rapprochement des cibles} & {\small Cibles historiques vs modèle} & {\small [écarts]} & {\small $<$ [x]\,\%} & {\small [OK / KO]} \\ \hline
-{\small Backtesting des moments simulés} & {\small Convergence moyenne / volatilité} & {\small [écarts]} & {\small $<$ [x] bp} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small Réplication paramètres (run indépendant)} & {\small Écart vs production} & {\small [écart]} & {\small $<$ [tol.]} & {\small [OK / KO]} \\ \hline
-{\small ACF post-unsmoothing} & {\small Annulation de l'autocorrélation d'ordre 1} & {\small [valeurs]} & {\small ACF(1) $\approx$ 0} & {\small [OK / KO]} \\ \hline
+\begin{longtable}{P{3.6cm}P{4.2cm}P{2.3cm}P{2.3cm}P{2.2cm}}
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Résultat} & \tablehead{Seuil / cible} & \tablehead{Conclusion} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Résultat} & \tablehead{Seuil / cible} & \tablehead{Conclusion} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Shapiro-Wilk / Jarque-Bera} & {\small Normalité des résidus} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small QQ-plot} & {\small Adéquation distributionnelle} & {\small [cf. figure]} & {\small Visuel} & {\small [OK / KO]} \\
+{\small Ljung-Box / ACF (1--12)} & {\small Autocorrélation résiduelle} & {\small [stat ; p-value]} & {\small p $>$ 5\,\%} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small Rapprochement des cibles} & {\small Cibles historiques vs modèle} & {\small [écarts]} & {\small $<$ [x]\,\%} & {\small [OK / KO]} \\
+{\small Backtesting des moments simulés} & {\small Convergence moyenne / volatilité} & {\small [écarts]} & {\small $<$ [x] bp} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small Réplication paramètres (run indépendant)} & {\small Écart vs production} & {\small [écart]} & {\small $<$ [tol.]} & {\small [OK / KO]} \\
+{\small ACF post-unsmoothing} & {\small Annulation de l'autocorrélation d'ordre 1} & {\small [valeurs]} & {\small ACF(1) $\approx$ 0} & {\small [OK / KO]} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Synthèse des tests de validation - infrastructure}
@@ -1941,17 +1941,17 @@ Cette Axe restitue la validation conduite sur le modèle et les données, au moy
 \figureph{Trajectoire moyenne simulée et quantiles 25\,\% / 75\,\% vs cibles}
 \subsection{Axe 3 - Points d'attention et approches alternatives}
 Sans remettre en cause le dispositif en production, nous identifions les points d'attention suivants et proposons des approches alternatives potentiellement plus pertinentes sur le plan économique et mathématique.
-\begin{longtable}{|P{1.1cm}|P{3.8cm}|P{5.0cm}|P{4.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Point d'attention} & \thead{Approche / modèle alternatif proposé} & \thead{Bénéfice attendu} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Point d'attention} & \thead{Approche / modèle alternatif proposé} & \thead{Bénéfice attendu} \\
-\hline\endhead
-\hline\endfoot
-{\small IF-A1} & {\small Indice coté NMX30 : profil proche des actions (corrélations 72--92\,\%)} & {\small Indice / modèle plus spécifique à l'infrastructure non cotée} & {\small Contribution réelle à la diversification} \\ \hline
-\rowcolor{nexlight}
-{\small IF-A2} & {\small Hypothèse BS gaussien} & {\small Modèle à retour à la moyenne des rendements} & {\small Réalisme des cash-flows régulés} \\ \hline
+\begin{longtable}{P{1.1cm}P{3.8cm}P{5.0cm}P{4.0cm}}
+\toprule
+\tablehead{Réf.} & \tablehead{Point d'attention} & \tablehead{Approche / modèle alternatif proposé} & \tablehead{Bénéfice attendu} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Réf.} & \tablehead{Point d'attention} & \tablehead{Approche / modèle alternatif proposé} & \tablehead{Bénéfice attendu} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small IF-A1} & {\small Indice coté NMX30 : profil proche des actions (corrélations 72--92\,\%)} & {\small Indice / modèle plus spécifique à l'infrastructure non cotée} & {\small Contribution réelle à la diversification} \\
+\rowcolor{nxlightblue}
+{\small IF-A2} & {\small Hypothèse BS gaussien} & {\small Modèle à retour à la moyenne des rendements} & {\small Réalisme des cash-flows régulés} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Points d'attention et alternatives - Infrastructure}
@@ -1967,54 +1967,54 @@ La dépendance est modélisée par une copule gaussienne sur les browniens du GS
 \textbf{Calibrage} : corrélations de Pearson deux à deux sur les facteurs observables (maturités 2 / 10 ans ; crédit 5 ans), conversion analytique, régularisation de Higham. \textbf{Simulation} : décomposition de Cholesky de la matrice des browniens, appliquée aux incréments gaussiens. La matrice en production est de dimension 15 (régimes stressés inclus).
 \subsubsection{Données et fenêtre de calibrage}
 Ensemble des séries du GSE, à pas mensuel, arrêtées au 31/12/2025.
-\begin{longtable}{|P{2.6cm}|P{2.0cm}|P{4.6cm}|P{1.4cm}|P{2.6cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Driver} & \thead{Source} & \thead{Ticker / série} & \thead{Fréq.} & \thead{Première date} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Driver} & \thead{Source} & \thead{Ticker / série} & \thead{Fréq.} & \thead{Première date} \\
-\hline\endhead
-\hline\endfoot
-{\small Tous facteurs} & {\small Cf. \S\ref{sec:carto}} & {\small Séries du GSE (15 drivers)} & {\small Mens.} & {\small 31/12/2025} \\ \hline
+\begin{longtable}{P{2.6cm}P{2.0cm}P{4.6cm}P{1.4cm}P{2.6cm}}
+\toprule
+\tablehead{Driver} & \tablehead{Source} & \tablehead{Ticker / série} & \tablehead{Fréq.} & \tablehead{Première date} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Driver} & \tablehead{Source} & \tablehead{Ticker / série} & \tablehead{Fréq.} & \tablehead{Première date} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Tous facteurs} & {\small Cf. \S\ref{sec:carto}} & {\small Séries du GSE (15 drivers)} & {\small Mens.} & {\small 31/12/2025} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Données de calibrage - structure de dépendance - corrélations}
 La fenêtre de \textbf{20 ans} (arrêtée au 31/12/2025) est retenue, conformément à la justification transverse de la Section~\ref{sec:fenetre}.
 \subsubsection{Implémentation}
-\begin{longtable}{|P{3.6cm}|P{3.0cm}|P{4.2cm}|P{3.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Étape} & \thead{Langage / outil} & \thead{Localisation} & \thead{Statut vérification} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Étape} & \thead{Langage / outil} & \thead{Localisation} & \thead{Statut vérification} \\
-\hline\endhead
-\hline\endfoot
-{\small Estimation + passage browniens} & {\small Python} & {\small \ph{[script Python]}} & {\small \ph{[à vérifier]}} \\ \hline
-\rowcolor{nexlight}
-{\small Régularisation Higham} & {\small Python} & {\small \ph{[script Python]}} & {\small \ph{[à vérifier]}} \\ \hline
-{\small Cholesky + diffusion corrélée} & {\small MATLAB} & {\small \ph{[module GSE]}} & {\small \ph{[à vérifier]}} \\ \hline
+\begin{longtable}{P{3.6cm}P{3.0cm}P{4.2cm}P{3.0cm}}
+\toprule
+\tablehead{Étape} & \tablehead{Langage / outil} & \tablehead{Localisation} & \tablehead{Statut vérification} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Étape} & \tablehead{Langage / outil} & \tablehead{Localisation} & \tablehead{Statut vérification} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Estimation + passage browniens} & {\small Python} & {\small \ph{[script Python]}} & {\small \ph{[à vérifier]}} \\
+\rowcolor{nxlightblue}
+{\small Régularisation Higham} & {\small Python} & {\small \ph{[script Python]}} & {\small \ph{[à vérifier]}} \\
+{\small Cholesky + diffusion corrélée} & {\small MATLAB} & {\small \ph{[module GSE]}} & {\small \ph{[à vérifier]}} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Localisation des implémentations et statut de vérification}
 \subsubsection{Paramètres en production (allocation 2026 vs 2022)}
-\begin{longtable}{|P{5.8cm}|P{3.0cm}|P{4.4cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Couple de facteurs (extrait)} & \thead{Corrél. browniens 2026} & \thead{Commentaire} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Couple de facteurs (extrait)} & \thead{Corrél. browniens 2026} & \thead{Commentaire} \\
-\hline\endhead
-\hline\endfoot
-{\small Action Euro $\times$ Action Monde} & {\small 82,85\,\%} & {\small Cohérent (forte corrélation actions)} \\ \hline
-\rowcolor{nexlight}
-{\small Action Euro $\times$ Spread crédit} & {\small $-$71,47\,\%} & {\small Corrélation négative attendue} \\ \hline
-{\small Action Euro $\times$ Dette privée} & {\small $-$72,52\,\%} & {\small } \\ \hline
-\rowcolor{nexlight}
-{\small Inflation LT $\times$ Taux réel LT} & {\small $-$22,65\,\%} & {\small Cohérent avec la littérature} \\ \hline
-{\small Spread crédit $\times$ Dette privée} & {\small 90,83\,\%} & {\small Très élevée (proximité des risques)} \\ \hline
-\rowcolor{nexlight}
-{\small Action Monde $\times$ Action Monde stressée} & {\small 0,0\,\%} & {\small \textbf{À vérifier} (convention ou anomalie)} \\ \hline
-{\small Private Equity $\times$ Infrastructure} & {\small 72,66\,\%} & {\small } \\ \hline
+\begin{longtable}{P{5.8cm}P{3.0cm}P{4.4cm}}
+\toprule
+\tablehead{Couple de facteurs (extrait)} & \tablehead{Corrél. browniens 2026} & \tablehead{Commentaire} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Couple de facteurs (extrait)} & \tablehead{Corrél. browniens 2026} & \tablehead{Commentaire} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Action Euro $\times$ Action Monde} & {\small 82,85\,\%} & {\small Cohérent (forte corrélation actions)} \\
+\rowcolor{nxlightblue}
+{\small Action Euro $\times$ Spread crédit} & {\small $-$71,47\,\%} & {\small Corrélation négative attendue} \\
+{\small Action Euro $\times$ Dette privée} & {\small $-$72,52\,\%} & {\small } \\
+\rowcolor{nxlightblue}
+{\small Inflation LT $\times$ Taux réel LT} & {\small $-$22,65\,\%} & {\small Cohérent avec la littérature} \\
+{\small Spread crédit $\times$ Dette privée} & {\small 90,83\,\%} & {\small Très élevée (proximité des risques)} \\
+\rowcolor{nxlightblue}
+{\small Action Monde $\times$ Action Monde stressée} & {\small 0,0\,\%} & {\small \textbf{À vérifier} (convention ou anomalie)} \\
+{\small Private Equity $\times$ Infrastructure} & {\small 72,66\,\%} & {\small } \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Paramètres en production - valeurs extraites du classeur \texttt{Template\_Allocationv2.xlsm}}
@@ -2029,21 +2029,21 @@ La fenêtre de \textbf{20 ans} (arrêtée au 31/12/2025) est retenue, conformém
 \end{auditbox}
 \subsection{Axe 2 - Validation des modèles et des données (tests)}
 Cette Axe restitue la validation conduite sur le modèle et les données, au moyen de la batterie de tests décrite en Section~\ref{sec:tests}.
-\begin{longtable}{|P{3.6cm}|P{4.2cm}|P{2.3cm}|P{2.3cm}|P{2.2cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Résultat} & \thead{Seuil / cible} & \thead{Conclusion} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Résultat} & \thead{Seuil / cible} & \thead{Conclusion} \\
-\hline\endhead
-\hline\endfoot
-{\small Matrice simulée vs cible} & {\small Restitution des corrélations en sortie} & {\small [écarts]} & {\small $<$ [x] pts} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small Impact Higham} & {\small Distance matrice cible / SDP} & {\small [Frobenius]} & {\small Documenté} & {\small [OK / KO]} \\ \hline
-{\small Cohérence économique} & {\small Signes et magnitudes vs littérature} & {\small [revue]} & {\small Cohérent} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small Vérif. formules de passage} & {\small Contre-dérivation des conversions} & {\small [OK / écarts]} & {\small Identité analytique} & {\small [OK / KO]} \\ \hline
-{\small Valeurs atypiques} & {\small Corrélations à 0\,\% normal / stressé} & {\small [contrôle]} & {\small Convention justifiée} & {\small [OK / KO]} \\ \hline
+\begin{longtable}{P{3.6cm}P{4.2cm}P{2.3cm}P{2.3cm}P{2.2cm}}
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Résultat} & \tablehead{Seuil / cible} & \tablehead{Conclusion} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Résultat} & \tablehead{Seuil / cible} & \tablehead{Conclusion} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Matrice simulée vs cible} & {\small Restitution des corrélations en sortie} & {\small [écarts]} & {\small $<$ [x] pts} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small Impact Higham} & {\small Distance matrice cible / SDP} & {\small [Frobenius]} & {\small Documenté} & {\small [OK / KO]} \\
+{\small Cohérence économique} & {\small Signes et magnitudes vs littérature} & {\small [revue]} & {\small Cohérent} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small Vérif. formules de passage} & {\small Contre-dérivation des conversions} & {\small [OK / écarts]} & {\small Identité analytique} & {\small [OK / KO]} \\
+{\small Valeurs atypiques} & {\small Corrélations à 0\,\% normal / stressé} & {\small [contrôle]} & {\small Convention justifiée} & {\small [OK / KO]} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Synthèse des tests de validation - structure de dépendance - corrélations}
@@ -2051,21 +2051,21 @@ Cette Axe restitue la validation conduite sur le modèle et les données, au moy
 \figureph{Matrice de corrélation simulée vs cible (écarts)}
 \subsection{Axe 3 - Points d'attention et approches alternatives}
 Sans remettre en cause le dispositif en production, nous identifions les points d'attention suivants et proposons des approches alternatives potentiellement plus pertinentes sur le plan économique et mathématique.
-\begin{longtable}{|P{1.1cm}|P{3.8cm}|P{5.0cm}|P{4.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Point d'attention} & \thead{Approche / modèle alternatif proposé} & \thead{Bénéfice attendu} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Point d'attention} & \thead{Approche / modèle alternatif proposé} & \thead{Bénéfice attendu} \\
-\hline\endhead
-\hline\endfoot
-{\small CO-A1} & {\small Copule gaussienne : pas de dépendance de queue} & {\small Copule à dépendance de queue (Student, mélanges) pour le stress} & {\small Réalisme des co-mouvements en crise} \\ \hline
-\rowcolor{nexlight}
-{\small CO-A2} & {\small Corrélations \og normal \fg{} vs \og stressé \fg{} à 0\,\% (Action Monde)} & {\small Vérifier convention / séparer les matrices par régime} & {\small Exactitude de la structure de dépendance} \\ \hline
-{\small CO-A3} & {\small Décorrélations structurelles fixées à 0 (CT $\times$ LT d'un V2F ; croisées inter-V2F)} & {\small Estimer ces corrélations sur historique ; mesurer l'impact d'une valeur non nulle} & {\small Structure de dépendance non sur-contrainte} \\ \hline
-\rowcolor{nexlight}
-{\small CO-A4} & {\small Adossement du facteur court aux corrélations du facteur long} & {\small Calibrer directement les corrélations du facteur court} & {\small Précision de la dépendance court terme} \\ \hline
-{\small CO-A5} & {\small Hypothèse de corrélation identique aux deux facteurs d'un V2F (formules de passage)} & {\small Lever l'hypothèse ; calibrage facteur par facteur} & {\small Précision de la conversion cibles $\to$ browniens} \\ \hline
+\begin{longtable}{P{1.1cm}P{3.8cm}P{5.0cm}P{4.0cm}}
+\toprule
+\tablehead{Réf.} & \tablehead{Point d'attention} & \tablehead{Approche / modèle alternatif proposé} & \tablehead{Bénéfice attendu} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Réf.} & \tablehead{Point d'attention} & \tablehead{Approche / modèle alternatif proposé} & \tablehead{Bénéfice attendu} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small CO-A1} & {\small Copule gaussienne : pas de dépendance de queue} & {\small Copule à dépendance de queue (Student, mélanges) pour le stress} & {\small Réalisme des co-mouvements en crise} \\
+\rowcolor{nxlightblue}
+{\small CO-A2} & {\small Corrélations \og normal \fg{} vs \og stressé \fg{} à 0\,\% (Action Monde)} & {\small Vérifier convention / séparer les matrices par régime} & {\small Exactitude de la structure de dépendance} \\
+{\small CO-A3} & {\small Décorrélations structurelles fixées à 0 (CT $\times$ LT d'un V2F ; croisées inter-V2F)} & {\small Estimer ces corrélations sur historique ; mesurer l'impact d'une valeur non nulle} & {\small Structure de dépendance non sur-contrainte} \\
+\rowcolor{nxlightblue}
+{\small CO-A4} & {\small Adossement du facteur court aux corrélations du facteur long} & {\small Calibrer directement les corrélations du facteur court} & {\small Précision de la dépendance court terme} \\
+{\small CO-A5} & {\small Hypothèse de corrélation identique aux deux facteurs d'un V2F (formules de passage)} & {\small Lever l'hypothèse ; calibrage facteur par facteur} & {\small Précision de la conversion cibles $\to$ browniens} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Points d'attention et alternatives - Structure de dépendance - corrélations}
@@ -2082,53 +2082,53 @@ Le GSE simule conjointement l'ensemble des facteurs de risque sous la probabilit
 \textbf{Simulation} Monte-Carlo en MATLAB : 5\,000 trajectoires, pas mensuel ($dt = 1/12$), horizon de projection 35 ans \ph{[ALM $\sim$30 ans]}. Chaque facteur est diffusé par son schéma propre (exact V2F, Alfonsi pour le CIR, exact log-OU pour la dette privée, BS pour actions / immobilier / infra / non coté), les chocs étant corrélés via $L$.
 \subsubsection{Données et fenêtre de calibrage}
 Pas de calibrage propre ; le moteur consomme les paramètres et la matrice de corrélation calibrés.
-\begin{longtable}{|P{2.6cm}|P{2.0cm}|P{4.6cm}|P{1.4cm}|P{2.6cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Driver} & \thead{Source} & \thead{Ticker / série} & \thead{Fréq.} & \thead{Première date} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Driver} & \thead{Source} & \thead{Ticker / série} & \thead{Fréq.} & \thead{Première date} \\
-\hline\endhead
-\hline\endfoot
-{\small Paramètres GSE} & {\small Classeur} & {\small \texttt{Paramètre GSE20}} & {\small -} & {\small 31/12/2025} \\ \hline
-\rowcolor{nexlight}
-{\small Matrice de corrélation} & {\small Module Python} & {\small \texttt{Correlation 55}} & {\small -} & {\small 31/12/2025} \\ \hline
+\begin{longtable}{P{2.6cm}P{2.0cm}P{4.6cm}P{1.4cm}P{2.6cm}}
+\toprule
+\tablehead{Driver} & \tablehead{Source} & \tablehead{Ticker / série} & \tablehead{Fréq.} & \tablehead{Première date} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Driver} & \tablehead{Source} & \tablehead{Ticker / série} & \tablehead{Fréq.} & \tablehead{Première date} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Paramètres GSE} & {\small Classeur} & {\small \texttt{Paramètre GSE20}} & {\small -} & {\small 31/12/2025} \\
+\rowcolor{nxlightblue}
+{\small Matrice de corrélation} & {\small Module Python} & {\small \texttt{Correlation 55}} & {\small -} & {\small 31/12/2025} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Données de calibrage - moteur de simulation monte-carlo}
 La fenêtre de \textbf{20 ans} (arrêtée au 31/12/2025) est retenue, conformément à la justification transverse de la Section~\ref{sec:fenetre}.
 \subsubsection{Implémentation}
-\begin{longtable}{|P{3.6cm}|P{3.0cm}|P{4.2cm}|P{3.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Étape} & \thead{Langage / outil} & \thead{Localisation} & \thead{Statut vérification} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Étape} & \thead{Langage / outil} & \thead{Localisation} & \thead{Statut vérification} \\
-\hline\endhead
-\hline\endfoot
-{\small Génération des chocs corrélés} & {\small MATLAB} & {\small \ph{[module GSE]}} & {\small \ph{[à vérifier]}} \\ \hline
-\rowcolor{nexlight}
-{\small Diffusion jointe + sorties} & {\small MATLAB} & {\small \ph{[module GSE]}} & {\small \ph{[à vérifier]}} \\ \hline
-{\small Restitution (rdt / vol / corrél.)} & {\small Excel} & {\small onglet \texttt{OutPut}} & {\small \ph{[à vérifier]}} \\ \hline
+\begin{longtable}{P{3.6cm}P{3.0cm}P{4.2cm}P{3.0cm}}
+\toprule
+\tablehead{Étape} & \tablehead{Langage / outil} & \tablehead{Localisation} & \tablehead{Statut vérification} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Étape} & \tablehead{Langage / outil} & \tablehead{Localisation} & \tablehead{Statut vérification} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Génération des chocs corrélés} & {\small MATLAB} & {\small \ph{[module GSE]}} & {\small \ph{[à vérifier]}} \\
+\rowcolor{nxlightblue}
+{\small Diffusion jointe + sorties} & {\small MATLAB} & {\small \ph{[module GSE]}} & {\small \ph{[à vérifier]}} \\
+{\small Restitution (rdt / vol / corrél.)} & {\small Excel} & {\small onglet \texttt{OutPut}} & {\small \ph{[à vérifier]}} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Localisation des implémentations et statut de vérification}
 \subsubsection{Paramètres en production (allocation 2026 vs 2022)}
-\begin{longtable}{|P{5.6cm}|P{3.0cm}|P{4.6cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Paramètre de simulation} & \thead{Valeur} & \thead{Commentaire} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Paramètre de simulation} & \thead{Valeur} & \thead{Commentaire} \\
-\hline\endhead
-\hline\endfoot
-{\small Nombre de simulations} & {\small 5\,000} & {\small Onglet GSE20} \\ \hline
-\rowcolor{nexlight}
-{\small Pas de temps $dt$} & {\small $1/12$} & {\small Mensuel} \\ \hline
-{\small Horizon de projection} & {\small 35 ans} & {\small \ph{[ALM $\sim$30 ans à confirmer]}} \\ \hline
-\rowcolor{nexlight}
-{\small Schéma CIR (crédit)} & {\small Alfonsi} & {\small } \\ \hline
-{\small Réserve initiale} & {\small $\approx$ 18,63 Md\euro{}} & {\small } \\ \hline
+\begin{longtable}{P{5.6cm}P{3.0cm}P{4.6cm}}
+\toprule
+\tablehead{Paramètre de simulation} & \tablehead{Valeur} & \tablehead{Commentaire} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Paramètre de simulation} & \tablehead{Valeur} & \tablehead{Commentaire} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Nombre de simulations} & {\small 5\,000} & {\small Onglet GSE20} \\
+\rowcolor{nxlightblue}
+{\small Pas de temps $dt$} & {\small $1/12$} & {\small Mensuel} \\
+{\small Horizon de projection} & {\small 35 ans} & {\small \ph{[ALM $\sim$30 ans à confirmer]}} \\
+\rowcolor{nxlightblue}
+{\small Schéma CIR (crédit)} & {\small Alfonsi} & {\small } \\
+{\small Réserve initiale} & {\small $\approx$ 18,63 Md\euro{}} & {\small } \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Paramètres en production - valeurs extraites du classeur \texttt{Template\_Allocationv2.xlsm}}
@@ -2143,20 +2143,20 @@ La fenêtre de \textbf{20 ans} (arrêtée au 31/12/2025) est retenue, conformém
 \end{auditbox}
 \subsection{Axe 2 - Validation des modèles et des données (tests)}
 Cette Axe restitue la validation conduite sur le modèle et les données, au moyen de la batterie de tests décrite en Section~\ref{sec:tests}.
-\begin{longtable}{|P{3.6cm}|P{4.2cm}|P{2.3cm}|P{2.3cm}|P{2.2cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Résultat} & \thead{Seuil / cible} & \thead{Conclusion} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Test / indicateur} & \thead{Objet} & \thead{Résultat} & \thead{Seuil / cible} & \thead{Conclusion} \\
-\hline\endhead
-\hline\endfoot
-{\small Convergence Monte-Carlo} & {\small Stabilité des sorties vs nombre de simulations} & {\small [écart-type MC]} & {\small $\propto 1/\sqrt{N}$} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small Restitution des moments} & {\small Rendements / volatilités simulés vs cibles} & {\small [écarts]} & {\small $<$ [x] bp} & {\small [OK / KO]} \\ \hline
-{\small Matrice corrél. simulée vs cible} & {\small Cohérence de la structure de dépendance} & {\small [écarts]} & {\small $<$ [x] pts} & {\small [OK / KO]} \\ \hline
-\rowcolor{nexlight}
-{\small Reproductibilité (graine)} & {\small Graine aléatoire fixée} & {\small [OK / KO]} & {\small Tracé} & {\small [OK / KO]} \\ \hline
+\begin{longtable}{P{3.6cm}P{4.2cm}P{2.3cm}P{2.3cm}P{2.2cm}}
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Résultat} & \tablehead{Seuil / cible} & \tablehead{Conclusion} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Test / indicateur} & \tablehead{Objet} & \tablehead{Résultat} & \tablehead{Seuil / cible} & \tablehead{Conclusion} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small Convergence Monte-Carlo} & {\small Stabilité des sorties vs nombre de simulations} & {\small [écart-type MC]} & {\small $\propto 1/\sqrt{N}$} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small Restitution des moments} & {\small Rendements / volatilités simulés vs cibles} & {\small [écarts]} & {\small $<$ [x] bp} & {\small [OK / KO]} \\
+{\small Matrice corrél. simulée vs cible} & {\small Cohérence de la structure de dépendance} & {\small [écarts]} & {\small $<$ [x] pts} & {\small [OK / KO]} \\
+\rowcolor{nxlightblue}
+{\small Reproductibilité (graine)} & {\small Graine aléatoire fixée} & {\small [OK / KO]} & {\small Tracé} & {\small [OK / KO]} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Synthèse des tests de validation - moteur de simulation monte-carlo}
@@ -2164,18 +2164,18 @@ Cette Axe restitue la validation conduite sur le modèle et les données, au moy
 \figureph{Enveloppes quantiles des principales classes d'actifs}
 \subsection{Axe 3 - Points d'attention et approches alternatives}
 Sans remettre en cause le dispositif en production, nous identifions les points d'attention suivants et proposons des approches alternatives potentiellement plus pertinentes sur le plan économique et mathématique.
-\begin{longtable}{|P{1.1cm}|P{3.8cm}|P{5.0cm}|P{4.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Point d'attention} & \thead{Approche / modèle alternatif proposé} & \thead{Bénéfice attendu} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Point d'attention} & \thead{Approche / modèle alternatif proposé} & \thead{Bénéfice attendu} \\
-\hline\endhead
-\hline\endfoot
-{\small MC-A1} & {\small Erreur Monte-Carlo à 5\,000 trajectoires} & {\small Réduction de variance (antithétiques, quasi-MC) ; intervalle de confiance des sorties} & {\small Précision des indicateurs d'allocation} \\ \hline
-\rowcolor{nexlight}
-{\small MC-A2} & {\small Pas mensuel uniforme sur 35 ans} & {\small Contrôle du biais de discrétisation sur les facteurs non exacts (CIR)} & {\small Exactitude des trajectoires} \\ \hline
-{\small MC-A3} & {\small Horizon de simulation (35 ans) vs horizon ALM ($\sim$30 ans)} & {\small Aligner / documenter les horizons} & {\small Cohérence ALM} \\ \hline
+\begin{longtable}{P{1.1cm}P{3.8cm}P{5.0cm}P{4.0cm}}
+\toprule
+\tablehead{Réf.} & \tablehead{Point d'attention} & \tablehead{Approche / modèle alternatif proposé} & \tablehead{Bénéfice attendu} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Réf.} & \tablehead{Point d'attention} & \tablehead{Approche / modèle alternatif proposé} & \tablehead{Bénéfice attendu} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small MC-A1} & {\small Erreur Monte-Carlo à 5\,000 trajectoires} & {\small Réduction de variance (antithétiques, quasi-MC) ; intervalle de confiance des sorties} & {\small Précision des indicateurs d'allocation} \\
+\rowcolor{nxlightblue}
+{\small MC-A2} & {\small Pas mensuel uniforme sur 35 ans} & {\small Contrôle du biais de discrétisation sur les facteurs non exacts (CIR)} & {\small Exactitude des trajectoires} \\
+{\small MC-A3} & {\small Horizon de simulation (35 ans) vs horizon ALM ($\sim$30 ans)} & {\small Aligner / documenter les horizons} & {\small Cohérence ALM} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Points d'attention et alternatives - Moteur de simulation Monte-Carlo}
@@ -2245,20 +2245,20 @@ L'approche consiste à définir une matrice de liquidité par classe d'actifs :
 \centering
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{lccc}
-\hline
-Classe d'actifs & Allocation stratégique & Taux de liquidité retenu & Contribution à la liquidité \\
-\hline
-Actions Europe & 32\,\% & 100\,\% & 32,0\,\% \\
+\toprule
+\tablehead{Classe d'actifs} & \tablehead{Allocation stratégique} & \tablehead{Taux de liquidité retenu} & \tablehead{Contribution à la liquidité} \\
+\midrule
+\rowcolor{nxlightblue} Actions Europe & 32\,\% & 100\,\% & 32,0\,\% \\
 Actions Monde & 8\,\% & 100\,\% & 8,0\,\% \\
-Obligations d'entreprise (BBB, maturité 5 ans) & 20\,\% & 100\,\% & 20,0\,\% \\
+\rowcolor{nxlightblue} Obligations d'entreprise (BBB, maturité 5 ans) & 20\,\% & 100\,\% & 20,0\,\% \\
 Obligations souveraines & 20\,\% & 100\,\% & 20,0\,\% \\
-Obligations indexées sur l'inflation & 10\,\% & 100\,\% & 10,0\,\% \\
+\rowcolor{nxlightblue} Obligations indexées sur l'inflation & 10\,\% & 100\,\% & 10,0\,\% \\
 Immobilier & 7\,\% & 0\,\% & 0,0\,\% \\
-Private Equity & 3\,\% & 0\,\% & 0,0\,\% \\
+\rowcolor{nxlightblue} Private Equity & 3\,\% & 0\,\% & 0,0\,\% \\
 Dette privée & 0\,\% & 0\,\% & 0,0\,\% \\
-\hline
+\midrule
 Total & 100\,\% & - & 90,0\,\% \\
-\hline
+\bottomrule
 \end{tabular}%
 }
 \caption{Matrice de liquidité}
@@ -2402,32 +2402,32 @@ Dans le cadre de la diminution de la duration du passif et du rapprochement de l
 
 Le tableau ci-dessous consolide les points d'attention (Axe 3) de chaque composante. Le statut de vérification (Axe 1) et de validation (Axe 2) est suivi en parallèle.
 
-\begin{longtable}{|P{1.2cm}|P{2.2cm}|P{4.2cm}|P{4.2cm}|P{1.4cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Composante} & \thead{Point d'attention} & \thead{Alternative proposée} & \thead{Priorité} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Réf.} & \thead{Composante} & \thead{Point d'attention} & \thead{Alternative proposée} & \thead{Priorité} \\
-\hline\endhead
-\hline\endfoot
-{\small IN-A*} & {\small Inflation} & {\small [Synthèse]} & {\small [Synthèse]} & {\small [H/M/B]} \\ \hline
-\rowcolor{nexlight}
-{\small TR-A*} & {\small Taux réels} & {\small [Synthèse]} & {\small [Synthèse]} & {\small [H/M/B]} \\ \hline
-{\small ZC-A*} & {\small Courbe nominale} & {\small [Synthèse]} & {\small [Synthèse]} & {\small [H/M/B]} \\ \hline
-\rowcolor{nexlight}
-{\small CR-A*} & {\small Crédit} & {\small [Synthèse]} & {\small [Synthèse]} & {\small [H/M/B]} \\ \hline
-{\small DP-A*} & {\small Dette privée} & {\small [Synthèse]} & {\small [Synthèse]} & {\small [H/M/B]} \\ \hline
-\rowcolor{nexlight}
-{\small LQ-A*} & {\small Prime de liquidité} & {\small [Synthèse]} & {\small [Synthèse]} & {\small [H/M/B]} \\ \hline
-{\small AC-A*} & {\small Actions} & {\small [Synthèse]} & {\small [Synthèse]} & {\small [H/M/B]} \\ \hline
-\rowcolor{nexlight}
-{\small PE-A*} & {\small Non coté} & {\small [Synthèse]} & {\small [Synthèse]} & {\small [H/M/B]} \\ \hline
-{\small IM-A*} & {\small Immobilier} & {\small [Synthèse]} & {\small [Synthèse]} & {\small [H/M/B]} \\ \hline
-\rowcolor{nexlight}
-{\small IF-A*} & {\small Infrastructure} & {\small [Synthèse]} & {\small [Synthèse]} & {\small [H/M/B]} \\ \hline
-{\small CO-A*} & {\small Corrélations} & {\small [Synthèse]} & {\small [Synthèse]} & {\small [H/M/B]} \\ \hline
-\rowcolor{nexlight}
-{\small MC-A*} & {\small Simulation} & {\small [Synthèse]} & {\small [Synthèse]} & {\small [H/M/B]} \\ \hline
+\begin{longtable}{P{1.2cm}P{2.2cm}P{4.2cm}P{4.2cm}P{1.4cm}}
+\toprule
+\tablehead{Réf.} & \tablehead{Composante} & \tablehead{Point d'attention} & \tablehead{Alternative proposée} & \tablehead{Priorité} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Réf.} & \tablehead{Composante} & \tablehead{Point d'attention} & \tablehead{Alternative proposée} & \tablehead{Priorité} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small IN-A*} & {\small Inflation} & {\small [Synthèse]} & {\small [Synthèse]} & {\small [H/M/B]} \\
+\rowcolor{nxlightblue}
+{\small TR-A*} & {\small Taux réels} & {\small [Synthèse]} & {\small [Synthèse]} & {\small [H/M/B]} \\
+{\small ZC-A*} & {\small Courbe nominale} & {\small [Synthèse]} & {\small [Synthèse]} & {\small [H/M/B]} \\
+\rowcolor{nxlightblue}
+{\small CR-A*} & {\small Crédit} & {\small [Synthèse]} & {\small [Synthèse]} & {\small [H/M/B]} \\
+{\small DP-A*} & {\small Dette privée} & {\small [Synthèse]} & {\small [Synthèse]} & {\small [H/M/B]} \\
+\rowcolor{nxlightblue}
+{\small LQ-A*} & {\small Prime de liquidité} & {\small [Synthèse]} & {\small [Synthèse]} & {\small [H/M/B]} \\
+{\small AC-A*} & {\small Actions} & {\small [Synthèse]} & {\small [Synthèse]} & {\small [H/M/B]} \\
+\rowcolor{nxlightblue}
+{\small PE-A*} & {\small Non coté} & {\small [Synthèse]} & {\small [Synthèse]} & {\small [H/M/B]} \\
+{\small IM-A*} & {\small Immobilier} & {\small [Synthèse]} & {\small [Synthèse]} & {\small [H/M/B]} \\
+\rowcolor{nxlightblue}
+{\small IF-A*} & {\small Infrastructure} & {\small [Synthèse]} & {\small [Synthèse]} & {\small [H/M/B]} \\
+{\small CO-A*} & {\small Corrélations} & {\small [Synthèse]} & {\small [Synthèse]} & {\small [H/M/B]} \\
+\rowcolor{nxlightblue}
+{\small MC-A*} & {\small Simulation} & {\small [Synthèse]} & {\small [Synthèse]} & {\small [H/M/B]} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Registre consolidé des points d'attention (Axe 3)}
@@ -2704,23 +2704,23 @@ Matar va proposer d'utiliser les paramètres prospectif de rendement pour calibr
 
 \section{Liste des documents et fichiers reçus}
 
-\begin{longtable}{|P{5.0cm}|P{3.0cm}|P{1.8cm}|P{5.0cm}|}
-\hline\rowcolor{nexnavy}
-\thead{Document / fichier} & \thead{Émetteur} & \thead{Date} & \thead{Description} \\
-\hline\endfirsthead
-\hline\rowcolor{nexnavy}
-\thead{Document / fichier} & \thead{Émetteur} & \thead{Date} & \thead{Description} \\
-\hline\endhead
-\hline\endfoot
-{\small \texttt{Template\_Allocationv2.xlsm}} & {\small CDC - DPS / ALM-RF} & {\small 2025/2026} & {\small Paramètres GSE (20 / 15 ans), prime de liquidité, corrélations, sorties de simulation} \\ \hline
-\rowcolor{nexlight}
-{\small Refonte Modèle Allocation d'actifs (note)} & {\small CDC - DPS / ALM-RF} & {\small [Date]} & {\small Documentation de la refonte du GSE} \\ \hline
-{\small Rapport Milliman - Revue des paramètres} & {\small Milliman} & {\small 01/07/2022} & {\small Revue indépendante précédente} \\ \hline
-\rowcolor{nexlight}
-{\small [Codes R - calibrage anciens facteurs]} & {\small [CDC]} & {\small [Date]} & {\small [À compléter]} \\ \hline
-{\small [Codes Python - corrélations]} & {\small [CDC]} & {\small [Date]} & {\small [À compléter]} \\ \hline
-\rowcolor{nexlight}
-{\small [Code MATLAB - simulation]} & {\small [CDC]} & {\small [Date]} & {\small [À compléter]} \\ \hline
+\begin{longtable}{P{5.0cm}P{3.0cm}P{1.8cm}P{5.0cm}}
+\toprule
+\tablehead{Document / fichier} & \tablehead{Émetteur} & \tablehead{Date} & \tablehead{Description} \\
+\midrule\endfirsthead
+\toprule
+\tablehead{Document / fichier} & \tablehead{Émetteur} & \tablehead{Date} & \tablehead{Description} \\
+\midrule\endhead
+\bottomrule\endfoot
+{\small \texttt{Template\_Allocationv2.xlsm}} & {\small CDC - DPS / ALM-RF} & {\small 2025/2026} & {\small Paramètres GSE (20 / 15 ans), prime de liquidité, corrélations, sorties de simulation} \\
+\rowcolor{nxlightblue}
+{\small Refonte Modèle Allocation d'actifs (note)} & {\small CDC - DPS / ALM-RF} & {\small [Date]} & {\small Documentation de la refonte du GSE} \\
+{\small Rapport Milliman - Revue des paramètres} & {\small Milliman} & {\small 01/07/2022} & {\small Revue indépendante précédente} \\
+\rowcolor{nxlightblue}
+{\small [Codes R - calibrage anciens facteurs]} & {\small [CDC]} & {\small [Date]} & {\small [À compléter]} \\
+{\small [Codes Python - corrélations]} & {\small [CDC]} & {\small [Date]} & {\small [À compléter]} \\
+\rowcolor{nxlightblue}
+{\small [Code MATLAB - simulation]} & {\small [CDC]} & {\small [Date]} & {\small [À compléter]} \\
 \end{longtable}
 \vspace{-10pt}
 \tabcaption{Inventaire des éléments transmis}
