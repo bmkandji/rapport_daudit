@@ -54,6 +54,7 @@
 
 % --------- PACKAGES FONCTIONNELS --------------------------------------------
 \usepackage{amsmath,amssymb}
+\usepackage{bm}
 \usepackage{graphicx}
 \usepackage{eurosym}
 \usepackage{textcomp}
@@ -202,6 +203,8 @@
 
 % --------- COMMANDES & STYLES DE TABLEAUX (du document, restylés v2) --------
 \newcolumntype{P}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+\newcolumntype{R}{>{\raggedright\arraybackslash}X}   % colonne X ragged (libellés)
+\newcolumntype{C}{>{\centering\arraybackslash}X}     % colonne X centrée (données)
 % Charte v2 : règles booktabs par défaut (noires), interligne de tableau 1.4
 % (cf. rapport_Audit_GSE_CDC_Phase1, skill nexialog-note-technique-latex).
 \renewcommand{\arraystretch}{1.4}
@@ -370,7 +373,7 @@ Notre revue se concentre autour des trois phases suivantes :
 Le tableau ~\ref{tab:carto} présente l'inventaire des composantes du GSE, les modèle de diffusion, la technique de calibrage, le schéma / moteur de simulation et l'outil d'implémentation par facteur de risque. Il constitue le référentiel de la revue.
 
 \begingroup\small\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.2}
-\begin{longtable}{>{\raggedright\arraybackslash}p{1.9cm}>{\raggedright\arraybackslash}p{2.3cm}>{\raggedright\arraybackslash}p{2.7cm}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{1.4cm}>{\scriptsize\raggedright\arraybackslash}p{2.6cm}}
+\begin{longtable}{>{\raggedright\arraybackslash}p{2.0cm}>{\raggedright\arraybackslash}p{2.3cm}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{2.3cm}>{\raggedright\arraybackslash}p{1.3cm}>{\raggedright\arraybackslash}p{2.4cm}}
 \toprule
 \tablehead{Composante} & \tablehead{Modèle} & \tablehead{Calibrage} & \tablehead{Simulation} & \tablehead{Implém.} & \tablehead{Données (ticker)} \\
 \midrule
@@ -381,16 +384,16 @@ Le tableau ~\ref{tab:carto} présente l'inventaire des composantes du GSE, les m
 \endhead
 \bottomrule
 \endfoot
-\rowcolor{nxlightblue} Inflation (CT~/~LT) & Vasicek 2 facteurs & cible COR + Cibles distributionnelles & Schéma exact V2F & R~/~MATLAB & \texttt{GTFRFII2YR} / \texttt{GTFRFII10YR Corp} (BEIR) \\
-Taux réels (CT~/~LT) & Vasicek 2 facteurs & MCO + Cibles distributionnelles & Schéma exact V2F & R~/~MATLAB & Implicités (nominaux + inflation) \\
-\rowcolor{nxlightblue} Courbe nominale (ZC) & Fisher + corrections de covariance & Param. hérités taux-inflation + primes de risque & Formules fermées V2F & MATLAB & \texttt{GFRN2} / \texttt{GFRN10 Index} \\
-Crédit (spread IG) & CIR & {\small Schéma d'Euler puis Initialisation par OLS puis max.\ de vraisemblance ($\chi^2$ décentré)}. & Schéma d'Euler, Alfonsi ou Diop selon pas, pas mensuel (Alfonsi) & MATLAB & \texttt{H06270EU Index} \\
-\rowcolor{nxlightblue} Dette privée (spread) & Black-Karasinski & Régression (log-spreads) & Schéma exact log-OU & MATLAB & \texttt{LP01TREU Index} \\
-Prime de liquidité & Écart CDS~/~obligataire ; ajust.\ de $\theta$ & Dire d'expert + Solveur d'implicitaion & --- & Excel~/~MATLAB & CDS vs \texttt{LP01TREU} (HY) \\
-\rowcolor{nxlightblue} Actions (Euro~/~Monde~/~Émergent) & Hardy RSLN-2 (2 régimes) & Maximum de vraisemblance & BS par régime, pas mensuel & R~/~MATLAB & \texttt{MSDEE15N} / \texttt{MSDEWEUN} / \texttt{MSDEEEMN Index} \\
-Action non cotée (PE) & BS (après \emph{unsmoothing}) & \emph{Unsmoothing} AR(1) + formule fermée & Loi normal iid & Excel~/~MATLAB & \texttt{LPX50TR Index} \\
-\rowcolor{nxlightblue} Immobilier & BS (après \emph{unsmoothing}) & \emph{Unsmoothing} AR(1) + formule fermée & Loi normal iid & Excel~/~MATLAB & EDHEC IEIF (ieif.fr) \\
-Infrastructure & BS & Formule fermée & Loi normal iid & Excel~/~MATLAB & \texttt{NMX30T Index} \\
+\rowcolor{nxlightblue} Inflation (CT~/~LT) & Vasicek 2 facteurs & cible COR + cibles distributionnelles & Schéma exact V2F & R~/~MATLAB & GTFRFII2YR / GTFRFII10YR Corp (BEIR) \\
+Taux réels (CT~/~LT) & Vasicek 2 facteurs & MCO + cibles distributionnelles & Schéma exact V2F & R~/~MATLAB & Implicités (nominaux + inflation) \\
+\rowcolor{nxlightblue} Courbe nominale (ZC) & Fisher + corrections de covariance & Paramètres hérités taux-inflation + primes de risque & Formules fermées V2F & MATLAB & GFRN2 / GFRN10 Index \\
+Crédit (spread IG) & CIR & Euler puis OLS puis max.\ de vraisemblance ($\chi^2$ décentré) & Alfonsi, pas mensuel & MATLAB & H06270EU Index \\
+\rowcolor{nxlightblue} Dette privée (spread) & Black-Karasinski & Régression (log-spreads) & Schéma exact log-OU & MATLAB & LP01TREU Index \\
+Prime de liquidité & Écart CDS~/~obligataire ; ajust.\ de $\theta$ & Dire d'expert + solveur d'implicitation & --- & Excel~/~MATLAB & CDS vs LP01TREU (HY) \\
+\rowcolor{nxlightblue} Actions (Euro~/~Monde~/~Émergent) & Hardy RSLN-2 (2 régimes) & Maximum de vraisemblance & BS par régime, pas mensuel & R~/~MATLAB & MSDEE15N / MSDEWEUN / MSDEEEMN Index \\
+Action non cotée (PE) & BS (après \emph{unsmoothing}) & \emph{Unsmoothing} AR(1) + formule fermée & Loi normale iid & Excel~/~MATLAB & LPX50TR Index \\
+\rowcolor{nxlightblue} Immobilier & BS (après \emph{unsmoothing}) & \emph{Unsmoothing} AR(1) + formule fermée & Loi normale iid & Excel~/~MATLAB & EDHEC IEIF (ieif.fr) \\
+Infrastructure & BS & Formule fermée & Loi normale iid & Excel~/~MATLAB & NMX30T Index \\
 \rowcolor{nxlightblue} Corrélations & Gaussienne ; passage cibles $\to$ browniens & Pearson + formules de passage & Cholesky & Python & Toutes les séries ci-dessus \\
 Moteur de simulation & Monte-Carlo (5\,000 traj., $dt=1/12$) & --- & Diffusion jointe corrélée & MATLAB & --- \\
 \caption{Cartographie des composantes du GSE.}
@@ -594,12 +597,12 @@ Les produits financiers sont obtenus en appliquant le taux de rendement aux rés
 \renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{4pt}
 \begin{tabular}{
 >{\centering\arraybackslash}p{0.8cm}
->{\raggedright\arraybackslash}p{4.6cm}
->{\centering\arraybackslash}p{1.5cm}
->{\centering\arraybackslash}p{0.9cm}
+>{\raggedright\arraybackslash}p{4.2cm}
 >{\centering\arraybackslash}p{1.8cm}
 >{\centering\arraybackslash}p{0.9cm}
->{\centering\arraybackslash}p{1.2cm}
+>{\centering\arraybackslash}p{1.9cm}
+>{\centering\arraybackslash}p{0.9cm}
+>{\centering\arraybackslash}p{1.3cm}
 >{\centering\arraybackslash}p{1.1cm}
 }
 \toprule
@@ -709,7 +712,7 @@ avec $\varepsilon^{1}_t,\varepsilon^{2}_t\sim\mathcal N(0,1)$ i.i.d.\ et $\mathb
 \begin{table}[H]
 \centering\small
 \renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
-\begin{tabularx}{\linewidth}{R c c >{\raggedright\arraybackslash}p{3.4cm}}
+\begin{tabularx}{\linewidth}{R C C R}
 \toprule
 \tablehead{Paramètre} & \tablehead{2026 (20~ans)} & \tablehead{2022} & \tablehead{Commentaire} \\
 \midrule
@@ -739,7 +742,7 @@ R^{r}(0,m)=\frac{1+R^{n}(0,m)}{1+i(m)}-1 .
 \begin{table}[H]
 \centering\small
 \renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
-\begin{tabularx}{\linewidth}{R c c >{\raggedright\arraybackslash}p{3.6cm}}
+\begin{tabularx}{\linewidth}{R C C R}
 \toprule
 \tablehead{Paramètre} & \tablehead{2026 (20~ans)} & \tablehead{2022} & \tablehead{Commentaire} \\
 \midrule
@@ -771,7 +774,7 @@ La re-dérivation indépendante (intégrales de Wiener, Fubini) confirme l'exact
 \begin{table}[H]
 \centering\small
 \renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{5pt}
-\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{3.2cm} R >{\raggedright\arraybackslash}p{1.9cm}}
+\begin{tabularx}{\linewidth}{R R R}
 \toprule
 \tablehead{Hypothèse} & \tablehead{Couples concernés} & \tablehead{Valeur} \\
 \midrule
@@ -800,7 +803,7 @@ Corrél.\ identique aux 2 facteurs & Formules de passage V2F~$\times$~autre & $\
 \begin{table}[H]
 \centering\small
 \renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
-\begin{tabularx}{\linewidth}{R c c >{\raggedright\arraybackslash}p{3.4cm}}
+\begin{tabularx}{\linewidth}{R C C R}
 \toprule
 \tablehead{Paramètre} & \tablehead{2026 (20~ans)} & \tablehead{2022} & \tablehead{Commentaire} \\
 \midrule
@@ -831,7 +834,7 @@ $(k,\sigma)$ sont estimés par régression sur les log-spreads ; $\theta$ est aj
 \begin{table}[H]
 \centering\small
 \renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
-\begin{tabularx}{\linewidth}{R c c >{\raggedright\arraybackslash}p{3.2cm}}
+\begin{tabularx}{\linewidth}{R C C R}
 \toprule
 \tablehead{Paramètre} & \tablehead{2026 (20~ans)} & \tablehead{2022} & \tablehead{Commentaire} \\
 \midrule
@@ -862,7 +865,7 @@ Les spreads CDS et obligataire étant log-Vasicek d'espérance $\mathbb E[s_\inf
 \begin{table}[H]
 \centering\small
 \renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
-\begin{tabularx}{\linewidth}{R c c}
+\begin{tabularx}{\linewidth}{R C C}
 \toprule
 \tablehead{Grandeur} & \tablehead{CDS} & \tablehead{Spread 20~ans} \\
 \midrule
@@ -892,7 +895,7 @@ Conditionnellement au régime $\rho_t\in\{1,2\}$ (chaîne de Markov $(p_{ij})$),
 \begin{table}[H]
 \centering\small
 \renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
-\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{5.6cm} c c c}
+\begin{tabularx}{\linewidth}{R C C C}
 \toprule
 \tablehead{Paramètre (20~ans)} & \tablehead{Euro} & \tablehead{Monde} & \tablehead{Émerg.} \\
 \midrule
@@ -923,7 +926,7 @@ de sorte que $\mathrm{Cov}(r_t^\ast,r_{t-1}^\ast)=0$ ; $(\mu,\sigma)$ du Black-S
 \begin{table}[H]
 \centering\small
 \renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
-\begin{tabularx}{\linewidth}{R c >{\raggedright\arraybackslash}p{4.0cm}}
+\begin{tabularx}{\linewidth}{R C R}
 \toprule
 \tablehead{Paramètre} & \tablehead{2026 (20~ans)} & \tablehead{Commentaire} \\
 \midrule
@@ -944,7 +947,7 @@ $\sigma$ (post-\emph{unsmoothing}) & $29{,}70\,\%$ & Régime faible vol.~: $15{,
 \begin{table}[H]
 \centering\small
 \renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
-\begin{tabularx}{\linewidth}{R c c}
+\begin{tabularx}{\linewidth}{R C C}
 \toprule
 \tablehead{Paramètre} & \tablehead{2026 (20~ans)} & \tablehead{2022} \\
 \midrule
@@ -964,7 +967,7 @@ $\sigma$ (post-\emph{unsmoothing}) & $6{,}128\,\%$ & $7{,}9\,\%$ \\
 \begin{table}[H]
 \centering\small
 \renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
-\begin{tabularx}{\linewidth}{R c c}
+\begin{tabularx}{\linewidth}{R C C}
 \toprule
 \tablehead{Paramètre} & \tablehead{2026 (20~ans)} & \tablehead{2022} \\
 \midrule
@@ -994,7 +997,7 @@ La refonte 2026 dérive le couple Black-Karasinski et intègre la dette privée 
 \begin{table}[H]
 \centering\small
 \renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
-\begin{tabularx}{\linewidth}{R c}
+\begin{tabularx}{\linewidth}{R C}
 \toprule
 \tablehead{Couple de facteurs} & \tablehead{Corrél.\ browniens 2026} \\
 \midrule
@@ -1020,7 +1023,7 @@ Les chocs corrélés sont obtenus par décomposition de Cholesky $\bm\varepsilon
 \begin{table}[H]
 \centering\small
 \renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
-\begin{tabularx}{\linewidth}{R c R c}
+\begin{tabularx}{\linewidth}{R C R C}
 \toprule
 \tablehead{Paramètre} & \tablehead{Valeur} & \tablehead{Paramètre} & \tablehead{Valeur} \\
 \midrule
@@ -1053,7 +1056,7 @@ Le calibrage des V2F résout un programme de minimum de distance $\hat\Theta=\op
 \begin{table}[H]
 \centering\small
 \renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
-\begin{tabularx}{\linewidth}{R c c c}
+\begin{tabularx}{\linewidth}{R C C C}
 \toprule
 \tablehead{Paramètre (facteur long terme)} & \tablehead{Régression} & \tablehead{Cibles distrib.} & \tablehead{Direction} \\
 \midrule
@@ -1070,7 +1073,7 @@ Taux réels - $\sigma_2$ (volatilité) & $0{,}6\,\%$ & $0{,}9\,\%$ & $\times\,1{
 \begin{table}[H]
 \centering\small
 \renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
-\begin{tabularx}{\linewidth}{R c c c}
+\begin{tabularx}{\linewidth}{R C C C}
 \toprule
 \tablehead{Facteur} & \tablehead{$\kappa$ (cibles)} & \tablehead{Demi-vie $\ln 2/\kappa$} & \tablehead{Fenêtre/demi-vie} \\
 \midrule
@@ -1111,7 +1114,7 @@ Ce cadre a été implémenté et appliqué à l'ensemble des facteurs (module \t
 \begin{table}[H]
 \centering\small
 \renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{5pt}
-\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{3.4cm} X X}
+\begin{tabularx}{\linewidth}{R R R}
 \toprule
 \tablehead{Point d'attention} & \tablehead{Conséquence} & \tablehead{Correctif proposé} \\
 \midrule
@@ -1200,7 +1203,7 @@ Le processus d’allocation stratégique de l’IRCANTEC ne prend pas explicitem
 \begin{table}[H]
 \centering\small
 \renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{6pt}
-\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}X c c c}
+\begin{tabularx}{\linewidth}{R C C C}
 \toprule
 \tablehead{Classe d'actifs} & \tablehead{Allocation stratégique} & \tablehead{Taux de liquidité retenu} & \tablehead{Contribution à la liquidité} \\
 \midrule
@@ -1252,7 +1255,7 @@ La contrainte de liquidité s'écrit alors :
 \begin{table}[H]
 \centering\small
 \renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{4pt}
-\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{1.7cm} *{8}{>{\centering\arraybackslash}X}}
+\begin{tabularx}{\linewidth}{R CCCCCCCC}
 \toprule
 \tablehead{Borne} & \tablehead{Actions Euro} & \tablehead{Actions Monde} & \tablehead{Immobilier} & \tablehead{Non coté} & \tablehead{Crédit} & \tablehead{ZCR} & \tablehead{ZCN} & \tablehead{Actions EM} \\
 \midrule
@@ -1285,7 +1288,7 @@ Supérieure & 24 & 18 & 10 & 6 & 24 & 22 & 14 & 4 \\
 \begin{table}[H]
 \centering\small
 \renewcommand{\arraystretch}{1.4}\setlength{\tabcolsep}{5pt}
-\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}X *{6}{>{\centering\arraybackslash}c}}
+\begin{tabularx}{\linewidth}{R CCCCCC}
 \toprule
 \tablehead{Classe d'actifs} & \tablehead{2018} & \tablehead{2021} & \tablehead{2022} & \tablehead{2023} & \tablehead{2024} & \tablehead{2025} \\
 \midrule
@@ -1562,22 +1565,22 @@ Ces scénarios permettent aussi de s’approprier les impacts associés aux chan
 \small
 \renewcommand{\arraystretch}{1.3}
 
-\begin{longtable}{p{3.2cm} p{4.2cm} p{8.2cm}}
+\begin{longtable}{>{\raggedright\arraybackslash}p{3.0cm} >{\raggedright\arraybackslash}p{4.0cm} >{\raggedright\arraybackslash}p{7.4cm}}
 
 \caption{Classification des scénarios NGFS selon leur dynamique de transition climatique.}
 \label{tab:ngfs_scenarios} \\
 
 \toprule
-\textbf{Catégorie de scénarios NGFS} &
-\textbf{Description} &
-\textbf{Scénarios} \\ 
+\tablehead{Catégorie de scénarios NGFS} &
+\tablehead{Description} &
+\tablehead{Scénarios} \\ 
 \midrule
 \endfirsthead
 
 \toprule
-\textbf{Catégorie de scénarios NGFS} &
-\textbf{Description} &
-\textbf{Scénarios} \\ 
+\tablehead{Catégorie de scénarios NGFS} &
+\tablehead{Description} &
+\tablehead{Scénarios} \\ 
 \midrule
 \endhead
 
@@ -1780,7 +1783,7 @@ Matar va proposer d'utiliser les paramètres prospectif de rendement pour calibr
 
 \section{Liste des documents et fichiers reçus}
 
-\begin{longtable}{P{5.0cm}P{3.0cm}P{1.8cm}P{5.0cm}}
+\begin{longtable}{P{4.6cm}P{2.8cm}P{1.6cm}P{4.6cm}}
 \toprule
 \tablehead{Document / fichier} & \tablehead{Émetteur} & \tablehead{Date} & \tablehead{Description} \\
 \midrule\endfirsthead
@@ -1788,7 +1791,7 @@ Matar va proposer d'utiliser les paramètres prospectif de rendement pour calibr
 \tablehead{Document / fichier} & \tablehead{Émetteur} & \tablehead{Date} & \tablehead{Description} \\
 \midrule\endhead
 \bottomrule\endfoot
-{\small \texttt{Template\_Allocationv2.xlsm}} & {\small CDC - DPS / ALM-RF} & {\small 2025/2026} & {\small Paramètres GSE (20 / 15 ans), prime de liquidité, corrélations, sorties de simulation} \\
+{\small Template\_Allocationv2.xlsm} & {\small CDC - DPS / ALM-RF} & {\small 2025/2026} & {\small Paramètres GSE (20 / 15 ans), prime de liquidité, corrélations, sorties de simulation} \\
 \rowcolor{nxlightblue}
 {\small Refonte Modèle Allocation d'actifs (note)} & {\small CDC - DPS / ALM-RF} & {\small [Date]} & {\small Documentation de la refonte du GSE} \\
 {\small Rapport Milliman - Revue des paramètres} & {\small Milliman} & {\small 01/07/2022} & {\small Revue indépendante précédente} \\
